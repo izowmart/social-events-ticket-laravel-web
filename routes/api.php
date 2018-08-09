@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,3 +17,7 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::get('get_posts','Api\PostController@index');
+Route::post('store_posts','Api\PostController@store');
+Route::post('like_posts','Api\PostController@like');
+Route::post('abuse','Api\PostController@abuse');

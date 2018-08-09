@@ -19,7 +19,7 @@ class CreateAbusesTable extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->integer('post_id')->unsigned();
             $table->foreign('post_id')->references('id')->on('posts');
-            $table->integer('count');
+            $table->integer('type')->comment("1: spam, 2: terrorism,3: inappropriate_content,4: other");
             $table->timestamps();
         });
     }
