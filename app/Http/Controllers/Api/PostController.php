@@ -10,7 +10,6 @@ use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -91,15 +90,17 @@ class PostController extends Controller
         }
 
     }
-    public function delete(Request $request){
+
+    public function delete(Request $request)
+    {
         $post_id = $request->input('post_id');
-        try{
-            Post::where('id',$post_id)->delete();
+        try {
+            Post::where('id', $post_id)->delete();
             return Response::json(array(
                 "success" => true,
                 "message" => "post successfully deleted",
             ));
-        }catch(\Exception $exception){
+        } catch (\Exception $exception) {
             return Response::json(array(
                 "success" => false,
                 "message" => "error deleting post",
@@ -113,8 +114,8 @@ class PostController extends Controller
         $post_id = $request->input('post_id');
         $report_abuse = Like::where("user_id", $user_id)->where("post_id", $post_id);
         if ($report_abuse == null) {
-            $post = Post::where('id',$post_id);
-            $user = User::where('id',$user_id)->username;
+            $post = Post::where('id', $post_id);
+            $user = User::where('id', $user_id)->username;
             $like = new Like();
             $like->user_id = $user_id;
             $like->post_id = $post_id;
@@ -123,7 +124,7 @@ class PostController extends Controller
             $notification->initializer_id = $user_id;
             $notification->recipient_id = $post->user_id;
             $notification->type = 1;
-            $notification->message = $user." liked your post";
+            $notification->message = $user . " liked your post";
             $notification->save();
             return Response::json(array(
                 "success" => true,
@@ -138,8 +139,31 @@ class PostController extends Controller
 
     }
 
+    public function get_abuse(Request $request)
+    {
+        $user_id = $request->input('user_id');
+        try {
+            $reported_abuses = Abuse::where('user_id', $user_id)->toarray();
+            return Response::json(array(
+                    "success" => true,
+                    "message" => "found " . count($reported_abuses),
+                    "data" => $reported_abuses,
+                )
+
+            );
+        } catch (\Exception $exception) {
+            return Response::json(array(
+                    "success" => false,
+                    "message" => "error fetching reported abuses",
+                )
+
+            );
+        }
+
+    }
+
     public
-    function abuse(Request $request)
+    function report_abuse(Request $request)
     {
         $user_id = $request->input('user_id');
         $post_id = $request->input('post_id');
@@ -163,4 +187,6 @@ class PostController extends Controller
             ));
         }
     }
+
+
 }

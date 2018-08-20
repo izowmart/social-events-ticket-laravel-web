@@ -49,19 +49,4 @@ class CountryController extends Controller
             ));
         }
     }
-    public function delete(Request $request){
-        $country_id = $request->input('country_id');
-        try{
-            Country::where('id',$country_id)->delete();
-            return Response::json(array(
-                "success" => true,
-                "message" => "country successfully deleted",
-                            ));
-        }catch(\Exception $exception){
-            return Response::json(array(
-                "success" => false,
-                "message" => "error deleting country",
-            ));
-        }
-    }
 }

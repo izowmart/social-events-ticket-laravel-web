@@ -19,16 +19,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('get_adverts','Api\AdvertController@index');
-Route::post('create_advert','Api\AdvertController@create');
-Route::post('delete_advert','Api\AdvertController@delete');
+Route::post('create_adverts_view','Api\AdvertController@create_advert_view');
 
 Route::get('get_countries','Api\CountryController@index');
-Route::post('create_country','Api\CountryController@create');
-Route::post('delete_country','Api\CountryController@delete');
 
 Route::get('get_events','Api\EventController@index');
-Route::post('create_event','Api\EventController@create');
-Route::post('delete_event','Api\EventController@delete');
 
 Route::post('get_notifications','Api\NotificationController@index');
 
@@ -36,8 +31,7 @@ Route::get('get_posts','Api\PostController@index');
 Route::post('store_post','Api\PostController@store');
 Route::post('delete_post','Api\PostController@delete');
 Route::post('like_post','Api\PostController@like');
-Route::post('abuse','Api\PostController@abuse');
+Route::post('report_abuse','Api\PostController@get_abuse');
+Route::post('get_abuse','Api\PostController@report_abuse');
 
 Route::get('get_venues','Api\VenueController@index');
-Route::post('create_venue','Api\VenueController@create');
-Route::post('delete_venue','Api\VenueController@delete');
