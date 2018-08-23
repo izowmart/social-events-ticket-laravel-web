@@ -13,7 +13,7 @@ class CreateEventSponsorMediaTable extends Migration
      */
     public function up()
     {
-        Schema::create('event__sponsor__media', function (Blueprint $table) {
+        Schema::create('event_sponsor_media', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('event_id')->unsigned();
             $table->foreign('event_id')->references('id')->on('events');
@@ -29,6 +29,6 @@ class CreateEventSponsorMediaTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('event__sponsor__media');
+        Schema::dropIfExists('event_sponsor_media');
     }
 }

@@ -13,7 +13,7 @@ class CreateEventScannersTable extends Migration
      */
     public function up()
     {
-        Schema::create('event__scanners', function (Blueprint $table) {
+        Schema::create('event_scanners', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('scanner_id')->unsigned();
             $table->foreign('scanner_id')->references('id')->on('scanners');
@@ -30,6 +30,6 @@ class CreateEventScannersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('event__scanners');
+        Schema::dropIfExists('event_scanners');
     }
 }

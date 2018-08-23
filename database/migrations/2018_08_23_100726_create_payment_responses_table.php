@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateScannersTable extends Migration
+class CreatePaymentResponsesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,14 +12,12 @@ class CreateScannersTable extends Migration
      * @return void
      */
     public function up()
+
     {
-        Schema::create('scanners', function (Blueprint $table) {
+        Schema::create('payment_responses', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('event_organizer_id')->unsigned();
-            $table->foreign('event_organizer_id')->references('id')->on('event_organizers');
-            $table->string('first_name');
-            $table->string('last_name');
-            $table->string('password');
+            $table->string('type')->default('failure')->comment('failure or success');
+            $table->text('response');
             $table->timestamps();
         });
     }
@@ -31,6 +29,6 @@ class CreateScannersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('scanners');
+        Schema::dropIfExists('payment_responses');
     }
 }

@@ -13,7 +13,7 @@ class CreateAppVersionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('app__versions', function (Blueprint $table) {
+        Schema::create('app_versions', function (Blueprint $table) {
             $table->increments('id');
             $table->string('least_accepted_version_code');
             $table->string('latest_version_code');
@@ -28,6 +28,6 @@ class CreateAppVersionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('app__versions');
+        Schema::dropIfExists('app_versions');
     }
 }

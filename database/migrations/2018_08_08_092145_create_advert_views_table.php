@@ -13,7 +13,7 @@ class CreateAdvertViewsTable extends Migration
      */
     public function up()
     {
-        Schema::create('advert__views', function (Blueprint $table) {
+        Schema::create('advert_views', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('advert_id')->unsigned();
             $table->foreign('advert_id')->references('id')->on('adverts');
@@ -31,6 +31,6 @@ class CreateAdvertViewsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('advert__views');
+        Schema::dropIfExists('advert_views');
     }
 }
