@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\PaymentResponse;
+use App\TicketCustomer;
 use Illuminate\Http\Request;
-use PHPUnit\Util\Json;
 
 class HomeController extends Controller
 {
@@ -18,12 +18,11 @@ class HomeController extends Controller
 
     }
 
-    public function encryptData(Request $request)
+    public function index()
     {
-        $event_organizer_id =  $request->event_organizer_id;
-        $amount = $request->amount;
+        $amount = "1000";
 
-        $event_organizer = Event
+        $ticket_customer = TicketCustomer::findOrFail(1);
 
         /**
          *
@@ -33,27 +32,33 @@ class HomeController extends Controller
          *       - email
          *
          */
-
-        $merchantProperties = [
-            "merchantTransactionID"   => "".uniqid("Trans:"),
-            "customerFirstName"       => 'john',
-            "customerLastName"        => "njoro",
-            "MSISDN"                  => "254711110128",
-            "customerEmail"           => "johnnjoroge40@gmail.com",
-            "amount"                  => "1000",
-            "currencyCode"            => "KES",
-            "accountNumber"           => "123456",
-            "serviceCode"             => "APISBX3857",
-            "dueDate"                 => "2018-08-24 11:09:59",
-            "serviceDescription"      => "Getting service/good x",
-            "accessKey"               => "$2a$08$Ga/jSxv1qturlAr8SkHhzOaprXnfOJUTqB6fLRrc/0nSYpRlAd96e",
-            "countryCode"             => "KE",
-            "languageCode"            => "en",
-            "successRedirectUrl"      => "{{route('success_url')}}",
-            "failRedirectUrl"         => "{{route('failure_url')}}",
-            "paymentWebhookUrl"       => "http://ef1ebeb0.ngrok.io/payments/process_payment"
+        $payload = [
+            "merchantTransactionID" => "" . uniqid("Trans:"),
+            "customerFirstName"     => $ticket_customer->first_name,
+            "customerLastName"      => $ticket_customer->last_name,
+            "MSISDN"                => $ticket_customer->phone_number,
+            "customerEmail"         => $ticket_customer->email,
+            "amount"                => $amount,
+            "currencyCode"          => "KES",
+            "accountNumber"         => "123456",
+            "serviceCode"           => "APISBX3857",
+            "dueDate"               => "2018-08-24 11:09:59",
+            "serviceDescription"    => "Getting service/good x",
+            "accessKey"             => '$2a$08$Ga/jSxv1qturlAr8SkHhzOaprXnfOJUTqB6fLRrc/0nSYpRlAd96e',
+            "countryCode"           => "KE",
+            "languageCode"          => "en",
+            "successRedirectUrl"    => "http://dc91f14b.ngrok.io/payments/success_url",
+            "failRedirectUrl"       => "http://dc91f14b.ngrok.io/payments/failure_url",
+            "paymentWebhookUrl"     => "http://dc91f14b.ngrok.io/payments/process_payment"
         ];
 
+
+        return view('welcome',compact('payload'));
+
+    }
+
+    public function encryptData(Request $request)
+    {
         $payload = json_decode($request->getContent());
 
         //The encryption method to be used
@@ -94,7 +99,7 @@ class HomeController extends Controller
             //display a success message to the user
             return view('payments.success');
         } catch ( \Exception $exception ) {
-            logger("PAYMENT SUCCESS error:: ".$exception->getMessage()."\nTrace::: ".$exception->getTraceAsString());
+            logger("PAYMENT SUCCESS error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
         }
     }
 
@@ -113,7 +118,7 @@ class HomeController extends Controller
             //display a success message to the user
             return view('payments.failure');
         } catch ( \Exception $exception ) {
-            logger("PAYMENT FAILURE error:: ".$exception->getMessage()."\nTrace::: ".$exception->getTraceAsString());
+            logger("PAYMENT FAILURE error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
         }
     }
 
@@ -132,17 +137,17 @@ class HomeController extends Controller
             logger("PROCESS PAYMENT::  " . $payload);
 
             //confirm whether  the payment should be accepted or not
-
+            $result = json_decode($payload);
             return response()->json([
-                'checkoutRequestID'=>$payload->checkoutRequestID,
-                'merchantTransactionID'=>$payload->merchantTransactionID,
-                'statusCode'=> $payload->requestStatusCode == 178 ? 183 : 180,
-                'statusDescription' => $payload->requestStatusCode == 178 ? "Payment Accepted" : "Payment declined",//$payload->requestStatusDescription,
-                'receiptNumber' => $payload->merchantTransactionID,
+                'checkoutRequestID'     => $result->checkoutRequestID,
+                'merchantTransactionID' => $result->merchantTransactionID,
+                'statusCode'            => $result->requestStatusCode == 178 ? 183 : 180,
+                'statusDescription'     => $result->requestStatusCode == 178 ? "Payment Accepted" : "Payment declined",
+                'receiptNumber'         => $result->merchantTransactionID,
             ]);
 
-        } catch ( \Exception $exception) {
-            logger("PAYMENT PROCESS error:: ".$exception->getMessage()."\nTrace::: ".$exception->getTraceAsString());
+        } catch ( \Exception $exception ) {
+            logger("PAYMENT PROCESS error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
         }
     }
 
