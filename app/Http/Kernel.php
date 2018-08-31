@@ -19,6 +19,8 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \App\Http\Middleware\TrustProxies::class,
+
+       
     ];
 
     /**
@@ -59,5 +61,8 @@ class Kernel extends HttpKernel
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+         //add custom middlewares here as key and value pair.
+         'admin_auth' => \App\Http\Middleware\AuthenticateAdmin::class,
+         'admin_guest' => \App\Http\Middleware\RedirectIfAdminAuthenticated::class,
     ];
 }

@@ -45,6 +45,12 @@ return [
             'driver' => 'token',
             'provider' => 'users',
         ],
+
+        //Our new custom driver.
+        'web_admin' => [
+            'driver' => 'session',
+            'provider' => 'admins',
+        ],
     ],
 
     /*
@@ -74,6 +80,11 @@ return [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
+        //admin user provider
+        'admins' => [
+            'driver' => 'eloquent',  //We are using eloquent model
+            'model' => App\Admin::class,
+        ],
     ],
 
     /*
@@ -97,6 +108,15 @@ return [
             'table' => 'password_resets',
             'expire' => 60,
         ],
+        //admin password broker
+       'admins' => [
+            //user provider for admin
+           'provider' => 'admins',
+            //table to store password reset tokens for admin
+           'table' => 'password_resets',
+           //expire time for these tokens in minutes
+           'expire' => 60,
+       ],
     ],
 
 ];
