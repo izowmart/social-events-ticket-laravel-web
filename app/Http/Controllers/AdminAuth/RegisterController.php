@@ -51,10 +51,10 @@ class RegisterController extends Controller
         ]);
     }
 
-    //Create a new seller instance after a validation.
+    //Create a new admin instance after a validation.
     protected function create(array $data)
     {
-        return Seller::create([
+        return Admin::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
