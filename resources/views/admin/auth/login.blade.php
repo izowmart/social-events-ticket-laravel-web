@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('admin.layouts')
 
 @section('title')
     <title>Admin Login - Fika</title>
@@ -10,12 +10,14 @@
     </section>
     <section class="login-content">
       <div class="logo">
-        <h1>Vali</h1>
+        <h1>Login</h1>
       </div>
       <div class="login-box">
-        <form class="login-form" method="POST" action="{{ url('/admin_login') }}">
+        <form class="login-form" method="POST" action="{{ route('admin_login_form_process') }}">
            @csrf
-          <h3 class="login-head"><i class="fa fa-lg fa-fw fa-user"></i>ADMIN SIGN IN</h3>
+          <h3 class="login-head"><i class="fa fa-lg fa-fw fa-user"></i><br>
+            ADMIN
+          </h3>
           <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
             <label class="control-label">Email</label>
             <input class="form-control" type="text" name="email" placeholder="Input email address" value="{{ old('email') }}" required autofocus>
@@ -41,7 +43,7 @@
                   <input type="checkbox"><span class="label-text" name="remember" {{ old('remember') ? 'checked' : ''}}>Remember me</span>
                 </label>
               </div>
-              <p class="semibold-text mb-2"><a href="{{ url('admin_password/reset') }}">Forgot Password ?</a></p>
+              <p class="semibold-text mb-2"><a href="{{ route('admin_email_form') }}">Forgot Password ?</a></p>
             </div>
           </div>
           <div class="form-group btn-container">

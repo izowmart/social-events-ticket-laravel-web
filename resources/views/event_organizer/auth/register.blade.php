@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('event_organizer.layouts')
 
 @section('title')
     <title>Event Organizer Register - Fika</title>
@@ -35,7 +35,7 @@
                         </span>
                     @endif
                 </div>
-              </div>
+            </div>
             <div class="col-md-6">                  
                 <div class="form-group{{ $errors->has('last_name') ? ' has-error' : '' }}">
                     <label class="control-label">Last Name</label>
@@ -47,8 +47,8 @@
                     @endif
                 </div>
             </div>
-          </div>
-          <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
+           </div>
+           <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
             <label class="control-label">Email</label>
             <input class="form-control" type="text" name="email" placeholder="Input email address" value="{{ old('email') }}" required autofocus>
             @if ($errors->has('email'))

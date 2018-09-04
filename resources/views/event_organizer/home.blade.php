@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('event_organizer.layouts')
 
 @section('content')
     @include('event_organizer.includes.header')

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('admin.layouts')
 
 @section('title')
     <title>Reset Password - Fika</title>
@@ -10,7 +10,7 @@
     </section>
     <section class="login-content">
       <div class="logo">
-        <h1>Vali</h1>
+        <h1>Reset Password</h1>
       </div>
       <div class="reset-box">
         @if (session('status'))
@@ -22,7 +22,10 @@
            {{ csrf_field() }}
 
             <input type="hidden" name="token" value="{{ $token }}">
-          <h3 class="login-head"><i class="fa fa-lg fa-fw fa-user"></i>RESET PASSWORD</h3>
+          <h3 class="login-head">
+              <i class="fa fa-lg fa-fw fa-user"></i><br>
+              Admin
+          </h3>
           <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
             <label class="control-label">Email</label>
             <input class="form-control" type="text" name="email" placeholder="Input email address" value="{{ old('email') }}" required autofocus>

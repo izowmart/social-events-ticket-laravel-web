@@ -16,7 +16,7 @@ use Auth;
 
 class RegisterController extends Controller
 {
-    protected $redirectPath = 'admin_home';
+    protected $redirectPath = 'admin_register';
     
     //shows registration form to admin
     public function showRegistrationForm()
@@ -34,10 +34,8 @@ class RegisterController extends Controller
        //Create admin
         $admin = $this->create($request->all());
 
-        //Authenticates admin
-        $this->guard()->login($admin);
-
-       //Redirects admins
+        //Give message to admin after successfull registration
+        $request->session()->flash('status', 'Admin registered successfully');
         return redirect($this->redirectPath);
     }
 
@@ -45,7 +43,8 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => 'required|max:255',
+            'first_name' => 'required|max:255',
+            'last_name' => 'required|max:255',
             'email' => 'required|email|max:255|unique:admins',
             'password' => 'required|min:6|confirmed',
         ]);
@@ -55,7 +54,8 @@ class RegisterController extends Controller
     protected function create(array $data)
     {
         return Admin::create([
-            'name' => $data['name'],
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
         ]);
