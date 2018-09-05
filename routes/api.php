@@ -19,7 +19,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('adverts','Api\AdvertController@index');
-Route::post('adverts_view','Api\AdvertController@create_advert_view');
+Route::post('adverts_view','Api\AdvertController@advert_view');
+Route::post('adverts','Api\AdvertController@store');
 
 Route::get('get_countries','Api\CountryController@index');
 
