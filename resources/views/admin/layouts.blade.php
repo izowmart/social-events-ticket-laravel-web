@@ -10,7 +10,9 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}">
     
     <!-- Font-icon css-->
-    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	
+	@yield('testing-styles')
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -49,7 +51,7 @@
 	//Activate bootstrip tooltips
 	$("[data-toggle='tooltip']").tooltip();
 
-})();
+	})();
 </script>
 <!-- The javascript plugin to display page loading on top-->
 <script src="{{ asset('js/plugins/pace.min.js') }}"></script>

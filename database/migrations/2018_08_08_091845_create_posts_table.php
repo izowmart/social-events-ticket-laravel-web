@@ -25,6 +25,7 @@ class CreatePostsTable extends Migration
             $table->boolean('anonymous');
             $table->integer('type')->comment("1: Everyone,2: Venue Profile,3: Friends");
             $table->boolean('shared');
+            $table->integer('status')->default(1)->comment('0- inactive, 1 - active, 2 - deactivated');
             $table->timestamps();
         });
     }
