@@ -162,8 +162,7 @@ class PostController extends Controller
 
     }
 
-    public
-    function report_abuse(Request $request)
+    public function report_abuse(Request $request)
     {
         $user_id = $request->input('user_id');
         $post_id = $request->input('post_id');
