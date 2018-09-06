@@ -18,7 +18,7 @@
                 {{ session('status') }}
             </div>
         @endif 
-        <form class="login-form" method="POST" action="{{ route('event_organizer_reset_form_process') }}"">
+        <form class="login-form" method="POST" action="{{ route('event_organizer_reset_form_post') }}">
            {{ csrf_field() }}
 
             <input type="hidden" name="token" value="{{ $token }}">

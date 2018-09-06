@@ -14,7 +14,7 @@ use Auth;
 class RegisterController extends Controller
 {    
     //we will redirect to the same page
-    protected $redirectPath = 'event_organizer_register';
+    protected $redirectPath = 'event_organizer/register';
 
     //shows registration form to Event Organizer
     public function showRegistrationForm()

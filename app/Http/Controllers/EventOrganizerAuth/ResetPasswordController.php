@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Password;
 class ResetPasswordController extends Controller
 {
     //event_organizer redirect path
-    protected $redirectTo = '/event_organizer_home';
+    protected $redirectTo = 'event_organizer/home';
 
     //trait for handling reset Password
     use ResetsPasswords;
