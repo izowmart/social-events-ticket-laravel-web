@@ -36,12 +36,9 @@ Route::group(['prefix'=>'auth'], function () {
 Route::get('adverts','Api\AdvertController@index');
 Route::post('adverts_view','Api\AdvertController@advert_view');
 Route::post('adverts','Api\AdvertController@store');
-
 Route::get('countries','Api\CountryController@index');
-
 Route::get('events','Api\EventController@index');
-
-Route::post('get_notifications','Api\NotificationController@index');
+Route::get('notifications/{id}','Api\NotificationController@index');
 
 Route::get('get_posts','Api\PostController@index');
 Route::post('store_post','Api\PostController@store');
