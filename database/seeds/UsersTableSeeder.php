@@ -13,10 +13,7 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        $country = Country::create([
-            'name' => 'Kenya',
-        ]);
-
+    
         User::create([
             'first_name' => 'John',
             'last_name'  => 'Doe',
