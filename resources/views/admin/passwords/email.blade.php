@@ -18,7 +18,7 @@
                 {{ session('status') }}
             </div>
         @endif        
-        <form class="forget-form" method="POST" action="{{ route('admin_email_process') }}">
+        <form class="forget-form" method="POST" action="{{ route('admin_email_post') }}">
           {{ csrf_field() }}
           <h3 class="login-head">
             <i class="fa fa-lg fa-fw fa-lock"></i><br>
