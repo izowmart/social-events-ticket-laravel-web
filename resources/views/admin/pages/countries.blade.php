@@ -1,4 +1,4 @@
-@extends('admin.layouts')
+\@extends('admin.layouts')
 
 @section('testing-styles')
 <style>
@@ -19,14 +19,14 @@
         </div>
         <ul class="app-breadcrumb breadcrumb">
           <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
-          <li class="breadcrumb-item"><a href="{{ route('admin_homepage') }}">Home</a></li>
-          <li class="breadcrumb-item"><a href="{{ route('admins_table') }}">Countries</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('admin_home') }}">Home</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('admins') }}">Countries</a></li>
         </ul>
       </div>
       <div class="row">
         <div class="col-md-12">
           <div class="tile">
-            <p><a class="btn btn-primary icon-btn float-right" href="{{ route('add_countries') }}"><i class="fa fa-plus"></i>Add Country</a></p><br><br>              
+            <p><a class="btn btn-primary icon-btn float-right" href="{{ route('add_country') }}"><i class="fa fa-plus"></i>Add Country</a></p><br><br>
             <div class="tile-body">
               <table class="table table-hover table-bordered" id="adminsTable">
                 <thead>

@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Password;
 class ResetPasswordController extends Controller
 {
     //admin redirect path
-    protected $redirectTo = '/admin_home';
+    protected $redirectTo = 'admin/home';
 
     //trait for handling reset Password
     use ResetsPasswords;

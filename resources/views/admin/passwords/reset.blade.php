@@ -18,7 +18,7 @@
                 {{ session('status') }}
             </div>
         @endif 
-        <form class="login-form" method="POST" action="{{ url('/admin_password/reset') }}"">
+        <form class="login-form" method="POST" action="{{ route('admin_reset_post') }}">
            {{ csrf_field() }}
 
             <input type="hidden" name="token" value="{{ $token }}">

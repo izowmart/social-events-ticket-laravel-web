@@ -18,7 +18,7 @@
                 {{ session('status') }}
             </div>
         @endif        
-        <form class="forget-form" method="POST" action="{{ route('event_organizer_email_form_process') }}">
+        <form class="forget-form" method="POST" action="{{ route('event_organizer_email_form_post') }}">
           {{ csrf_field() }}
           <h3 class="login-head">
             <i class="fa fa-lg fa-fw fa-lock"></i><br>

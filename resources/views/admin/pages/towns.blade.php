@@ -19,14 +19,14 @@
         </div>
         <ul class="app-breadcrumb breadcrumb">
           <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
-          <li class="breadcrumb-item"><a href="{{ route('admin_homepage') }}">Home</a></li>
-          <li class="breadcrumb-item"><a href="{{ route('admins_table') }}">Towns</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('admin_home') }}">Home</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('admins') }}">Towns</a></li>
         </ul>
       </div>
       <div class="row">
         <div class="col-md-12">
           <div class="tile">  
-              <p><a class="btn btn-primary icon-btn float-right" href="{{ route('add_towns') }}"><i class="fa fa-plus"></i>Add Town</a></p><br><br>        
+              <p><a class="btn btn-primary icon-btn float-right" href="{{ route('add_town') }}"><i class="fa fa-plus"></i>Add Town</a></p><br><br>
             <div class="tile-body">
                 @foreach ($towns as $town)
                     @foreach ($town as $item)

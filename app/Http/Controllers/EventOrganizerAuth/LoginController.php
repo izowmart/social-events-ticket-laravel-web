@@ -14,7 +14,7 @@ use Auth;
 class LoginController extends Controller
 {
     //Where to redirect event_organizer after login.
-    protected $redirectTo = '/event_organizer_home';
+    protected $redirectTo = 'event_organizer/home';
 
     //Trait
     use AuthenticatesUsers;    

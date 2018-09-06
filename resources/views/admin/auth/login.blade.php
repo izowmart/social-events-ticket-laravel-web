@@ -13,7 +13,7 @@
         <h1>Login</h1>
       </div>
       <div class="login-box">
-        <form class="login-form" method="POST" action="{{ route('admin_login_form_process') }}">
+        <form class="login-form" method="POST" action="{{ route('admin_login_post') }}">
            @csrf
           <h3 class="login-head"><i class="fa fa-lg fa-fw fa-user"></i><br>
             ADMIN
