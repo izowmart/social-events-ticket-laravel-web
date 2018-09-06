@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Advert;
-use App\Advert_View;
 use App\AdvertView;
 use App\Http\Resources\AdvertResource;
 use Illuminate\Http\Request;
