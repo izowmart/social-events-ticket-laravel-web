@@ -22,7 +22,7 @@ Route::get('adverts','Api\AdvertController@index');
 Route::post('adverts_view','Api\AdvertController@advert_view');
 Route::post('adverts','Api\AdvertController@store');
 
-Route::get('get_countries','Api\CountryController@index');
+Route::get('countries','Api\CountryController@index');
 
 Route::get('get_events','Api\EventController@index');
 
