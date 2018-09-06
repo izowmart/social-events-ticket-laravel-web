@@ -24,6 +24,8 @@ Route::group(['prefix'=>'auth'], function () {
     Route::group(['prefix'=>'user'], function () {
        Route::get('users','Api\AuthController@index');
        Route::post('register','Api\AuthController@register_user');
+       Route::post('login', 'Api\AuthController@login_user');
+       Route::post('reset_password_email', 'Api\AuthController@reset_password_user');
     });
 
 });

@@ -17,9 +17,9 @@ class AuthenticateEventOrganizer
     {
         //If request does not comes from logged in event_organizer
        //then he shall be redirected to event_organizer Login page
-    //    if (! Auth::guard('web_event_organizer')->check()) {
-    //        return redirect('/event_organizer_login');
-    //    }
+        if (! Auth::guard('web_event_organizer')->check()) {
+            return redirect('/event_organizer_login');
+        }
         return $next($request);
     }
 }
