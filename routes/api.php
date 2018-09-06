@@ -40,11 +40,12 @@ Route::get('countries','Api\CountryController@index');
 Route::get('events','Api\EventController@index');
 Route::get('notifications/{id}','Api\NotificationController@index');
 
-Route::get('get_posts','Api\PostController@index');
-Route::post('store_post','Api\PostController@store');
+Route::get('venues','Api\VenueController@index');
+
+Route::get('posts','Api\PostController@index');
+Route::post('posts','Api\PostController@store');
 Route::post('delete_post','Api\PostController@delete');
 Route::post('like_post','Api\PostController@like');
 Route::post('report_abuse','Api\PostController@get_abuse');
-Route::post('get_abuse','Api\PostController@report_abuse');
 
-Route::get('get_venues','Api\VenueController@index');
+

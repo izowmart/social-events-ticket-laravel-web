@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\VenueResource;
 use App\Venue;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -12,11 +13,11 @@ class VenueController extends Controller
     public function index()
     {
         try {
-            $venues = Venue::all()->toArray();
+            $venues = Venue::all();
             return Response::json(array(
                     "success" => true,
                     "message" => "found " . count($venues),
-                    "data" => $venues
+                    "data" => VenueResource::make($venues),
                 )
 
             );
