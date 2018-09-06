@@ -56,6 +56,12 @@ return [
             'driver' => 'session',
             'provider' => 'event_organizers',
         ],
+
+        //our scanners custom driver
+        'scanner' =>[
+            'driver' => 'session',
+            'provider' => 'scanners',
+        ],
     ],
 
     /*
@@ -94,6 +100,12 @@ return [
         'event_organizers' => [
             'driver' => 'eloquent',  //We are using eloquent model
             'model' => App\EventOrganizer::class,
+        ],
+
+        //scanners provider
+        'scanners' => [
+            'driver' => 'eloquent',
+            'model'     => App\Scanner::class,
         ],
     ],
 
@@ -136,6 +148,13 @@ return [
            //expire time for these tokens in minutes
            'expire' => 60,
        ],
+
+        //scanners
+        'scanners' => [
+            'provider' => 'scanners',
+            'table'     => 'scanners_password_resets',
+            'expire'    => 60,
+        ],
     ],
 
 ];

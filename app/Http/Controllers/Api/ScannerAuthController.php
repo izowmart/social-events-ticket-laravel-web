@@ -2,91 +2,39 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Http\Resources\UserResource;
+use App\Http\Resources\ScannerResource;
 use App\Http\Traits\UniversalMethods;
-use App\User;
+use App\Scanner;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 
-
-class AuthController extends Controller
+class ScannerAuthController extends Controller
 {
-    //Sends Password Reset emails
-    use SendsPasswordResetEmails;
+    use SendsPasswordResetEmails, AuthenticatesUsers;
 
-    /**
-     * Register an app user
-     *
-     * @param \Illuminate\Http\Request $request
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function register_user(Request $request)
+
+    public function index()
     {
-        $validator = Validator::make($request->all(),
-            [
-                'username'   => 'required',
-                'first_name' => 'required',
-                'last_name'  => 'required',
-                'email'      => 'required|email|unique:users,email',
-                'password'   => 'required|min:8'
-            ],
-            [
-                'username.required'   => 'Please provide a username',
-                'first_name.required' => 'Please provide your first name',
-                'last_name.required'  => 'Please provide your last name',
-                'email.required'      => 'Please provide your email',
-                'email.email'         => 'Email address is invalid',
-                'email.unique'        => 'The email address is already in use',
-                'password.required'   => 'Please provide a password',
-                'password.min'        => 'Password must be at least 8 characters',
-            ]
-        );
+        $scanners = Scanner::all();
 
-        if ($validator->fails()) {
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
-                    'data'    => []
-                ], 200
-            );
-        } else {
-
-            $user = User::create($request->all());
-
-            if ($user) {
-
-                return response()->json(
-                    [
-                        'success' => true,
-                        'message' => 'User Account Created Successfully. Welcome!',
-                        'data'    => UserResource::make($user),
-                    ], 200
-                );
-            } else {
-                return response()->json(
-                    [
-                        'success' => false,
-                        'message' => 'User Account Creation Failed!',
-                        'data'    => [],
-                    ], 500
-                );
-            }
-        }
+        return response()->json([
+            'success'=>true,
+            'message'      => 'Found '.count($scanners),
+            'data' => ScannerResource::make($scanners),
+        ]);
     }
 
 
-    public function login_user(Request $request)
+    public function login(Request $request)
     {
         $validator = Validator::make($request->all(),
             [
-                'email'    => 'required|email|exists:users,email',
+                'email'    => 'required|email|exists:scanners,email',
                 'password' => 'required|min:8'
             ],
             [
@@ -108,13 +56,13 @@ class AuthController extends Controller
             );
         } else {
             //attempt to authenticate user
-            if (Auth::attempt($request->only(['email', 'password']))) {
+            if ($this->guard()->attempt($request->only(['email', 'password']))) {
 
                 return response()->json(
                     [
                         'success' => true,
-                        'message' => 'User Successfully Logged In. Welcome!',
-                        'data'    => UserResource::make(Auth::user()),
+                        'message' => 'Scanner Successfully Logged In. Welcome!',
+                        'data'    => ScannerResource::make($this->guard()->user()),
                     ], 200
                 );
             } else {
@@ -129,11 +77,11 @@ class AuthController extends Controller
         }
     }
 
-    public function reset_password_user(Request $request)
+    public function reset_password(Request $request)
     {
         $validator = Validator::make($request->all(),
             [
-                'email' => 'required|email|exists:users,email'
+                'email' => 'required|email|exists:scanners,email'
             ],
             [
                 'email.required' => 'Please provide an email address',
@@ -198,19 +146,15 @@ class AuthController extends Controller
     }
 
 
-    public function index()
+    //Custom guard for admin
+    protected function guard()
     {
-        $users = User::all();
-
-        return response()->json(
-            [
-                'success' => true,
-                'message' => 'Found ' . count($users) . ' users',
-                'data'    => UserResource::collection($users),
-            ], 200
-        );
-
+        return Auth::guard('scanner');
     }
 
-
+    //Password Broker for admin Model
+    public function broker()
+    {
+        return Password::broker('scanners');
+    }
 }

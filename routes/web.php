@@ -70,10 +70,21 @@ Route::group(['middleware' => 'guest'], function () {
         Route::post('reset', 'UserAuth\ResetPasswordController@reset');
     });
 
+    Route::group(['prefix'=>'scanner'], function () {
+
+        //android app users - password reset routes
+        Route::get('reset/{token}', 'ScannerAuth\ResetPasswordController@showResetForm');
+        Route::post('reset', 'ScannerAuth\ResetPasswordController@reset');
+    });
+
 });
 //where the android app user is redirected to after password reset
 Route::group(['middleware' => 'web'], function () {
     Route::get('user_home', 'HomeController@home_user');
+});
+
+Route::group(['middleware' => 'scanner', 'prefix'=>'scanner'], function () {
+    Route::get('home', 'HomeController@home_scanner');
 });
 
 //Only logged in users can access or send requests to these pages

@@ -1,9 +1,5 @@
 <?php
 
-use function foo\func;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -26,6 +22,13 @@ Route::group(['prefix'=>'auth'], function () {
        Route::post('register','Api\AuthController@register_user');
        Route::post('login', 'Api\AuthController@login_user');
        Route::post('reset_password_email', 'Api\AuthController@reset_password_user');
+    });
+
+    Route::group(['prefix'=>'scanner'], function () {
+        Route::get('scanners','Api\ScannerAuthController@index');
+        Route::post('register','Api\ScannerAuthController@register');
+        Route::post('login', 'Api\ScannerAuthController@login');
+        Route::post('reset_password_email', 'Api\ScannerAuthController@reset_password');
     });
 
 });

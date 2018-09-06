@@ -11,7 +11,7 @@ use Illuminate\Foundation\Auth\ResetsPasswords;
 class ResetPasswordController extends Controller
 {
     //user redirect path
-    protected $redirectTo = '/user_home';
+    protected $redirectTo = '/user/home';
 
     //trait for handling reset Password
     use ResetsPasswords;

@@ -19,7 +19,9 @@ class CreateScannersTable extends Migration
             $table->foreign('event_organizer_id')->references('id')->on('event_organizers');
             $table->string('first_name');
             $table->string('last_name');
+            $table->string('email')->unique();
             $table->string('password');
+            $table->rememberToken();
             $table->timestamps();
         });
     }
