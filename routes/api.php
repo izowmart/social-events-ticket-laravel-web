@@ -1,5 +1,6 @@
 <?php
 
+use function foo\func;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +17,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::group(['prefix'=>'auth'], function () {
+
+    Route::group(['prefix'=>'user'], function () {
+       Route::get('users','Api\AuthController@index');
+       Route::post('register','Api\AuthController@register_user');
+    });
+
 });
 
 Route::get('adverts','Api\AdvertController@index');
