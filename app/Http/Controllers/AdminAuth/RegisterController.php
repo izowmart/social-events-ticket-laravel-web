@@ -7,7 +7,8 @@ use App\Http\Controllers\Controller;
 
 //Validator facade used in validator method
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Mail;
+use App\Http\Requests;
 //admin Model
 use App\Admin;
 
@@ -23,42 +24,37 @@ class RegisterController extends Controller
     {
         return view('admin.pages.add_admin');
     }
-
-  //Handles registration request for admin
+    
+    //Create a new admin instance after a validation.
     public function register(Request $request)
     {
-
-       //Validates data
-        $this->validator($request->all())->validate();
-
-       //Create admin
-        $admin = $this->create($request->all());
-
-        //Give message to admin after successfull registration
-        $request->session()->flash('status', 'Admin registered successfully');
-        return redirect($this->redirectPath);
-    }
-
-    //Validates user's Input
-    protected function validator(array $data)
-    {
-        return Validator::make($data, [
+        $this->validate($request, [
             'first_name' => 'required|max:255',
             'last_name' => 'required|max:255',
             'email' => 'required|email|max:255|unique:admins',
         ]);
-    }
 
-    //Create a new admin instance after a validation.
-    protected function create(array $data)
-    {
         $password = substr(md5(microtime()),rand(0,26),8);
-        return Admin::create([
-            'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
-            'email' => $data['email'],
-            'password' => bcrypt($password),
-        ]);
+        // Admin::create([
+        //     'first_name' => $request['first_name'],
+        //     'last_name' => $request['last_name'],
+        //     'email' => $request['email'],
+        //     'password' => bcrypt($password),
+        // ]);
+        $admin_first_name = $request['first_name'];
+        $admin_email = $request['email'];
+        $admin_password = $password;
+
+        $data = array('name'=>$admin_first_name,'email'=>$admin_email,'password'=>$admin_password);
+        Mail::send('admin.mail', $data, function($message) use ($admin_email, $admin_first_name) {
+            $message->to($admin_email, 'Added as admin')->subject
+                ('Added as an admin');
+            $message->from('xyz@gmail.com','FIKA');
+        });
+
+        //Give message to admin after successfull registration
+        $request->session()->flash('status', 'Admin registered successfully');
+        return redirect($this->redirectPath);
         
     }
 

@@ -8,10 +8,10 @@
       </div>
     </div>
     <ul class="app-menu">
-      <li><a class="app-menu__item active" href="{{ route('admin_homepage') }}"><i class="app-menu__icon fa fa-home"></i><span class="app-menu__label">Home</span></a></li>
-      <li><a class="app-menu__item" href="{{ route('admins_table') }}"><i class="app-menu__icon fa fa-user-circle"></i><span class="app-menu__label">Admins</span></a></li>
-      <li><a class="app-menu__item" href="charts.html"><i class="app-menu__icon fa fa-map-o"></i><span class="app-menu__label">Country</span></a></li>
-      <li><a class="app-menu__item" href="charts.html"><i class="app-menu__icon fa fa-compass"></i><span class="app-menu__label">Town</span></a></li>
+      <li><a class="app-menu__item {{ Route::currentRouteNamed('adminhomepage') ? 'active' : '' }}" href="{{ route('admin_homepage') }}"><i class="app-menu__icon fa fa-home"></i><span class="app-menu__label">Home</span></a></li>
+      <li><a class="app-menu__item {{ Route::currentRouteNamed('admins_table') ? 'active' : '' }}" href="{{ route('admins_table') }}"><i class="app-menu__icon fa fa-user-circle"></i><span class="app-menu__label">Admins</span></a></li>
+      <li><a class="app-menu__item {{ Route::currentRouteNamed('countries') ? 'active' : '' }}" href="{{ route('countries') }}"><i class="app-menu__icon fa fa-map-o"></i><span class="app-menu__label">Countries</span></a></li>
+      <li><a class="app-menu__item {{ Route::currentRouteNamed('towns') ? 'active' : '' }}" href="{{ route('towns') }}"><i class="app-menu__icon fa fa-compass"></i><span class="app-menu__label">Towns</span></a></li>
       <li><a class="app-menu__item" href="charts.html"><i class="app-menu__icon fa fa-bullhorn"></i><span class="app-menu__label">Adverts</span></a></li>
       <li><a class="app-menu__item" href="charts.html"><i class="app-menu__icon fa fa-map-marker"></i><span class="app-menu__label">Venue</span></a></li>
       <li><a class="app-menu__item" href="charts.html"><i class="app-menu__icon fa fa-group"></i><span class="app-menu__label">Users</span></a></li>

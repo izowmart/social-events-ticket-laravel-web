@@ -51,6 +51,10 @@ Route::get('/add-admin', 'AdminAuth\RegisterController@showRegistrationForm')->n
 Route::post('/add-admin', 'AdminAuth\RegisterController@register')->name('admin_registration_process');
 
 Route::get('/admins', 'AdminPages\AdminsController@index')->name('admins_table');
+Route::get('/countries', 'AdminPages\CountriesController@index')->name('countries');
+Route::get('/countries/add', 'AdminPages\CountriesController@showAddForm')->name('add_countries');
+Route::get('/towns', 'AdminPages\TownsController@index')->name('towns');
+Route::get('/towns/add', 'AdminPages\TownsController@store')->name('add_towns');
 });
 
 
