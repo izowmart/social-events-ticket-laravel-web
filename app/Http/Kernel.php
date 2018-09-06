@@ -63,8 +63,8 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
          //add custom middlewares here as key and value pair.
          'admin_auth' => \App\Http\Middleware\AuthenticateAdmin::class,
-         'admin_guest' => \App\Http\Middleware\RedirectIfAdminAuthenticated::class,
+//         'admin_guest' => \App\Http\Middleware\RedirectIfAdminAuthenticated::class,
          'event_organizer_auth' => \App\Http\Middleware\AuthenticateEventOrganizer::class,
-         'event_organizer_guest' => \App\Http\Middleware\RedirectIfEventOrganizerAuthenticated::class,
+//         'event_organizer_guest' => \App\Http\Middleware\RedirectIfEventOrganizerAuthenticated::class,
     ];
 }
