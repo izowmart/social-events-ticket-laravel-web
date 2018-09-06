@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Country;
+use App\Http\Resources\CountryResource;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Response;
@@ -16,7 +17,7 @@ class CountryController extends Controller
             return Response::json(array(
                     "success" => true,
                     "message" => "found " . count($countries),
-                    "data" => $countries,
+                    "data" => CountryResource::make($countries),
                 )
 
             );

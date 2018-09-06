@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Event;
+use App\Http\Resources\EventResource;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Response;
@@ -16,7 +17,7 @@ class EventController extends Controller
             return Response::json(array(
                     "success" => "true",
                     "message" => "found " . count($events),
-                    "data" => $events,
+                    "data" => EventResource::make($events),
                 )
 
             );

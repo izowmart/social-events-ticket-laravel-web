@@ -39,7 +39,7 @@ Route::post('adverts','Api\AdvertController@store');
 
 Route::get('countries','Api\CountryController@index');
 
-Route::get('get_events','Api\EventController@index');
+Route::get('events','Api\EventController@index');
 
 Route::post('get_notifications','Api\NotificationController@index');
 
