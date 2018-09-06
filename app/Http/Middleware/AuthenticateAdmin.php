@@ -20,9 +20,9 @@ class AuthenticateAdmin
     {
         //If request does not comes from logged in admin
        //then he shall be redirected to admin Login page
-    //    if (! Auth::guard('web_admin')->check()) {
-    //        return redirect('/admin_login');
-    //    }
+        if (! Auth::guard('web_admin')->check()) {
+            return redirect('/admin_login');
+        }
 
        return $next($request);
     }
