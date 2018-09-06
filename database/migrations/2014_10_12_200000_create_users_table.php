@@ -29,6 +29,7 @@ class CreateUsersTable extends Migration
             $table->string('app_version_code');
             $table->string('password');
             $table->rememberToken();
+            $table->integer('status')->default(1)->comment('0- inactive, 1 - active, 2 - deactivated');
             $table->timestamps();
         });
     }

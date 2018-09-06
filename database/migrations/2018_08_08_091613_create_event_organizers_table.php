@@ -19,6 +19,7 @@ class CreateEventOrganizersTable extends Migration
             $table->string('last_name');
             $table->string('email');
             $table->string('password');
+            $table->integer('status')->default(0)->comment('0- unverified, 1 - verified, 2 - deactivated');
             $table->rememberToken();
             $table->timestamps();
         });

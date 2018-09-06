@@ -2,14 +2,30 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+//Class which implements Illuminate\Contracts\Auth\Authenticatable
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class EventOrganizer extends Model
+//Trait for sending notifications in laravel
+use Illuminate\Notifications\Notifiable;
+
+//Notification for Seller
+use App\Notifications\EventOrganizerResetPasswordNotification;
+
+class EventOrganizer extends Authenticatable
 {
+    // This trait has notify() method defined
+    use Notifiable;
+
     protected $fillable = [
         'first_name', 'last_name', 'email', 'password',
     ];
     protected $hidden = [
         'password',
     ];
+
+    //Send password reset notification
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new EventOrganizerResetPasswordNotification($token));
+    }
 }

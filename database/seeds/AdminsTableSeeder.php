@@ -15,7 +15,7 @@ class AdminsTableSeeder extends Seeder
         Admin::create([
             'first_name' => 'John',
             'last_name'  => 'Admin',
-            'email'      => 'johnnjoroge40@gmail.com',
+            'email'      => 'johdoe@gmail.com',
             'password'   => bcrypt('password')
         ]);
     }
