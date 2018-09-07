@@ -104,7 +104,11 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
     Route::post('towns/add', 'AdminPages\TownsController@store')->name('add_town_post');    
     Route::get('adverts', 'AdminPages\AdvertsController@index')->name('adverts');
     Route::get('adverts/add', 'AdminPages\AdvertsController@showAddForm')->name('add_advert');
-    Route::post('adverts/add', 'AdminPages\AdvertsController@store')->name('add_advert_post');
+    Route::post('adverts/add', 'AdminPages\AdvertsController@store')->name('add_advert_post');    
+    Route::get('venues', 'AdminPages\VenuesController@index')->name('venues');
+    Route::get('venues/add', 'AdminPages\VenuesController@showAddForm')->name('add_venue');
+    Route::post('venues/add', 'AdminPages\VenuesController@store')->name('add_venue_post');
+    Route::get('users', 'AdminPages\UsersController@index')->name('users');
 });
 
 
