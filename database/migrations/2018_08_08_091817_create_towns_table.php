@@ -17,7 +17,7 @@ class CreateTownsTable extends Migration
             $table->increments('id');
             $table->integer('country_id')->unsigned();
             $table->foreign('country_id')->references('id')->on('countries');
-            $table->string('name');
+            $table->string('name')->unique();
             $table->timestamps();
         });
     }

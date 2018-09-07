@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abuse;
+use App\Http\Resources\PostResource;
+use App\Http\Traits\UniversalMethods;
 use App\Like;
 use App\Notification;
 use App\Post;
@@ -10,6 +12,7 @@ use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
 {
@@ -20,7 +23,7 @@ class PostController extends Controller
             return Response::json(array(
                     "success" => true,
                     "message" => "found " . count($posts),
-                    "data" => $posts,
+                    "data" => PostResource::make($posts),
                 )
 
             );
@@ -36,26 +39,61 @@ class PostController extends Controller
 
     public function store(Request $request)
     {
+        $validator = Validator::make($request->all(),
+            [
+                'user_id'       => 'required|exists:users,id',
+                'venue_id'      => 'required|exists:venues,id',
+                'media_type'    => 'required',
+                'type'          => 'required',
+                'comment'       => 'sometimes|min:2',
+            ],
+            [
+                'user_id.required'      => 'Kindly log in to continue!',
+                'user_id.exists'        => 'Kindly log in to continue',
+                'venue_id.required'     => 'Kindly log in to continue!',
+                'venue_id.exists'       => 'Kindly log in to continue',
+                'media_type.required'   => 'Something is wrong with the uploaded media file!',
+                'comment.min'           => 'You comment should be at least 2 characters!',
+                'type.required'                  => "Confirm who you'd like to see your post"
+            ]
+            );
+
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
+                    'data'    => []
+                ], 200
+            );
+        }
+
+//        dd($request->all());
+
         $user_id = $request->input('user_id');
         $venue_id = $request->input('venue_id');
         $media_type = $request->input('media_type');
-        $comment = $request->input('comment');
-        $anonymous = $request->input('anonymous');
         $type = $request->input('type');
-        $shared = $request->input('shared');
+
+        $shared = $request->has('shared') ? $request->input('shared') : false ;
+        $comment = $request->has('comment') ? $request->input('comment') : null;
+        $anonymous = $request->has('anonymous') ? $request->input('anonymous') : false ;
 
         try {
             if ($media_type == 1) {
-                $file_path = "uploads/posts/images/" . $user_id . "_" . uniqid() . '.png';
-                $success = move_uploaded_file($request->file('image'), $file_path);
+                $file_name = $user_id . "_" . uniqid() . '.png';
+                $file_path = "uploads/posts/images";
+                $success = $request->file('image')->storeAs($file_path, $file_name);
+//                $success = move_uploaded_file($request->file('image'), $file_path);
             } else {
-                $file_path = "uploads/posts/videos/" . $user_id . "_" . uniqid() . ".mp4";
+                $file_name = $user_id . "_" . uniqid() . '.png';
+                $file_path = "uploads/posts/videos/" . $file_name;
                 $success = move_uploaded_file($request->file('video'), $file_path);
             }
 
 
             if ($success) {
-                $media_url = $file_path;
+                $media_url = $file_name;
                 $post = new Post();
                 $post->user_id = $user_id;
                 $post->venue_id = $venue_id;
@@ -69,13 +107,13 @@ class PostController extends Controller
                 return Response::json(array(
                     "success" => true,
                     "message" => "post successfully saved",
-                    "data" => $post,
+                    "data" => PostResource::make($post),
                 ));
             } else {
                 return Response::json(array(
                     "success" => false,
                     "message" => "post not saved",
-                    "data" => $_FILES['video']['tmp_name'],
+                    "data" => [],
                 ));
             }
 
@@ -84,7 +122,7 @@ class PostController extends Controller
             return Response::json(array(
                 "success" => false,
                 "message" => "error saving post" . $exception,
-                "data" => $_FILES['video']['tmp_name'],
+                "data" => [],
 
             ));
         }
