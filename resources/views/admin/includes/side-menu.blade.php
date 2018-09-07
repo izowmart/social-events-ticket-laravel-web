@@ -13,8 +13,8 @@
       <li><a class="app-menu__item {{ Route::currentRouteNamed('admins') ? 'active' : '' }}" href="{{ route('admins') }}"><i class="app-menu__icon fa fa-user-circle"></i><span class="app-menu__label">Admins</span></a></li>
       <li><a class="app-menu__item {{ Route::currentRouteNamed('countries') ? 'active' : '' }}" href="{{ route('countries') }}"><i class="app-menu__icon fa fa-map-o"></i><span class="app-menu__label">Countries</span></a></li>
       <li><a class="app-menu__item {{ Route::currentRouteNamed('towns') ? 'active' : '' }}" href="{{ route('towns') }}"><i class="app-menu__icon fa fa-compass"></i><span class="app-menu__label">Towns</span></a></li>
-      <li><a class="app-menu__item" href="charts.html"><i class="app-menu__icon fa fa-bullhorn"></i><span class="app-menu__label">Adverts</span></a></li>
-      <li><a class="app-menu__item" href="charts.html"><i class="app-menu__icon fa fa-map-marker"></i><span class="app-menu__label">Venue</span></a></li>
+      <li><a class="app-menu__item {{ Route::currentRouteNamed('adverts') ? 'active' : '' }}" href="{{ route('adverts') }}"><i class="app-menu__icon fa fa-bullhorn"></i><span class="app-menu__label">Adverts</span></a></li>
+      <li><a class="app-menu__item" href="charts.html"><i class="app-menu__icon fa fa-map-marker"></i><span class="app-menu__label">Venues</span></a></li>
       <li><a class="app-menu__item" href="charts.html"><i class="app-menu__icon fa fa-group"></i><span class="app-menu__label">Users</span></a></li>
       <li><a class="app-menu__item" href="charts.html"><i class="app-menu__icon fa fa-gg"></i><span class="app-menu__label">Parts</span></a></li>
       <li><a class="app-menu__item" href="charts.html"><i class="app-menu__icon	fa fa-bug"></i><span class="app-menu__label">Abuse</span></a></li>

@@ -1,12 +1,5 @@
 @extends('admin.layouts')
 
-@section('testing-styles')
-<style>
-
-</style>
-    
-@endsection
-
 @section('content')
     @include('admin.includes.header')
     @include('admin.includes.side-menu')

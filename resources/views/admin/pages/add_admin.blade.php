@@ -83,17 +83,3 @@
       </div>
     </main>
 @endsection
-
-@section('other-scripts')
-@if (session('status'))
-    <script type="text/javascript">
-      $.notify({
-            title: "Success : ",
-            message: "{{ session('status') }}",
-            icon: 'fa fa-check' 
-          },{
-            type: "info"
-      });
-    </script>        
-@endif 
-@endsection
