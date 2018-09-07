@@ -8,6 +8,7 @@
       </div>
     </div>
     <ul class="app-menu">
+      @auth('web_admin')
       <li><a class="app-menu__item {{ Route::currentRouteNamed('admin_home') ? 'active' : '' }}" href="{{ route('admin_home') }}"><i class="app-menu__icon fa fa-home"></i><span class="app-menu__label">Home</span></a></li>
       <li><a class="app-menu__item {{ Route::currentRouteNamed('admins') ? 'active' : '' }}" href="{{ route('admins') }}"><i class="app-menu__icon fa fa-user-circle"></i><span class="app-menu__label">Admins</span></a></li>
       <li><a class="app-menu__item {{ Route::currentRouteNamed('countries') ? 'active' : '' }}" href="{{ route('countries') }}"><i class="app-menu__icon fa fa-map-o"></i><span class="app-menu__label">Countries</span></a></li>
@@ -17,6 +18,7 @@
       <li><a class="app-menu__item" href="charts.html"><i class="app-menu__icon fa fa-group"></i><span class="app-menu__label">Users</span></a></li>
       <li><a class="app-menu__item" href="charts.html"><i class="app-menu__icon fa fa-gg"></i><span class="app-menu__label">Parts</span></a></li>
       <li><a class="app-menu__item" href="charts.html"><i class="app-menu__icon	fa fa-bug"></i><span class="app-menu__label">Abuse</span></a></li>
+      @endauth
       <li class="treeview"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="app-menu__icon fa fa-th-list"></i><span class="app-menu__label">Event organizer</span><i class="treeview-indicator fa fa-angle-right"></i></a>
         <ul class="treeview-menu">
           <li><a class="treeview-item" href="table-basic.html"><i class="icon fa fa-circle-o"></i> Uneverified</a></li>

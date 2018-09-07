@@ -114,7 +114,7 @@
 
 @section('other-scripts')
 {{-- Page specific scripts --}}
-<script type="text/javascript" src="js/plugins/chart.js"></script>
+<script type="text/javascript" src="{{ asset('js/plugins/chart.js') }}"></script>
 <script type="text/javascript">
     new Chart($("#newUsers"), {
     type: 'line',
