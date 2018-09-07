@@ -28,11 +28,11 @@
           <div class="tile">  
               <p><a class="btn btn-primary icon-btn float-right" href="{{ route('add_town') }}"><i class="fa fa-plus"></i>Add Town</a></p><br><br>
             <div class="tile-body">
-                @foreach ($towns as $town)
+                {{-- @foreach ($towns as $town)
                     @foreach ($town as $item)
                         {{$item}}
                     @endforeach                  
-                @endforeach     
+                @endforeach      --}}
               <table class="table table-hover table-bordered" id="adminsTable">
                 <thead>
                   <tr>
@@ -42,12 +42,13 @@
                   </tr>
                 </thead>
                 <tbody>
-                    {{-- @foreach ($towns as $town)
-                    {<tr class="item {{$town->id}}">
-                        <td>{{$town->name}}</td>
+                    @foreach ($towns as $town)
+                    <tr class="item">
+                        <td>{{$town->town_name}}</td>
+                        <td>{{$town->country_name}}</td>
                         <td>{{date("M j, Y", strtotime($town->created_at))}}</td>
                     </tr>   }                     
-                    @endforeach                   --}}
+                    @endforeach                  
                 </tbody>
               </table>
             </div>
@@ -62,7 +63,7 @@
 <script type="text/javascript" src="{{ asset('js/plugins/jquery.dataTables.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/plugins/dataTables.bootstrap.min.js') }}"></script>
 <script type="text/javascript">$('#adminsTable').DataTable();</script>
-<script type="text/javascript" src="js/plugins/bootstrap-notify.min.js"></script>
+<script type="text/javascript" src="{{ asset('js/plugins/bootstrap-notify.min.js') }}"></script>
 @if (session('status'))
     <script type="text/javascript">
       $.notify({

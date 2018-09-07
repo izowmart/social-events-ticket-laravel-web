@@ -29,7 +29,7 @@ class CountriesController extends Controller
 
     public function showAddForm()
     {
-        return view('admin.pages.add_countries'); 
+        return view('admin.pages.add_country'); 
     }
 
     public function store(Request $request)

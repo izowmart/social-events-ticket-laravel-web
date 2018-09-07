@@ -56,7 +56,7 @@
 <script type="text/javascript" src="{{ asset('js/plugins/jquery.dataTables.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/plugins/dataTables.bootstrap.min.js') }}"></script>
 <script type="text/javascript">$('#adminsTable').DataTable();</script>
-<script type="text/javascript" src="{{ url('js/plugins/bootstrap-notify.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/plugins/bootstrap-notify.min.js') }}"></script>
 @if (session('status'))
     <script type="text/javascript">
       $.notify({
