@@ -32,8 +32,7 @@
                 <thead>
                   <tr>
                     <th>Name</th>
-                    <th>Added on</th>                    
-                    <th>Status</th>
+                    <th>Added on</th>      
                   </tr>
                 </thead>
                 <tbody>
@@ -41,15 +40,6 @@
                     <tr class="item {{$country->id}}">
                         <td>{{$country->name}}</td>
                         <td>{{date("M j, Y", strtotime($country->created_at))}}</td>
-                        <td>
-                          @if ($country->status==1)
-                              {{'Active'}}
-                          @elseif ($country->status==2)
-                              {{'Deactivated'}}
-                          @else
-                              {{'Inactive'}}
-                          @endif                          
-                        </td>
                     </tr>                        
                     @endforeach                  
                 </tbody>
@@ -66,7 +56,7 @@
 <script type="text/javascript" src="{{ asset('js/plugins/jquery.dataTables.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/plugins/dataTables.bootstrap.min.js') }}"></script>
 <script type="text/javascript">$('#adminsTable').DataTable();</script>
-<script type="text/javascript" src="js/plugins/bootstrap-notify.min.js"></script>
+<script type="text/javascript" src="{{ url('js/plugins/bootstrap-notify.min.js') }}"></script>
 @if (session('status'))
     <script type="text/javascript">
       $.notify({

@@ -1,8 +1,8 @@
 @extends('admin.layouts')
 
-@section('testing-styles')
+@section('other-styles')
 <style>
-
+<link rel="stylesheet" type="text/css" href="//github.com/downloads/lafeber/world-flags-sprite/flags16.css" />
 </style>
     
 @endsection
@@ -28,16 +28,16 @@
         <div class="col-md-12">
           <div class="tile">              
             <div class="tile-body">
-              <form method="POST" action="">
+              <form method="POST" action="{{ route('add_country_post') }}">
                 {{ csrf_field() }}
                   <div class="row">
                     <div class="col-md-5">
-                        <div class="form-group{{ $errors->has('country') ? ' has-error' : '' }}">
-                            <label class="control-label">Name</label>
-                            <input class="form-control" type="text" id="country" name="country" placeholder="Input name of the town"  required autofocus>
-                            @if ($errors->has('country'))
+                        <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
+                            <label class="control-label">Country name</label>
+                            <input class="form-control" type="text" id="country" name="name" placeholder="Input name of the country"  required autofocus>
+                            @if ($errors->has('name'))
                                 <span class="help-block">
-                                    <strong>{{ $errors->first('country') }}</strong>
+                                    <strong>{{ $errors->first('name') }}</strong>
                                 </span>
                             @endif
                         </div>
@@ -59,26 +59,19 @@
 @endsection
 
 @section('other-scripts')
-<script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=true&libraries=places&key=AIzaSyBO5Else2rW4UNyXiCMp3y20JV7BseTMys"></script>
-<script src="{{ asset('js/plugins/locationpicker.jquery.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/places.js@1.10.0"></script>
 <script>
-  $('#country').locationpicker({
-    location: {
-        latitude: 46.15242437752303,
-        longitude: 2.7470703125
-    },
-    radius: 300,
-    inputBinding: {
-        latitudeInput: $('#us7-lat'),
-        longitudeInput: $('#us7-lon'),
-        radiusInput: $('#us7-radius'),
-        locationNameInput: $('#us7-address')
-    },
-    enableAutocomplete: true,
-    autocompleteOptions: {
-        types: ['(countries)']
+(function() {
+  var placesAutocomplete = places({
+    container: document.querySelector('#country'),
+    type: 'country',
+    templates: {
+      suggestion: function(suggestion) {
+        return '<i class="flag ' + suggestion.countryCode + '"></i> ' +
+          suggestion.highlight.name;
+      }
     }
-});
-     
+  });
+})();
 </script>
 @endsection
