@@ -68,8 +68,6 @@ class PostController extends Controller
             );
         }
 
-//        dd($request->all());
-
         $user_id = $request->input('user_id');
         $venue_id = $request->input('venue_id');
         $media_type = $request->input('media_type');
@@ -81,14 +79,13 @@ class PostController extends Controller
 
         try {
             if ($media_type == 1) {
-                $file_name = $user_id . "_" . uniqid() . '.png';
+                $file_name = $user_id . "_" . uniqid() . '.'.$request->file('image')->getClientOriginalExtension();;
                 $file_path = "uploads/posts/images";
                 $success = $request->file('image')->storeAs($file_path, $file_name);
-//                $success = move_uploaded_file($request->file('image'), $file_path);
             } else {
-                $file_name = $user_id . "_" . uniqid() . '.png';
-                $file_path = "uploads/posts/videos/" . $file_name;
-                $success = move_uploaded_file($request->file('video'), $file_path);
+                $file_name = $user_id . "_" . uniqid() . '.'.$request->file('video')->getClientOriginalExtension();
+                $file_path = "uploads/posts/videos";
+                $success = $request->file('video')->storeAs($file_path, $file_name);
             }
 
 
