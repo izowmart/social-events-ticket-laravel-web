@@ -18,7 +18,7 @@
                 {{ session('status') }}
             </div>
         @endif   
-        <form class="register-form" method="POST" action="{{ route('event_organizer_register_post') }}">
+        <form class="register-form" method="POST" action="{{ route('event_organizer_register_form_post') }}">
            @csrf
           <h3 class="register-head">
               <i class="fa fa-lg fa-fw fa-user"></i><br>

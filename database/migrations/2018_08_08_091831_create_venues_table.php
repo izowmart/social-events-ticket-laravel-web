@@ -18,8 +18,8 @@ class CreateVenuesTable extends Migration
             $table->string('name');
             $table->integer('town_id')->unsigned();
             $table->foreign('town_id')->references('id')->on('towns');
-            $table->float('latitude');
-            $table->float('longitude');
+            $table->decimal('latitude');
+            $table->decimal('longitude');
             $table->string('contact_person_name');
             $table->string('contact_person_phone');
             $table->string('contact_person_email');
