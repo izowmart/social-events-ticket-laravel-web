@@ -145,25 +145,54 @@ class PostController extends Controller
 
     public function like(Request $request)
     {
+        $validator = Validator::make($request->all(),
+            [
+                'user_id' => 'required|exists:users,id',
+                'post_id' => 'required|exists:posts,id',
+            ],
+            [
+                'user_id.required' => 'Kindly Login In!',
+                'user_id.exists'    => 'Kindly Sign Up!',
+                'post_id.required' => 'Kindly Login In!',
+                'post_id.exists'    => 'Kindly Sign Up!'
+            ]
+
+        );
+
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
+                    'data'    => []
+                ], 200
+            );
+        }
+
         $user_id = $request->input('user_id');
         $post_id = $request->input('post_id');
-        $report_abuse = Like::where("user_id", $user_id)->where("post_id", $post_id);
+        $report_abuse = Like::where("user_id", $user_id)->where("post_id", $post_id)->first();
         if ($report_abuse == null) {
-            $post = Post::where('id', $post_id);
-            $user = User::where('id', $user_id)->username;
+            $post = Post::find($post_id);
+            $user = User::find($user_id);
             $like = new Like();
             $like->user_id = $user_id;
             $like->post_id = $post_id;
             $like->save();
+
+            //raise a new notification for the like
             $notification = new Notification();
             $notification->initializer_id = $user_id;
             $notification->recipient_id = $post->user_id;
             $notification->type = 1;
-            $notification->message = $user . " liked your post";
+            $notification->model_id = $post->id;
             $notification->save();
+
+            //TODO:: FCM notification for the like
+
             return Response::json(array(
                 "success" => true,
-                "message" => "You had liked a post",
+                "message" => "You have liked a post",
             ));
         } else {
             return Response::json(array(
