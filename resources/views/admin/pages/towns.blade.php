@@ -28,17 +28,13 @@
           <div class="tile">  
               <p><a class="btn btn-primary icon-btn float-right" href="{{ route('add_town') }}"><i class="fa fa-plus"></i>Add Town</a></p><br><br>
             <div class="tile-body">
-                {{-- @foreach ($towns as $town)
-                    @foreach ($town as $item)
-                        {{$item}}
-                    @endforeach                  
-                @endforeach      --}}
               <table class="table table-hover table-bordered" id="adminsTable">
                 <thead>
                   <tr>
                     <th>Town Name</th>
                     <th>Country</th>
                     <th>Added on</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -47,7 +43,16 @@
                         <td>{{$town->town_name}}</td>
                         <td>{{$town->country_name}}</td>
                         <td>{{date("M j, Y", strtotime($town->created_at))}}</td>
-                    </tr>   }                     
+                        <td>
+                          <a href="{{ route('edit_town',array('country'=>$town->country_name,'town'=>$town->town_name))}}" class="btn btn-sm btn-outline-primary">Edit</a>
+                         
+                          <button onClick="deleteBtn({{$town->id}})" class="btn btn-sm btn-outline-danger">Delete</button>
+                          <form id="delete_form_{{$town->id}}" action="{{ route('delete_town') }}" method="POST" style="display: none;">
+                              {{ csrf_field() }}
+                              <input type="hidden" name="id" value="{{$town->id}}">
+                          </form>
+                        </td>
+                    </tr>                       
                     @endforeach                  
                 </tbody>
               </table>
@@ -64,6 +69,29 @@
 <script type="text/javascript" src="{{ asset('js/plugins/dataTables.bootstrap.min.js') }}"></script>
 <script type="text/javascript">$('#adminsTable').DataTable();</script>
 <script type="text/javascript" src="{{ asset('js/plugins/bootstrap-notify.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/plugins/sweetalert.min.js') }}"></script>
+<script>
+  function deleteBtn(id) {    
+    swal({
+      		title: "Are you sure?",
+      		text: "You will not be able to recover this record",
+      		type: "warning",
+      		showCancelButton: true,
+      		confirmButtonText: "Yes, delete it!",
+      		cancelButtonText: "No, cancel!",
+      		closeOnConfirm: false,
+      		closeOnCancel: true
+      	}, function(isConfirm) {
+          if (isConfirm) {
+            $form ="delete_form_"+id;
+      			document.getElementById($form).submit();
+      		}
+          
+      		
+      	});
+  }
+  
+</script>
 @if (session('status'))
     <script type="text/javascript">
       $.notify({
