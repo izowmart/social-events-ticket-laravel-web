@@ -46,7 +46,7 @@ Route::get('posts','Api\PostController@index');
 Route::post('posts','Api\PostController@store');
 Route::post('delete_post','Api\PostController@delete');
 Route::post('like_post','Api\PostController@like');
-Route::post('report_abuse','Api\PostController@get_abuse');
+Route::post('report_abuse','Api\PostController@report_abuse');
 
 Route::get('user/{id}/relations', 'Api\AuthController@user_relations');
 Route::post('user/follow', 'Api\AuthController@follow');

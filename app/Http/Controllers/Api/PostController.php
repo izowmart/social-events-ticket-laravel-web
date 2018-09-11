@@ -199,11 +199,37 @@ class PostController extends Controller
 
     public function report_abuse(Request $request)
     {
+        $validator = Validator::make($request->all(),
+            [
+                'user_id' => 'required|exists:users,id',
+                'post_id' => 'required|exists:posts,id',
+                'type'    => 'required'
+            ],
+            [
+                'user_id.required' => 'Kindly Login In!',
+                'user_id.exists'    => 'Kindly Sign Up!',
+                'post_id.required' => 'Kindly Login In!',
+                'post_id.exists'    => 'Kindly Sign Up!'
+            ]
+
+        );
+
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
+                    'data'    => []
+                ], 200
+            );
+        }
+
         $user_id = $request->input('user_id');
         $post_id = $request->input('post_id');
         $type = $request->input('type');
 
-        $report_abuse = Abuse::where("user_id", $user_id)->where("post_id", $post_id);
+        $report_abuse = Abuse::where("user_id", $user_id)->where("post_id", $post_id)->first();
+
         if ($report_abuse == null) {
             $abuse = new Abuse();
             $abuse->user_id = $user_id;
