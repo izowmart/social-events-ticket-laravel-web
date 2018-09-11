@@ -33,5 +33,22 @@ class UsersTableSeeder extends Seeder
             'created_at' =>now(),
             'updated_at' =>now(),
         ]);
+
+        User::create([
+            'first_name' => 'John',
+            'last_name'  => 'Test',
+            'username'   => 'johntest',
+            'email'      => 'john@muva.co.ke',
+            'year_of_birth' => '1990',
+            'gender'     => 1,
+            'image_url' => '5b903c5022bc21536179280.jpg',
+            'country_id' => $country->id,
+            'fcm_token' => 0,
+            'auto_follow_status' => 1,
+            'app_version_code' => '1.0.0',
+            'password'   => bcrypt('password'),
+            'created_at' =>now(),
+            'updated_at' =>now(),
+        ]);
     }
 }

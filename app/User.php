@@ -33,4 +33,33 @@ class User extends Authenticatable
     {
         $this->notify(new UserResetPasswordNotification($token));
     }
+
+    public function follows($user_id,$status=1)
+    {
+        return $this->following()->attach($user_id,['status'=>$status,'created_at'=>now(),'updated_at'=> now()]);
+    }
+
+    public function unfollows($user_id)
+    {
+        return $this->following()->detach($user_id);
+    }
+
+    public function approve_following($user_id,$status = 1)
+    {
+        return $this->following()->updateExistingPivot($user_id,['status'=>$status,'created_at'=>now(),'updated_at'=> now()]);
+    }
+
+    public function followers() //those who follow me
+    {
+        return $this->belongsToMany(User::class,'followers','followed_id','follower_id')
+            ->withPivot(['status'])
+            ->withTimestamps();
+    }
+
+    public function following() //those I follow
+    {
+        return $this->belongsToMany(User::class, 'followers', 'follower_id','followed_id')
+            ->withPivot(['status'])
+            ->withTimestamps();
+    }
 }

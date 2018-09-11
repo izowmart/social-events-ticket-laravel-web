@@ -48,4 +48,6 @@ Route::post('delete_post','Api\PostController@delete');
 Route::post('like_post','Api\PostController@like');
 Route::post('report_abuse','Api\PostController@get_abuse');
 
+Route::get('user/{id}/relations', 'Api\AuthController@user_relations');
+Route::post('user/follow', 'Api\AuthController@follow');
 
