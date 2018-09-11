@@ -32,6 +32,18 @@ class CountriesController extends Controller
         return view('admin.pages.add_country'); 
     }
 
+    public function showEditForm($name)
+    {
+        $country = Country::where('name',$name)->first();
+
+        $data=array(
+            'name'=>$name,
+            'id'=>$country->id
+        );
+        return view('admin.pages.edit_country')->with($data); 
+        
+    }
+
     public function store(Request $request)
     {
         
@@ -44,8 +56,41 @@ class CountriesController extends Controller
 
         $country->save();
 
-        //Give message to admin after successfull registration
+        //Give message to admin after successfull operation
         $request->session()->flash('status', 'Country added successfully');
         return redirect($this->redirectPath);
     } 
+
+    public function update(Request $request)
+    {
+        
+        $this->validate($request, [
+            'name'=>'required'
+        ]); 
+
+        $country = Country::find($request->id);
+        $country->name = $request->name;
+
+        $country->save();
+        //Give message to admin after successfull operation
+        $request->session()->flash('status', 'Country updated successfully');
+        return redirect($this->redirectPath);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Request $request)
+    {
+        $id = $request->id;
+        $country = Country::find($id);
+        //Country::destroy($id);
+        $country->delete();
+        //Give message to admin after successfull operation
+        $request->session()->flash('status', 'Country deleted successfully');
+        return response()->json(['success'=>'Deleted successfully']);
+    }
 }

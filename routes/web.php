@@ -105,6 +105,9 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
     Route::get('countries', 'AdminPages\CountriesController@index')->name('countries');
     Route::get('countries/add', 'AdminPages\CountriesController@showAddForm')->name('add_country');
     Route::post('countries/add', 'AdminPages\CountriesController@store')->name('add_country_post');
+    Route::get('countries/edit/{name}', 'AdminPages\CountriesController@showEditForm')->name('edit_country');
+    Route::post('countries/edit', 'AdminPages\CountriesController@update')->name('edit_country_post');
+    Route::post('countries/delete', 'AdminPages\CountriesController@destroy')->name('delete_country');
     Route::get('towns', 'AdminPages\TownsController@index')->name('towns');
     Route::get('towns/add', 'AdminPages\TownsController@showAddForm')->name('add_town');
     Route::post('towns/add', 'AdminPages\TownsController@store')->name('add_town_post');    

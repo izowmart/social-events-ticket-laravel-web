@@ -1,4 +1,4 @@
-\@extends('admin.layouts')
+@extends('admin.layouts')
 
 @section('testing-styles')
 <style>
@@ -32,14 +32,25 @@
                 <thead>
                   <tr>
                     <th>Name</th>
-                    <th>Added on</th>      
+                    <th>Added on</th>
+                    <th>Action</th>      
                   </tr>
                 </thead>
                 <tbody>
                     @foreach ($countries as $country)
                     <tr class="item {{$country->id}}">
                         <td>{{$country->name}}</td>
-                        <td>{{date("M j, Y", strtotime($country->created_at))}}</td>
+                        <td>{{date("jS M Y", strtotime($country->created_at))}}</td>
+                        <td>
+                          <a href="{{ route('edit_country',$country->name)}}" class="btn btn-sm btn-outline-primary">Edit</a>
+                          @if(count($country->users)==0 && count($country->towns)==0)
+                          <button onClick="deleteBtn({{$country->id}})" class="btn btn-sm btn-outline-danger">Delete</button>
+                          <form id="delete_form_{{$country->id}}" action="{{ route('delete_country') }}" method="POST" style="display: none;">
+                              {{ csrf_field() }}
+                              <input type="hidden" name="id" value="{{$country->id}}">
+                          </form>
+                          @endif
+                        </td>
                     </tr>                        
                     @endforeach                  
                 </tbody>
@@ -57,6 +68,29 @@
 <script type="text/javascript" src="{{ asset('js/plugins/dataTables.bootstrap.min.js') }}"></script>
 <script type="text/javascript">$('#adminsTable').DataTable();</script>
 <script type="text/javascript" src="{{ asset('js/plugins/bootstrap-notify.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/plugins/sweetalert.min.js') }}"></script>
+<script>
+  function deleteBtn(id) {    
+    swal({
+      		title: "Are you sure?",
+      		text: "You will not be able to recover this record",
+      		type: "warning",
+      		showCancelButton: true,
+      		confirmButtonText: "Yes, delete it!",
+      		cancelButtonText: "No, cancel!",
+      		closeOnConfirm: false,
+      		closeOnCancel: true
+      	}, function(isConfirm) {
+          if (isConfirm) {
+            $form ="delete_form_"+id;
+      			document.getElementById($form).submit();
+      		}
+          
+      		
+      	});
+  }
+  
+</script>
 @if (session('status'))
     <script type="text/javascript">
       $.notify({
