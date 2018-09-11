@@ -25,7 +25,7 @@ class CreateUsersTable extends Migration
             $table->integer('country_id')->unsigned()->nullable();
             $table->foreign('country_id')->references('id')->on('countries');
             $table->string('fcm_token')->default("0");
-            $table->boolean('auto_follow_status')->default(true);
+            $table->boolean('auto_follow_status')->default(true)->comment('true: follow is automatic; false: send me a follow request');
             $table->string('app_version_code')->default("1.0.0");
             $table->string('password');
             $table->integer('status')->default(1)->comment('0- inactive, 1 - active, 2 - deactivated');

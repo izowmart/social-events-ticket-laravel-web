@@ -21,10 +21,10 @@ class CreatePostsTable extends Migration
             $table->foreign('venue_id')->references('id')->on('venues');
             $table->integer('media_type')->comment("1: Image,2: Video");
             $table->string('media_url');
-            $table->text('comment');
-            $table->boolean('anonymous')->comment('this is whether the creator would like to be anonymous or not');
+            $table->text('comment')->nullable();
+            $table->boolean('anonymous')->default(false)->comment('this is whether the creator would like to be anonymous or not');
             $table->integer('type')->comment("1: Everyone,2: Venue Profile,3: Friends");
-            $table->boolean('shared')->comment('is this post an original or a shared one');
+            $table->boolean('shared')->default(false)->comment('is this post an original or a shared one');
             $table->integer('status')->default(1)->comment('0- inactive, 1 - active, 2 - deactivated');
             $table->timestamps();
         });
