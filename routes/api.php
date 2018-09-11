@@ -38,8 +38,8 @@ Route::post('adverts_view','Api\AdvertController@advert_view');
 Route::post('adverts','Api\AdvertController@store');
 Route::get('countries','Api\CountryController@index');
 Route::get('events','Api\EventController@index');
-Route::get('notifications/{id}','Api\NotificationController@index');
-
+Route::get('notifications/{user_id}','Api\NotificationController@index');
+Route::post('notifications', 'Api\NotificationController@markSeen');
 Route::get('venues','Api\VenueController@index');
 
 Route::get('posts','Api\PostController@index');
