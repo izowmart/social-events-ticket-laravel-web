@@ -91,6 +91,6 @@ class CountriesController extends Controller
         $country->delete();
         //Give message to admin after successfull operation
         $request->session()->flash('status', 'Country deleted successfully');
-        return response()->json(['success'=>'Deleted successfully']);
+        return redirect($this->redirectPath);
     }
 }

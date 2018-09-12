@@ -24,7 +24,7 @@ class AdvertsController extends Controller
      */
     public function index()
     {
-        $adverts = Advert::select('adverts.title','adverts.description','adverts.image_url','adverts.start_date','adverts.end_date','adverts.status','admins.first_name','admins.last_name')
+        $adverts = Advert::select('adverts.id','adverts.title','adverts.description','adverts.image_url','adverts.start_date','adverts.end_date','adverts.status','admins.first_name','admins.last_name')
                 ->join('admins', 'admins.id', '=', 'adverts.admin_id')
                 ->get();
         return view('admin.pages.adverts')->with('adverts',$adverts); 
@@ -34,6 +34,13 @@ class AdvertsController extends Controller
     {
         
         return view('admin.pages.add_advert'); 
+    }
+
+    public function showEditForm(Request $request)
+    {
+        $advert = Advert::find($request->id);     
+        return view('admin.pages.edit_advert')->with('advert',$advert); 
+        
     }
 
     public function store(Request $request)
@@ -79,4 +86,66 @@ class AdvertsController extends Controller
         $request->session()->flash('status', 'Advert added successfully');
         return redirect($this->redirectPath);
     } 
+
+    public function update(Request $request)
+    {
+        
+        $this->validate($request, [
+            'title'=>'required',
+            'description'=>'required',
+            'start'=>'required',
+            'stop'=>'required'
+        ]); 
+
+        // check if image was updated
+        if ($request->hasFile('image')) {
+            // Handle image upload
+            $filenameWithExt = $request->file('image')->getClientOriginalName();
+            //get just file name
+            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+            //get just ext
+            $extension = $request->file('image')->getClientOriginalExtension();
+            //file name to store
+            $fileNameToStore = 'advert'.'_'.time().'.'.$extension;
+            //upload image
+            $path = $request->file('image')->storeAs('public/images/adverts',$fileNameToStore);
+
+            //generate url for the image
+            $image_url = url('/storage/images/adverts/'.$fileNameToStore);
+
+            //delete the previous image
+            $prevoius_image_path = substr(parse_url($request->previous_image_url, PHP_URL_PATH), 1);
+            unlink(public_path($prevoius_image_path));
+        }
+        
+        $advert = Advert::find($request->id);
+        $advert->title = $request->title;
+        $advert->start_date = $request->start;
+        $advert->end_date = $request->stop;
+        if ($request->hasFile('image')) {
+            $advert->image_url = $image_url;
+        }
+        $advert->description = $request->description;
+        
+        $advert->save();
+
+        //Give message to admin after successfull registration
+        $request->session()->flash('status', 'Advert updated successfully');
+        return redirect($this->redirectPath);
+    } 
+
+    public function destroy(Request $request)
+    {
+        $id = $request->id;
+        $advert = Advert::find($id);
+
+        //delete both record and its image
+        $prevoius_image_path = substr(parse_url($advert->image_url, PHP_URL_PATH), 1);
+        unlink(public_path($prevoius_image_path));
+        $advert->delete();
+        //Give message to admin after successfull operation
+        $request->session()->flash('status', 'Advert deleted successfully');
+        return redirect($this->redirectPath);
+    }
+
 }

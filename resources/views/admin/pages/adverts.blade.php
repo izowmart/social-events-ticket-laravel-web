@@ -38,16 +38,17 @@
                     <th>End</th>
                     <th>Status</th>
                     <th>Added By</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                     @foreach ($adverts as $advert)
                     <tr class="item">
-                        <td>{{$advert->title}}</td>
-                        <td>{{ str_limit($advert->description, $limit = 70, $end = '...') }}</td>                        
-                        <td><img alt="image" src="{{$advert->image_url}}" width="80"></td>
-                        <td>{{$advert->start_date}}</td>
-                        <td>{{$advert->end_date}}</td>
+                        <td>{{str_limit($advert->title, $limit = 35, $end = '...')}}</td>
+                        <td>{{ str_limit($advert->description, $limit = 60, $end = '...') }}</td>                        
+                        <td><a href="{{$advert->image_url}}" target="_blank" class="btn btn-sm btn-outline-primary">View</a></td>
+                        <td>{{date("jS M Y", strtotime($advert->start_date))}}</td>
+                        <td>{{date("jS M Y", strtotime($advert->end_date))}}</td>
                         <td>
                             @if ($advert->status==1)
                                 {{'active'}}
@@ -58,6 +59,19 @@
                             @endif
                         </td>
                         <td>{{$advert->first_name}} {{$advert->last_name}}</td>
+                        <td>
+                          <button onClick="document.getElementById('edit_form_{{$advert->id}}').submit();" class="btn btn-sm btn-outline-primary">Edit</button>
+                          <form id="edit_form_{{$advert->id}}" action="{{ route('edit_advert') }}" method="POST" style="display: none;">
+                              {{ csrf_field() }}
+                              <input type="hidden" name="id" value="{{$advert->id}}">
+                          </form>
+
+                          <button onClick="deleteBtn({{$advert->id}})" class="btn btn-sm btn-outline-danger">Delete</button>
+                          <form id="delete_form_{{$advert->id}}" action="{{ route('delete_advert') }}" method="POST" style="display: none;">
+                              {{ csrf_field() }}
+                              <input type="hidden" name="id" value="{{$advert->id}}">
+                          </form>
+                        </td>
                     </tr>                        
                     @endforeach                  
                 </tbody>
@@ -75,6 +89,29 @@
 <script type="text/javascript" src="{{ asset('js/plugins/dataTables.bootstrap.min.js') }}"></script>
 <script type="text/javascript">$('#adminsTable').DataTable();</script>
 <script type="text/javascript" src="{{ asset('js/plugins/bootstrap-notify.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/plugins/sweetalert.min.js') }}"></script>
+<script>
+  function deleteBtn(id) {    
+    swal({
+      		title: "Are you sure?",
+      		text: "You will not be able to recover this record",
+      		type: "warning",
+      		showCancelButton: true,
+      		confirmButtonText: "Yes, delete it!",
+      		cancelButtonText: "No, cancel!",
+      		closeOnConfirm: false,
+      		closeOnCancel: true
+      	}, function(isConfirm) {
+          if (isConfirm) {
+            $form ="delete_form_"+id;
+      			document.getElementById($form).submit();
+      		}
+          
+      		
+      	});
+  }
+  
+</script>
 @if (session('status'))
     <script type="text/javascript">
       $.notify({

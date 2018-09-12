@@ -116,7 +116,10 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
     Route::post('towns/delete', 'AdminPages\TownsController@destroy')->name('delete_town');    
     Route::get('adverts', 'AdminPages\AdvertsController@index')->name('adverts');
     Route::get('adverts/add', 'AdminPages\AdvertsController@showAddForm')->name('add_advert');
-    Route::post('adverts/add', 'AdminPages\AdvertsController@store')->name('add_advert_post');    
+    Route::post('adverts/add', 'AdminPages\AdvertsController@store')->name('add_advert_post'); 
+    Route::post('adverts/edit', 'AdminPages\AdvertsController@showEditForm')->name('edit_advert');
+    Route::post('adverts/edit/update', 'AdminPages\AdvertsController@update')->name('edit_advert_post');
+    Route::post('adverts/delete', 'AdminPages\AdvertsController@destroy')->name('delete_advert');    
     Route::get('venues', 'AdminPages\VenuesController@index')->name('venues');
     Route::get('venues/add', 'AdminPages\VenuesController@showAddForm')->name('add_venue');
     Route::post('venues/add', 'AdminPages\VenuesController@store')->name('add_venue_post');
