@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AdvertResource extends JsonResource
@@ -20,10 +21,10 @@ class AdvertResource extends JsonResource
           "title"       =>$this->title,
           "description" =>$this->descritpion,
           "image_url"   =>$this->image_url,
-          "start_date"  =>$this->start_date,
-          "end_date"    =>$this->end_date,
-          "created_at"  =>$this->created_at,
-          "updated_at"  =>$this->updated_at,
+          "start_date"  =>Carbon::parse($this->start_date)->toDateString(),
+          "end_date"    =>Carbon::parse($this->end_date)->toDateString(),
+          "created_at"  =>Carbon::parse($this->created_at)->toDateString(),
+          "updated_at"  =>Carbon::parse($this->updated_at)->toDateString(),
         ];
     }
 }
