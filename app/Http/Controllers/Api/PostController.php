@@ -19,11 +19,11 @@ class PostController extends Controller
     public function index()
     {
         try {
-            $posts = Post::all()->toArray();
+            $posts = Post::all();
             return Response::json(array(
                     "success" => true,
                     "message" => "found " . count($posts),
-                    "data" => PostResource::make($posts),
+                    "data" => PostResource::collection($posts),
                 )
 
             );
