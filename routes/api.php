@@ -11,43 +11,42 @@
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+$api = app('Dingo\Api\Routing\Router');
 
-Route::group(['prefix'=>'auth'], function () {
+$api->version('v1', function ($api) {
+    $base_url = "App\Http\Controllers\\";
+    $api->group(['prefix' => 'auth'], function ($api) use ($base_url) {
 
-    Route::group(['prefix'=>'user'], function () {
-       Route::get('users','Api\AuthController@index');
-       Route::post('register','Api\AuthController@register_user');
-       Route::post('login', 'Api\AuthController@login_user');
-       Route::post('reset_password_email', 'Api\AuthController@reset_password_user');
+        $api->group(['prefix' => 'user'], function ($api) use ($base_url) {
+            $api->get('users', $base_url . 'Api\AuthController@index');
+            $api->post('register', $base_url . 'Api\AuthController@register_user');
+            $api->post('login', $base_url . 'Api\AuthController@login_user');
+            $api->post('reset_password_email', $base_url . 'Api\AuthController@reset_password_user');
+        });
+
+        $api->group(['prefix' => 'scanner'], function ($api) use ($base_url) {
+            $api->get('scanners', $base_url . 'Api\ScannerAuthController@index');
+            $api->post('register', $base_url . 'Api\ScannerAuthController@register');
+            $api->post('login', $base_url . 'Api\ScannerAuthController@login');
+            $api->post('reset_password_email', $base_url . 'Api\ScannerAuthController@reset_password');
+        });
     });
 
-    Route::group(['prefix'=>'scanner'], function () {
-        Route::get('scanners','Api\ScannerAuthController@index');
-        Route::post('register','Api\ScannerAuthController@register');
-        Route::post('login', 'Api\ScannerAuthController@login');
-        Route::post('reset_password_email', 'Api\ScannerAuthController@reset_password');
-    });
+    $api->get('adverts', $base_url . 'Api\AdvertController@index');
+    $api->post('adverts_view', $base_url . 'Api\AdvertController@advert_view');
+
+    $api->get('countries', $base_url . 'Api\CountryController@index');
+    $api->get('events/{user_id}', $base_url . 'Api\EventController@index');
+    $api->get('notifications/{user_id}', $base_url . 'Api\NotificationController@index');
+    $api->post('notifications', $base_url . 'Api\NotificationController@markSeen');
+    $api->get('venues', $base_url . 'Api\VenueController@index');
+    $api->get('posts/{user_id}', $base_url . 'Api\PostController@index');
+    $api->post('posts', $base_url . 'Api\PostController@store');
+    $api->post('delete_post', $base_url . 'Api\PostController@delete');
+    $api->post('like_post', $base_url . 'Api\PostController@like');
+    $api->post('report_abuse', $base_url . 'Api\PostController@report_abuse');
+    $api->get('user/{id}/relations', $base_url . 'Api\AuthController@user_relations');
+    $api->post('user/follow', $base_url . 'Api\AuthController@follow');
 
 });
-
-Route::get('adverts','Api\AdvertController@index');
-Route::post('adverts_view','Api\AdvertController@advert_view');
-Route::post('adverts','Api\AdvertController@store');
-Route::get('countries','Api\CountryController@index');
-Route::get('events','Api\EventController@index');
-Route::get('notifications/{user_id}','Api\NotificationController@index');
-Route::post('notifications', 'Api\NotificationController@markSeen');
-Route::get('venues','Api\VenueController@index');
-
-Route::get('posts','Api\PostController@index');
-Route::post('posts','Api\PostController@store');
-Route::post('delete_post','Api\PostController@delete');
-Route::post('like_post','Api\PostController@like');
-Route::post('report_abuse','Api\PostController@report_abuse');
-
-Route::get('user/{id}/relations', 'Api\AuthController@user_relations');
-Route::post('user/follow', 'Api\AuthController@follow');
 

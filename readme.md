@@ -59,7 +59,17 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
-## API Endpoints
+## API   
+We are using the [Dingo API Package](https://github.com/dingo/api) for the management of the endpoints, version-ing and routes classification. As such there's need to add the following to the .env file:-  
+API_STANDARDS_TREE=vnd  
+API_SUBTYPE=fika_app
+API_PREFIX=api
+API_VERSION=v1
+API_STRICT=true
+API_DEBUG=true
+
+
+##Endpoints  
 1. Register
 - Email
 - Facebook
