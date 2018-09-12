@@ -37,12 +37,13 @@
                     <th>Contact person phone</th>
                     <th>Contact person email</th>
                     <th>Status</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                     @foreach ($venues as $venue)
                     <tr class="item">
-                        <td>{{$venue->venue_name}}</td>
+                        <td>{{str_limit($venue->venue_name, $limit = 30, $end = '...')}}</td>
                         <td>{{ $venue->town_name}}</td>                        
                         <td>{{$venue->contact_person_name}}</td>
                         <td>{{$venue->contact_person_phone}}</td>
@@ -56,8 +57,21 @@
                                 {{'inactive'}}
                             @endif
                         </td>
+                        <td>
+                          <button onClick="document.getElementById('edit_form_{{$venue->id}}').submit();" class="btn btn-sm btn-outline-primary">Edit</button>
+                          <form id="edit_form_{{$venue->id}}" action="{{ route('edit_venue') }}" method="POST" style="display: none;">
+                              {{ csrf_field() }}
+                              <input type="hidden" name="id" value="{{$venue->id}}">
+                          </form>
+
+                          <button onClick="deleteBtn({{$venue->id}})" class="btn btn-sm btn-outline-danger">Delete</button>
+                          <form id="delete_form_{{$venue->id}}" action="{{ route('delete_venue') }}" method="POST" style="display: none;">
+                              {{ csrf_field() }}
+                              <input type="hidden" name="id" value="{{$venue->id}}">
+                          </form>
+                        </td>
                     </tr>                        
-                    @endforeach                  
+                    @endforeach                
                 </tbody>
               </table>
             </div>
@@ -73,6 +87,28 @@
 <script type="text/javascript" src="{{ asset('js/plugins/dataTables.bootstrap.min.js') }}"></script>
 <script type="text/javascript">$('#adminsTable').DataTable();</script>
 <script type="text/javascript" src="{{ asset('js/plugins/bootstrap-notify.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/plugins/sweetalert.min.js') }}"></script>
+<script>
+  function deleteBtn(id) {    
+    swal({
+      		title: "Are you sure?",
+      		text: "You will not be able to recover this record",
+      		type: "warning",
+      		showCancelButton: true,
+      		confirmButtonText: "Yes, delete it!",
+      		cancelButtonText: "No, cancel!",
+      		closeOnConfirm: false,
+      		closeOnCancel: true
+      	}, function(isConfirm) {
+          if (isConfirm) {
+            $form ="delete_form_"+id;
+      			document.getElementById($form).submit();
+      		}
+                		
+      	});
+  }
+  
+</script>
 @if (session('status'))
     <script type="text/javascript">
       $.notify({

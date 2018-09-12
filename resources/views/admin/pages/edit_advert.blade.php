@@ -7,7 +7,7 @@
     <main class="app-content">
       <div class="app-title">
         <div>
-          <h1><i class="fa fa-bullhorn"></i> Edit Advert</h1>          
+          <h1><i class="fa fa-bullhorn"></i> Edit Advert</h1>
           <p>Edit the details of the advert</p>
         </div>
         <ul class="app-breadcrumb breadcrumb">
