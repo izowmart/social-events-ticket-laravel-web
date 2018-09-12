@@ -21,6 +21,7 @@ class CreateEventsTable extends Migration
             $table->text('description');
             $table->string('location');
             $table->integer('type')->comment("1: Free,2: Paid");
+            $table->integer('status')->default(0)->comment('0- unverified, 1 - verified, 2 - deactivated');
             $table->timestamps();
         });
     }

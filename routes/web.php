@@ -102,6 +102,7 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
     Route::post('add', 'AdminAuth\RegisterController@register')->name('add_admin_post');
 
     Route::get('admins', 'AdminPages\AdminsController@index')->name('admins');
+
     Route::get('countries', 'AdminPages\CountriesController@index')->name('countries');
     Route::get('countries/add', 'AdminPages\CountriesController@showAddForm')->name('add_country');
     Route::post('countries/add', 'AdminPages\CountriesController@store')->name('add_country_post');
@@ -131,14 +132,23 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
     Route::post('venues/delete', 'AdminPages\VenuesController@destroy')->name('delete_venue');
 
     Route::get('users', 'AdminPages\UsersController@index')->name('users');
+
     Route::get('posts', 'AdminPages\PostsController@index')->name('posts');
     Route::post('posts/block', 'AdminPages\PostsController@block')->name('block_post');
     Route::post('abuses', 'AdminPages\AbusesController@index')->name('abuses');
+
     Route::get('event_organizers/unverified', 'AdminPages\EventOrganizersController@Unverifiedindex')->name('unverified_event_organizers');
     Route::get('event_organizers/verified', 'AdminPages\EventOrganizersController@Verifiedindex')->name('verified_event_organizers');
     Route::post('event_organizers/deactivate', 'AdminPages\EventOrganizersController@deactivate')->name('deactivate_event_organizer_post');
     Route::post('event_organizers/verify', 'AdminPages\EventOrganizersController@verify')->name('verify_event_organizer_post');
     Route::post('event_organizers/activate', 'AdminPages\EventOrganizersController@activate')->name('activate_event_organizer_post');
+
+    Route::get('events/unverified', 'AdminPages\EventsController@Unverifiedindex')->name('unverified_events');
+    Route::get('events/verified/paid', 'AdminPages\EventsController@VerifiedPaidindex')->name('verified_paid_events');
+    Route::get('events/verified/free', 'AdminPages\EventsController@VerifiedFreeindex')->name('verified_free_events');
+    Route::post('events/deactivate', 'AdminPages\EventsController@deactivate')->name('deactivate_event_post');
+    Route::post('events/verify', 'AdminPages\EventsController@verify')->name('verify_event_post');
+    Route::post('events/activate', 'AdminPages\EventsController@activate')->name('activate_event_post');
     
 });
 

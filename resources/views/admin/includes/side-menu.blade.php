@@ -24,12 +24,12 @@
           <li><a class="treeview-item {{ Route::currentRouteNamed('verified_event_organizers') ? 'active' : '' }}" href="{{ route('verified_event_organizers') }}"><i class="icon fa fa-circle-o"></i> Verified</a></li>
         </ul>
       </li>
-      <li class="treeview"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="app-menu__icon fa fa-calendar-check-o"></i><span class="app-menu__label">Events</span><i class="treeview-indicator fa fa-angle-right"></i></a>
+      <li class="treeview {{ Route::currentRouteNamed('verified_free_events') || Route::currentRouteNamed('unverified_events') || Route::currentRouteNamed('verified_paid_events') ? 'is-expanded' : '' }}"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="app-menu__icon fa fa-calendar-check-o"></i><span class="app-menu__label">Events</span><i class="treeview-indicator fa fa-angle-right"></i></a>
         <ul class="treeview-menu">
-          <li><a class="treeview-item" href="table-basic.html"><i class="icon fa fa-circle-o"></i> Uneverified</a></li>
-          <li class="treeview"><a class="treeview-item" href="table-data-table.html" data-toggle="treeview"><i class="icon fa fa-circle-o"></i> Verified</a>
-            <li><a class="treeview-item" href="table-basic.html"><i class="icon fa fa-circle-o"></i> Free</a></li>
-          </li>
+          <li><a class="treeview-item {{ Route::currentRouteNamed('unverified_events') ? 'active' : '' }}" href="{{ route('unverified_events') }}"><i class="icon fa fa-circle-o"></i> Unverified</a></li>
+          <li><a class="treeview-item" href="#"><i class="icon fa fa-circle-o"></i> Verified</a></li>
+          <li><a class="treeview-item {{ Route::currentRouteNamed('verified_free_events') ? 'active' : '' }}" href="{{ route('verified_free_events') }}"><i class="icon fa fa-circle-o"></i> Free</a></li>
+          <li><a class="treeview-item {{ Route::currentRouteNamed('verified_paid_events') ? 'active' : '' }}" href="{{ route('verified_paid_events') }}"><i class="icon fa fa-circle-o"></i> Paid</a></li>
         </ul>
       </li>
     </ul>
