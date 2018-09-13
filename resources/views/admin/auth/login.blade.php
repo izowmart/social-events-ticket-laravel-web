@@ -1,4 +1,4 @@
-@extends('admin.layouts')
+@extends('common_pages.layouts')
 
 @section('title')
     <title>Admin Login - Fika</title>

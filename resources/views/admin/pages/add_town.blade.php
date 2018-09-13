@@ -1,4 +1,4 @@
-@extends('admin.layouts')
+@extends('common_pages.layouts')
 
 @section('other-styles')
 <style>
@@ -8,8 +8,8 @@
 @endsection
 
 @section('content')
-    @include('admin.includes.header')
-    @include('admin.includes.side-menu')
+    @include('includes.header')
+    @include('includes.side-menu')
 
     <main class="app-content">
       <div class="app-title">

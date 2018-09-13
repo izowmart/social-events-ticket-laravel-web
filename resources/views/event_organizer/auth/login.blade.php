@@ -1,4 +1,4 @@
-@extends('event_organizer.layouts')
+@extends('common_pages.layouts')
 
 @section('title')
     <title>Event Organizer Login - Fika</title>
@@ -58,7 +58,7 @@
           </div><br>
           <div class="form-group">
             <div class="utility">
-              <p class="semibold-text mb-2"><a href="{{ route('event_organizer_registration_form') }}">Don't have an account?</a></p>
+              <p class="semibold-text mb-2"><a href="{{ route('event_organizer_register_form') }}">Don't have an account?</a></p>
             </div>
           </div>
         </form>
