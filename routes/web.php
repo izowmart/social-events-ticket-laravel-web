@@ -66,6 +66,7 @@ Route::group(['middleware' => 'guest'], function () {
         Route::post('/reset',
             'EventOrganizerAuth\ResetPasswordController@reset')->name('event_organizer_reset_form_post');
 
+
     });
 
 
@@ -93,7 +94,7 @@ Route::group(['middleware' => 'scanner', 'prefix'=>'scanner'], function () {
     Route::get('home', 'HomeController@home_scanner');
 });
 
-//Only logged in users can access or send requests to these pages
+//Only logged in admin can access or send requests to these pages
 Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
 
     Route::get('home', 'AdminPages\HomeController@index')->name('admin_home');
@@ -143,30 +144,29 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
     Route::post('event_organizers/verify', 'AdminPages\EventOrganizersController@verify')->name('verify_event_organizer_post');
     Route::post('event_organizers/activate', 'AdminPages\EventOrganizersController@activate')->name('activate_event_organizer_post');
 
-    Route::get('events/unverified', 'AdminPages\EventsController@Unverifiedindex')->name('unverified_events');
-    Route::get('events/verified/paid', 'AdminPages\EventsController@VerifiedPaidindex')->name('verified_paid_events');
-    Route::get('events/verified/free', 'AdminPages\EventsController@VerifiedFreeindex')->name('verified_free_events');
-    Route::post('events/deactivate', 'AdminPages\EventsController@deactivate')->name('deactivate_event_post');
-    Route::post('events/verify', 'AdminPages\EventsController@verify')->name('verify_event_post');
-    Route::post('events/activate', 'AdminPages\EventsController@activate')->name('activate_event_post');
+    Route::get('events/unverified', 'CommonPages\EventsController@Unverifiedindex')->name('admin_unverified_events');
+    Route::get('events/verified/paid', 'CommonPages\EventsController@VerifiedPaidindex')->name('admin_verified_paid_events');
+    Route::get('events/verified/free', 'CommonPages\EventsController@VerifiedFreeindex')->name('admin_verified_free_events');
+    Route::post('events/deactivate', 'CommonPages\EventsController@deactivate')->name('admin_deactivate_event_post');
+    Route::post('events/verify', 'CommonPages\EventsController@verify')->name('admin_verify_event_post');
+    Route::post('events/activate', 'CommonPages\EventsController@activate')->name('admin_activate_event_post');
     
 });
 
-
-/*
-|--------------------------------------------------------------------------
-| Event Organizer auth routes
-|--------------------------------------------------------------------------
-|
-*/
-
-//Only logged in users can access or send requests to these pages
-Route::group(['middleware' => 'event_organizer_auth',['prefix'=>'event_organizer']], function () {
+//Only logged in event organizer can access or send requests to these pages
+Route::group(['middleware' => 'event_organizer_auth','prefix'=>'event_organizer'], function () {
+    
+    Route::get('home', 'EventOrganizerPages\HomeController@index')->name('event_organizer_home');
 
     Route::post('logout', 'EventOrganizerAuth\LoginController@logout')->name('event_organizer_logout');
+    Route::get('events/unverified', 'CommonPages\EventsController@Unverifiedindex')->name('event_organizer_unverified_events');
+    Route::get('events/verified/paid', 'CommonPages\EventsController@VerifiedPaidindex')->name('event_organizer_verified_paid_events');
+    Route::get('events/verified/free', 'CommonPages\EventsController@VerifiedFreeindex')->name('event_organizer_verified_free_events');
+    Route::post('events/deactivate', 'CommonPages\EventsController@deactivate')->name('event_organizer_deactivate_event_post');
+    Route::post('events/verify', 'CommonPages\EventsController@verify')->name('event_organizer_verify_event_post');
+    Route::post('events/activate', 'CommonPages\EventsController@activate')->name('event_organizer_activate_event_post');    
+    Route::get('events/add', 'CommonPages\EventsController@showAddForm')->name('add_event');   
+    Route::post('events/add', 'CommonPages\EventsController@store')->name('add_event_post');
 
-    Route::get('home', function () {
-        return view('event-organizer.home');
-    });
 
 });
