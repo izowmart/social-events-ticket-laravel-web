@@ -21,7 +21,7 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->string('year_of_birth')->nullable();
             $table->integer('gender')->comment("1: Male, 2: Female")->nullable();
-            $table->string('image_url')->nullable();
+            $table->string('profile_url')->nullable();
             $table->integer('country_id')->unsigned()->nullable();
             $table->foreign('country_id')->references('id')->on('countries');
             $table->string('fcm_token')->default("0");
@@ -29,6 +29,7 @@ class CreateUsersTable extends Migration
             $table->string('app_version_code')->default("1.0.0");
             $table->string('password');
             $table->integer('status')->default(1)->comment('0- inactive, 1 - active, 2 - deactivated');
+            $table->boolean('first_time_login')->default(true);
             $table->rememberToken();
             $table->timestamps();
         });
