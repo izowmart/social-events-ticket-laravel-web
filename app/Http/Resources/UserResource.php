@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
@@ -16,17 +17,19 @@ class UserResource extends JsonResource
     {
         return [
             'id'                    => $this->id,
-            'name'                  => $this->first_name. ' '.$this->last_name,
+            'firstname'            => $this->first_name,
+            'lastname'             => $this->last_name,
             'username'              => $this->username,
             'email'                 => $this->email,
             'year_of_birth'         => $this->year_of_birth,
             'gender'                => $this->gender,
-            'profile_url'           => $this->image_url,
+            'profile_url'           => $this->profile_url,
             'country_id'            => $this->country_id,
             'fcm_token'             => $this->fcm_token,
             'auto_follow_status'    => $this->auto_follow_status,
             'app_version_code'      => $this->app_version_code,
             'is_first_time_login'   => $this->is_first_time_login,
+            'created_at'            => Carbon::parse($this->created_at)->toDateTimeString()
         ];
     }
 }
