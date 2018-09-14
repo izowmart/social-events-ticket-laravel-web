@@ -15,10 +15,18 @@ class EventsController extends Controller
     protected $UnverifiedredirectPath = 'admin/events/unverified';
 
     //event organizer redirect path
+    protected $EventOrganizerVerifiedPaidredirectPath = 'event_organizer/events/verified/paid';
+    protected $EventOrganizerVerifiedFreeredirectPath = 'event_organizer/events/verified/free';
     protected $EventOrganizerUnverifiedredirectPath = 'event_organizer/events/unverified';
 
     public function showAddForm(){
         return view('event_organizer.pages.add_event');
+
+    }
+
+    public function showEditForm(Request $request){
+        $event = Event::find($request->id);
+        return view('event_organizer.pages.edit_event')->with('event',$event);
 
     }
 
@@ -44,6 +52,46 @@ class EventsController extends Controller
         //Give message after successfull operation
         $request->session()->flash('status', 'Event added successfully');
         return redirect($this->EventOrganizerUnverifiedredirectPath);
+
+    }
+
+    public function update(Request $request){
+        $this->validate($request, [
+            'name'=>'required',
+            'description'=>'required',            
+            'location'=>'required',
+            'type'=>'required'
+        ]); 
+
+        $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
+
+        $event = Event::find($request->id);
+        $event->name = $request->name;
+        $event->event_organizer_id = $event_organizer_id;
+        $event->location = $request->location;
+        $event->description = $request->description;
+        $event->type = $request->type;
+
+        $event->save();
+
+        //Give message after successfull operation
+        $request->session()->flash('status', 'Event updated successfully');
+
+        //redirect event organizer to approproate place
+        $event_status = $event->status;
+        if($request->type==1 && $event_status!=0){
+            //if free event and not unverified
+            return redirect($this->EventOrganizerVerifiedFreeredirectPath);
+
+        }else if($request->type==2 && $event_status!=0){
+            //if paid event and not unverified
+            return redirect($this->EventOrganizerVerifiedPaidredirectPath);
+
+        }else{
+            //if its unverified
+            return redirect($this->EventOrganizerUnverifiedredirectPath);
+
+        }
 
     }
 
@@ -180,7 +228,31 @@ class EventsController extends Controller
         
     }
 
-    function CheckUserType(){
+    public function destroy(Request $request){
+        $event = Event::find($request->id);
+        $event_status = $event->status;
+        if($request->type==1 && $event_status!=0){
+            //if free event and not unverified
+            $redirect = redirect($this->EventOrganizerVerifiedFreeredirectPath);
+
+        }else if($request->type==2 && $event_status!=0){
+            //if paid event and not unverified
+            $redirect = redirect($this->EventOrganizerVerifiedPaidredirectPath);
+
+        }else{
+            //if its unverified
+            $redirect = redirect($this->EventOrganizerUnverifiedredirectPath);
+
+        }
+
+        $event->delete();
+        //Give message to event organizer after successfull operation
+        $request->session()->flash('status', 'Event deleted successfully');
+        return $redirect;
+
+    } 
+
+    public function CheckUserType(){
         //we check whether the logged in user is admin or event organizer
         if (Auth::guard('web_admin')->check()) {
             $user = "Admin";

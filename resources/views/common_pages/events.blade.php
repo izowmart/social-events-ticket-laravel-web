@@ -41,11 +41,15 @@
                 <thead>
                   <tr>
                     <th>Name</th>
-                    <th>Description</th>
                     <th>Location</th>                   
                     <th>Type</th>
-                    <th>Status</th>                   
-                    <th>Added by</th>                
+                    <th>Status</th>
+                    @auth('web_event_organizer')                        
+                    <th>Scanners</th> 
+                    @endauth   
+                    @auth('web_admin')                
+                    <th>Added by</th>                          
+                    @endauth              
                     <th>Created on</th>
                     <th>Action</th>
                   </tr>
@@ -53,9 +57,8 @@
                 <tbody>
                     @foreach ($events as $event)
                     <tr class="item">
-                        <td>{{str_limit($event->name, $limit = 15, $end = '...')}}</td>                        
-                        <td>{{str_limit($event->description, $limit = 40, $end = '...')}}</td> 
-                        <td>{{str_limit($event->location, $limit = 25, $end = '...')}}</td>
+                        <td>{{str_limit($event->name, $limit = 20, $end = '...')}}</td> 
+                        <td>{{str_limit($event->location, $limit = 15, $end = '...')}}</td>
                         <td>
                             @if ($event->type==1)
                                 {{'free'}}
@@ -71,8 +74,29 @@
                             @else                                
                                 {{'unverified'}}
                             @endif
-                        </td>                        
-                        <td>{{$event->first_name}} {{$event->last_name}}</td> 
+                        </td>
+                        @auth('web_event_organizer') 
+                        <td>{{ $event->scanners->count() }}
+                            @if ($event->scanners->count()>0)                            
+                            <a href=""  class="btn btn-sm btn-outline-primary">View</a>
+                                {{-- <a href="{{ route('scanners') }}" onclick="event.preventDefault(); document.getElementById('scanner-form-{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">View</a>
+                                <form id="scanner-form-{{$event->id}}" action="{{ route('scanners') }}" method="POST" style="display: none;">
+                                    {{ csrf_field() }}
+                                    <input type="hidden" name="id" value="{{$event->id}}">
+                                </form> --}}
+                            @else
+                                <a href="{{ route('add_scanner') }}" onclick="event.preventDefault(); document.getElementById('scanner-form-{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">Add</a>
+                                <form id="scanner-form-{{$event->id}}" action="{{ route('add_scanner') }}" method="POST" style="display: none;">
+                                    {{ csrf_field() }}
+                                    <input type="hidden" name="id" value="{{$event->id}}">
+                                    <input type="hidden" name="event_name" value="{{$event->name}}">
+                                </form>
+                            @endif
+                        </td>   
+                        @endauth
+                        @auth('web_admin')                                               
+                        <td>{{$event->first_name}} {{$event->last_name}}</td>                             
+                        @endauth
                         <td>{{date("jS M Y, g:i a", strtotime($event->created_at))}}</td>
                         <td>
                         {{-- check the user and set appropriate actions. --}}
@@ -104,8 +128,16 @@
                         @endauth
 
                         @auth('web_event_organizer')
-                            <a href="" onclick="event.preventDefault(); document.getElementById('verify-form').submit();" class="btn btn-sm btn-outline-primary">Edit</a>
-                            <a href="" onclick="event.preventDefault(); document.getElementById('verify-form').submit();" class="btn btn-sm btn-outline-primary">Delete</a>
+                            <button onClick="document.getElementById('edit_form_{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">Edit</button>
+                            <form id="edit_form_{{$event->id}}" action="{{ route('edit_event') }}" method="POST" style="display: none;">
+                                {{ csrf_field() }}
+                                <input type="hidden" name="id" value="{{$event->id}}">
+                            </form>
+                            <button onClick="deleteBtn({{$event->id}})" class="btn btn-sm btn-outline-danger">Delete</button>
+                            <form id="delete_form_{{$event->id}}" action="{{ route('delete_event') }}" method="POST" style="display: none;">
+                                {{ csrf_field() }}
+                                <input type="hidden" name="id" value="{{$event->id}}">
+                            </form>
                         @endauth
                         
                         </td>
@@ -128,6 +160,29 @@
     "order": [[ 4, "asc" ]]
 });</script>
 <script type="text/javascript" src="{{ asset('js/plugins/bootstrap-notify.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/plugins/sweetalert.min.js') }}"></script>
+<script>
+  function deleteBtn(id) {    
+    swal({
+      		title: "Are you sure?",
+      		text: "You will not be able to recover this record",
+      		type: "warning",
+      		showCancelButton: true,
+      		confirmButtonText: "Yes, delete it!",
+      		cancelButtonText: "No, cancel!",
+      		closeOnConfirm: false,
+      		closeOnCancel: true
+      	}, function(isConfirm) {
+          if (isConfirm) {
+            $form ="delete_form_"+id;
+      			document.getElementById($form).submit();
+      		}
+          
+      		
+      	});
+  }
+  
+</script>
 @if (session('status'))
     <script type="text/javascript">
       $.notify({
