@@ -10,4 +10,8 @@ class Event extends Model
         'event_organizer_id','name', 'description', 'location', 'type',
     ];
 
+    public function scanners(){
+        return $this->hasMany('App\EventScanner','event_id');
+    }
+
 }
