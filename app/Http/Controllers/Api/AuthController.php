@@ -64,8 +64,12 @@ class AuthController extends Controller
                 ], 200
             );
         } else {
+            $password = bcrypt($request->password);
+            $data = $request->except('password');
 
-            $user = User::create($request->all());
+            $data['password'] = $password;
+
+            $user = User::create($data);
 
             if ($user) {
 
