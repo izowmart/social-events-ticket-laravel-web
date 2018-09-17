@@ -22,8 +22,8 @@ class PostResource extends JsonResource
             'created_at'        => Carbon::parse($this->created_at)->toDateTimeString(),
             'media_type'        => $this->media_type,
             'media_url'         => $this->media_url,
-            'like'              => count($this->like) == 0 ? false : true,
-            'shared'            => $this->shared,
+            'like'              => (bool) count($this->like) == 0 ? false : true,
+            'shared'            => (bool) $this->shared,
             'comment'           => $this->comment,
         ];
     }
