@@ -26,9 +26,9 @@ class UserResource extends JsonResource
             'profile_url'           => $this->profile_url,
             'country_id'            => $this->country_id,
             'fcm_token'             => $this->fcm_token,
-            'auto_follow_status'    => $this->auto_follow_status,
+            'auto_follow_status'    => (bool) $this->auto_follow_status,
             'app_version_code'      => $this->app_version_code,
-            'is_first_time_login'   => $this->is_first_time_login,
+            'is_first_time_login'   => (bool) $this->first_time_login,
             'created_at'            => Carbon::parse($this->created_at)->toDateTimeString()
         ];
     }
