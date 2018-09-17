@@ -77,19 +77,20 @@
                         </td>
                         @auth('web_event_organizer') 
                         <td>{{ $event->scanners->count() }}
-                            @if ($event->scanners->count()>0)                            
-                            <a href=""  class="btn btn-sm btn-outline-primary">View</a>
-                                {{-- <a href="{{ route('scanners') }}" onclick="event.preventDefault(); document.getElementById('scanner-form-{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">View</a>
+                            @if ($event->scanners->count()>0)
+                                <a href="{{ route('scanners') }}" onclick="event.preventDefault(); document.getElementById('scanner-form-{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">View</a>
                                 <form id="scanner-form-{{$event->id}}" action="{{ route('scanners') }}" method="POST" style="display: none;">
                                     {{ csrf_field() }}
                                     <input type="hidden" name="id" value="{{$event->id}}">
-                                </form> --}}
+                                    <input type="hidden" name="event_name" value="{{$event->name}}">
+                                </form>
                             @else
                                 <a href="{{ route('add_scanner') }}" onclick="event.preventDefault(); document.getElementById('scanner-form-{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">Add</a>
                                 <form id="scanner-form-{{$event->id}}" action="{{ route('add_scanner') }}" method="POST" style="display: none;">
                                     {{ csrf_field() }}
                                     <input type="hidden" name="id" value="{{$event->id}}">
                                     <input type="hidden" name="event_name" value="{{$event->name}}">
+                                    <input type="hidden" name="event_status" value="{{$event->status}}">
                                 </form>
                             @endif
                         </td>   

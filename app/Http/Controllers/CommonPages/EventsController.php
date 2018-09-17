@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Event;
+use App\Scanner;
+use App\EventScanner;
 
 class EventsController extends Controller
 {
@@ -242,6 +244,17 @@ class EventsController extends Controller
         }else{
             //if its unverified
             $redirect = redirect($this->EventOrganizerUnverifiedredirectPath);
+
+        }
+
+        //first delete scanners if they exist
+        if($event->scanners->count()>0){
+            $event_scanners = EventScanner::where('event_id',$request->id)->get();
+            foreach($event_scanners as $event_scanner){                
+                $scanner = Scanner::find($event_scanner->scanner_id);                
+                $scanner->delete();
+                $event_scanner->delete();
+            }
 
         }
 
