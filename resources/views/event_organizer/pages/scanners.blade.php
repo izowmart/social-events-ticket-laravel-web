@@ -14,60 +14,52 @@
     <main class="app-content">
       <div class="app-title">
         <div>
-          <h1><i class="fa fa-map-marker"></i> Scanners</h1>
-          <p>List of all scanners</p>
+          <h1><i class="fa fa-user-secret"></i> Scanners</h1>
+          <p>List of all scanners from {{$event_name}} event</p>
         </div>
         <ul class="app-breadcrumb breadcrumb">
           <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
           <li class="breadcrumb-item"><a href="{{ route('admin_home') }}">Home</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('event_organizer_unverified_events') }}">Events</a></li>
           <li class="breadcrumb-item"><a href="{{ route('scanners') }}">Scanners</a></li>
         </ul>
       </div>
       <div class="row">
         <div class="col-md-12">
           <div class="tile">  
-              <p><a class="btn btn-primary icon-btn float-right" href="{{ route('add_scanner') }}"><i class="fa fa-plus"></i>Add Scanner</a></p><br><br>
+              <p><a class="btn btn-primary icon-btn float-right" href="{{ route('add_scanner') }}" onclick="event.preventDefault(); document.getElementById('scanner-form-{{$event_id}}').submit();"><i class="fa fa-plus"></i>Add Scanner</a></p><br><br>
+                <form id="scanner-form-{{$event_id}}" action="{{ route('add_scanner') }}" method="POST" style="display: none;">
+                    {{ csrf_field() }}
+                    <input type="hidden" name="id" value="{{$event_id}}">
+                </form>
             <div class="tile-body">
               <table class="table table-hover table-bordered" id="adminsTable">
                 <thead>
                   <tr>
                     <th>Name</th>
-                    <th>Town</th>
-                    <th>Contact person name</th>
-                    <th>Contact person phone</th>
-                    <th>Contact person email</th>
-                    <th>Status</th>
+                    <th>Eamil</th>
                     <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                     @foreach ($scanners as $scanner)
                     <tr class="item">
-                        <td>{{str_limit($scanner->scanner_name, $limit = 30, $end = '...')}}</td>
-                        <td>{{ $scanner->town_name}}</td>                        
-                        <td>{{$scanner->contact_person_name}}</td>
-                        <td>{{$scanner->contact_person_phone}}</td>
-                        <td>{{$scanner->contact_person_email}}</td>
-                        <td>
-                            @if ($scanner->status==1)
-                                {{'active'}}
-                            @elseif ($scanner->status==2)
-                                {{'deactivated'}}
-                            @else                                
-                                {{'inactive'}}
-                            @endif
-                        </td>
+                        <td>{{ $scanner->first_name}} {{ $scanner->last_name}}</td>                        
+                        <td>{{$scanner->email}}</td>
                         <td>
                           <button onClick="document.getElementById('edit_form_{{$scanner->id}}').submit();" class="btn btn-sm btn-outline-primary">Edit</button>
                           <form id="edit_form_{{$scanner->id}}" action="{{ route('edit_scanner') }}" method="POST" style="display: none;">
                               {{ csrf_field() }}
                               <input type="hidden" name="id" value="{{$scanner->id}}">
+                              <input type="hidden" name="event_status" value="{{$scanner->event_status}}">
+                              <input type="hidden" name="event_status" value="{{$scanner->event_status}}">
                           </form>
 
                           <button onClick="deleteBtn({{$scanner->id}})" class="btn btn-sm btn-outline-danger">Delete</button>
                           <form id="delete_form_{{$scanner->id}}" action="{{ route('delete_scanner') }}" method="POST" style="display: none;">
                               {{ csrf_field() }}
                               <input type="hidden" name="id" value="{{$scanner->id}}">
+                              <input type="hidden" name="event_status" value="{{$scanner->event_status}}">
                           </form>
                         </td>
                     </tr>                        

@@ -7,14 +7,14 @@
     <main class="app-content">
       <div class="app-title">
         <div>
-          <h1><i class="fa fa-edit"></i> Add Scanner</h1>
+          <h1><i class="fa fa-user-secret"></i> Add Scanner</h1>
           <p>Fill the form below to add a new scanner</p>
         </div>
         <ul class="app-breadcrumb breadcrumb">
           <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
           <li class="breadcrumb-item"><a href="{{ route('admin_home') }}">Home</a></li>
-          <li class="breadcrumb-item"><a href="{{ route('scanners') }}">Scanners</a></li>
-          <li class="breadcrumb-item"><a href="{{ route('add_scanner') }}">Add</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('event_organizer_unverified_events') }}">Events</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('add_scanner') }}">Add scanner</a></li>
         </ul>
       </div>
       <div class="row">
@@ -49,17 +49,6 @@
                     </div>                      
                   </div>
                   <div class="row"> 
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label>Phone number</label>
-                        <input type="tel" class="form-control" maxlength="13" placeholder="The scanner's phone number" name="phone" required/>  
-                        @if ($errors->has('phone'))
-                            <span class="help-block">
-                                <strong>{{ $errors->first('phone') }}</strong>
-                            </span>
-                        @endif
-                      </div>
-                    </div>
                     <div class="col-md-6">                   
                       <div class="form-group">
                         <label>Email</label>

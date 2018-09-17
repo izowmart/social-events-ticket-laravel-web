@@ -36,7 +36,7 @@
                     <th>Contact person name</th>
                     <th>Contact person phone</th>
                     <th>Contact person email</th>
-                    <th>Status</th>
+                    <th>Location</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -49,13 +49,7 @@
                         <td>{{$venue->contact_person_phone}}</td>
                         <td>{{$venue->contact_person_email}}</td>
                         <td>
-                            @if ($venue->status==1)
-                                {{'active'}}
-                            @elseif ($venue->status==2)
-                                {{'deactivated'}}
-                            @else                                
-                                {{'inactive'}}
-                            @endif
+                            <a target="_blank" href="https://maps.google.com/maps?q={{$venue->latitude}},{{$venue->longitude}}" class="btn btn-sm btn-outline-primary">View</a>
                         </td>
                         <td>
                           <button onClick="document.getElementById('edit_form_{{$venue->id}}').submit();" class="btn btn-sm btn-outline-primary">Edit</button>

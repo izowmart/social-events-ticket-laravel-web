@@ -188,7 +188,7 @@ Route::group(['middleware' => 'event_organizer_auth','prefix'=>'event_organizer'
         Route::post('delete', 'CommonPages\EventsController@destroy')->name('delete_event');
 
         Route::group(['prefix'=>'scanners'], function () {
-            Route::get('/', 'EventOrganizerPages\ScannersController@index')->name('scanners');
+            Route::post('/', 'EventOrganizerPages\ScannersController@index')->name('scanners');
             Route::post('add', 'EventOrganizerPages\ScannersController@showAddForm')->name('add_scanner');   
             Route::post('add/scanner', 'EventOrganizerPages\ScannersController@store')->name('add_scanner_post');    
             Route::post('edit', 'EventOrganizerPages\ScannersController@showEditForm')->name('edit_scanner');   
