@@ -103,24 +103,24 @@
                         {{-- check the user and set appropriate actions. --}}
                         @auth('web_admin')
                             @if ($event->status==0)
-                                <a href="{{ route('admin_verify_event_post') }}" onclick="event.preventDefault(); document.getElementById('verify-form').submit();" class="btn btn-sm btn-outline-primary">Verify</a>
-                                <form id="verify-form" action="{{ route('admin_verify_event_post') }}" method="POST" style="display: none;">
+                                <a href="{{ route('admin_verify_event_post') }}" onclick="event.preventDefault(); document.getElementById('verify_form_{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">Verify</a>
+                                <form id="verify_form_{{$event->id}}" action="{{ route('admin_verify_event_post') }}" method="POST" style="display: none;">
                                     {{ csrf_field() }}
                                     <input type="hidden" name="id" value="{{$event->id}}">
                                     <input type="hidden" name="type" value="{{$type}}">
                                 </form>
                             @endif 
                             @if ($event->status!==2)
-                                <a href="{{ route('admin_deactivate_event_post') }}" onclick="event.preventDefault(); document.getElementById('deactivate-form').submit();" class="btn btn-sm btn-outline-primary">Deactivate</a>
-                                <form id="deactivate-form" action="{{ route('admin_deactivate_event_post') }}" method="POST" style="display: none;">
+                                <a href="{{ route('admin_deactivate_event_post') }}" onclick="event.preventDefault(); document.getElementById('deactivate_form_{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">Deactivate</a>
+                                <form id="deactivate_form_{{$event->id}}" action="{{ route('admin_deactivate_event_post') }}" method="POST" style="display: none;">
                                     {{ csrf_field() }}
                                     <input type="hidden" name="id" value="{{$event->id}}">
                                     <input type="hidden" name="type" value="{{$type}}">
                                 </form>
                             @endif 
                             @if ($event->status==2)
-                                <a href="{{ route('admin_activate_event_post') }}" onclick="event.preventDefault(); document.getElementById('activate-form').submit();" class="btn btn-sm btn-outline-primary">Activate</a>
-                                <form id="activate-form" action="{{ route('admin_activate_event_post') }}" method="POST" style="display: none;">
+                                <a href="{{ route('admin_activate_event_post') }}" onclick="event.preventDefault(); document.getElementById('activate_form_{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">Activate</a>
+                                <form id="activate_form_{{$event->id}}" action="{{ route('admin_activate_event_post') }}" method="POST" style="display: none;">
                                     {{ csrf_field() }}
                                     <input type="hidden" name="id" value="{{$event->id}}">
                                     <input type="hidden" name="type" value="{{$type}}">
