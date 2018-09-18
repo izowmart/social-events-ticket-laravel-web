@@ -8,6 +8,7 @@ use App\Http\Traits\UniversalMethods;
 use App\Like;
 use App\Notification;
 use App\Post;
+use App\Transformers\PostTransformer;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -23,7 +24,7 @@ class PostController extends Controller
             return Response::json(array(
                     "success" => true,
                     "message" => "found " . count($posts),
-                    "data" => PostResource::collection($posts),
+                    "data" => fractal($posts, PostTransformer::class),
                 )
 
             );
@@ -104,7 +105,7 @@ class PostController extends Controller
                 return Response::json(array(
                     "success" => true,
                     "message" => "post successfully saved",
-                    "data" => PostResource::make($post),
+                    "data" => fractal($post,PostTransformer::class),
                 ));
             } else {
                 return Response::json(array(
@@ -199,29 +200,6 @@ class PostController extends Controller
                 "success" => false,
                 "message" => "You had already liked this post",
             ));
-        }
-
-    }
-
-    public function get_abuse(Request $request)
-    {
-        $user_id = $request->input('user_id');
-        try {
-            $reported_abuses = Abuse::where('user_id', $user_id)->toarray();
-            return Response::json(array(
-                    "success" => true,
-                    "message" => "found " . count($reported_abuses),
-                    "data" => $reported_abuses,
-                )
-
-            );
-        } catch (\Exception $exception) {
-            return Response::json(array(
-                    "success" => false,
-                    "message" => "error fetching reported abuses",
-                )
-
-            );
         }
 
     }

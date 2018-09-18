@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Resources\ScannerResource;
 use App\Http\Traits\UniversalMethods;
 use App\Scanner;
+use App\Transformers\ScannerTransformer;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
@@ -25,7 +26,7 @@ class ScannerAuthController extends Controller
         return response()->json([
             'success'=>true,
             'message'      => 'Found '.count($scanners),
-            'data' => ScannerResource::make($scanners),
+            'data' => fractal($scanners,ScannerTransformer::class),
         ]);
     }
 
@@ -62,7 +63,7 @@ class ScannerAuthController extends Controller
                     [
                         'success' => true,
                         'message' => 'Scanner Successfully Logged In. Welcome!',
-                        'data'    => ScannerResource::make($this->guard()->user()),
+                        'data'    => fractal($this->guard()->user(),ScannerTransformer::class),
                     ], 200
                 );
             } else {
