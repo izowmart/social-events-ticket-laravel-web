@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Resources\NotificationResource;
 use App\Http\Traits\UniversalMethods;
 use App\Notification;
+use App\Transformers\NotificationTransformer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Response;
@@ -19,7 +20,7 @@ class NotificationController extends Controller
             return Response::json(array(
                     "success" => true,
                     "message" => "found " . count($notifications),
-                    "data" => NotificationResource::make($notifications),
+                    "data" => fractal($notifications,NotificationTransformer::class),
                 )
 
             );
@@ -68,12 +69,12 @@ class NotificationController extends Controller
                 ->get();
 
 
-            $notifications = NotificationResource::make($notifications);
+//            $notifications = NotificationResource::make($notifications);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Marked the notification(s) as Read',
-                'data'      => $notifications
+                'data'      => fractal($notifications, NotificationTransformer::class)
             ]);
 
         } catch ( \Exception $exception ) {
