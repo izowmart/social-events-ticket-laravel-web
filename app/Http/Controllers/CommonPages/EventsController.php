@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Event;
+use App\PaidEventCategory;
+use App\EventSponsorMedia;
+use App\EventDate;
+use App\EventPrice;
 use App\Scanner;
 use App\EventScanner;
 
@@ -37,8 +41,41 @@ class EventsController extends Controller
             'name'=>'required',
             'description'=>'required',            
             'location'=>'required',
-            'type'=>'required'
+            'type'=>'required',
+            'image'=>'image',
+            'start_date'=>'required',
+            'start_time'=>'required',
+            'stop_date'=>'required',
+            'stop_time'=>'required'
         ]); 
+
+        //if its paid event, the amount and category is required
+        if($request->type==2){
+            $this->validate($request, [
+            'amount'=>'required',
+            'tickets'=>'required',
+            'category'=>'required'
+        ]); 
+        }
+
+        //join date and time
+        $join_start = $request->start_date.' '.$request->start_time.'00';
+        $join_stop = $request->stop_date.' '.$request->stop_time.'00';
+
+        $event_start = date("Y-m-d H:i:s", strtotime($join_start));
+        $event_stop = date("Y-m-d H:i:s", strtotime($join_stop));
+
+        // Handle image upload
+
+        $filenameWithExt = $request->file('image')->getClientOriginalName();
+        //get just file name
+        $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+        //get just ext
+        $extension = $request->file('image')->getClientOriginalExtension();
+        //file name to store
+        $fileNameToStore = 'event'.'_'.time().'.'.$extension;
+        //upload image
+        $path = $request->file('image')->storeAs('public/images/events',$fileNameToStore);
 
         $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
 
@@ -46,10 +83,41 @@ class EventsController extends Controller
         $event->name = $request->name;
         $event->event_organizer_id = $event_organizer_id;
         $event->location = $request->location;
+        $event->longitude = $request->longitude;
+        $event->latitude = $request->latitude;
+        $event->no_of_tickets = $request->tickets;
         $event->description = $request->description;
         $event->type = $request->type;
-
         $event->save();
+
+        $event_id = $event->id;
+
+        $event_date = new EventDate();
+        $event_date->event_id = $event_id;
+        $event_date->start_date_time = $event_start;
+        $event_date->end_date_time = $event_stop;
+        $event_date->save();
+
+        $event_sponsor_media = new EventSponsorMedia();
+        $event_sponsor_media->event_id = $event_id;
+        $event_sponsor_media->media_url = $fileNameToStore;
+        $event_sponsor_media->save();
+
+        $event_price = new EventPrice();
+        $event_price->event_id = $event_id;
+        if($request->type==2){
+            $event_price->price = $request->amount;
+        }
+        $event_price->save();
+
+        if($request->type==2){
+            $paid_event_category = new PaidEventCategory();
+            $paid_event_category->event_id = $event_id;
+            $paid_event_category->category = $request->category;
+            $paid_event_category->save();
+            
+        }      
+
 
         //Give message after successfull operation
         $request->session()->flash('status', 'Event added successfully');
@@ -258,6 +326,30 @@ class EventsController extends Controller
 
         }
 
+        //delete event_dates table
+        $event_dates = EventDate::where('event_id',$request->id);
+        $event_dates->delete();
+
+        //delete event_sponsor_media table
+        $event_sponsor_media = EventSponsorMedia::where('event_id',$request->id);
+        $event_sponsor_media->delete();
+
+        //delete event_sponsor_media table
+        $event_sponsor_media = EventSponsorMedia::where('event_id',$request->id);
+        $event_sponsor_media->delete();
+
+        //check if its paid event
+        if($event->type==2){
+            //delete event_prices table
+            $event_price = EventPrice::where('event_id',$request->id);
+            $event_dates->delete();
+
+            //delete paid_event_categories table
+            $paid_event_category = PaidEventCategory::where('event_id',$request->id);
+            $paid_event_category->delete();
+        }
+
+        //finally delete events table
         $event->delete();
         //Give message to event organizer after successfull operation
         $request->session()->flash('status', 'Event deleted successfully');

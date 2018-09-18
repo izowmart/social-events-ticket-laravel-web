@@ -1,9 +1,7 @@
 @extends('common_pages.layouts')
 
-@section('other-styles')
-<style>
+@section('styles')
 <link rel="stylesheet" type="text/css" href="//github.com/downloads/lafeber/world-flags-sprite/flags16.css" />
-</style>
     
 @endsection
 
@@ -138,7 +136,7 @@
       var placepicker = $(this).placepicker({
         map: $map.get(0),
         placeChanged: function(place) {
-          console.log("place changed: ", place.formatted_address, this.getLocation());
+          //console.log("place changed: ", place.formatted_address, this.getLocation());
           var latitude = this.getLocation().latitude;
           var longitude = this.getLocation().longitude;
           $('#location-lat').val(latitude);
