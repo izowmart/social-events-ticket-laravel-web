@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Advert;
 use App\AdvertView;
 use App\Http\Resources\AdvertResource;
+use App\Transformers\AdvertTransformer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Response;
+use Spatie\Fractalistic\ArraySerializer;
 
 class AdvertController extends Controller
 {
@@ -18,7 +20,7 @@ class AdvertController extends Controller
             return Response::json(array(
                     "success" => true,
                     "message" => "found " . count($adverts),
-                    "data" => AdvertResource::collection($adverts),
+                    "data" => fractal($adverts,AdvertTransformer::class,ArraySerializer::class),
                 )
 
             );
@@ -53,7 +55,7 @@ class AdvertController extends Controller
             return Response::json(array(
                     "success" => true,
                     "message" => "advert view created successfully",
-                    "data" => $advert_view,
+                    "data" => fractal($advert_view,AdvertTransformer::class,ArraySerializer::class),
                 )
 
             );
@@ -67,47 +69,5 @@ class AdvertController extends Controller
             );
         }
 
-    }
-
-    public function store(Request $request)
-    {
-        try {
-            //validation first
-            $data = [];
-            $data['title'] = $request->title;
-            $data['description'] = $request->description;
-            $data['start_date'] = $request->start_date;
-            $data['end_date'] = $request->end_date;
-            $data['admin_id'] = $request->admin_id;
-
-            if ($request->has('image')) {
-                $file = $request->file('image');
-                $file_name = uniqid().time().".jpg";
-                $file->move(public_path('uploads/adverts'),$file_name);
-                $data['image_url'] = $file_name;
-            }
-
-
-            $advert = Advert::create($data);
-
-            if ($advert) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'advert created',
-                    'datum'   => AdvertResource::collection($advert),
-                ]);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'advert not created',
-                    'datum'   => null
-                ]);
-            }
-        } catch ( \Exception $exception ) {
-            return response()->json([
-                'success'=>false,
-                'message'=>"failed ".$exception->getMessage(),
-            ]);
-        }
     }
 }

@@ -39,7 +39,10 @@ $api->version('v1', function ($api) {
     $api->get('events/{user_id}', $base_url . 'Api\EventController@index');
     $api->get('notifications/{user_id}', $base_url . 'Api\NotificationController@index');
     $api->post('notifications', $base_url . 'Api\NotificationController@markSeen');
-    $api->get('venues', $base_url . 'Api\VenueController@index');
+
+    $api->get('venues/{user_id}', $base_url . 'Api\VenueController@index');
+    $api->post('follow_venue', $base_url . 'Api\VenueController@follow_venue');
+
     $api->get('posts/{user_id}', $base_url . 'Api\PostController@index');
     $api->post('posts', $base_url . 'Api\PostController@store');
     $api->post('delete_post', $base_url . 'Api\PostController@delete');

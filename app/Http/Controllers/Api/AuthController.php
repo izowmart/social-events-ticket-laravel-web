@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Http\Traits\UniversalMethods;
 use App\Notification;
+use App\Transformers\UserTransformer;
 use App\User;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
@@ -77,7 +78,7 @@ class AuthController extends Controller
                     [
                         'success' => true,
                         'message' => 'User Account Created Successfully. Welcome!',
-                        'data'    => UserResource::make($user),
+                        'data'    => fractal($user,UserTransformer::class),
                     ], 200
                 );
             } else {
@@ -125,7 +126,7 @@ class AuthController extends Controller
                     [
                         'success' => true,
                         'message' => 'User Successfully Logged In. Welcome!',
-                        'data'    => UserResource::make(Auth::user()),
+                        'data'    =>fractal(Auth::user(),UserTransformer::class),
                     ], 200
                 );
             } else {
@@ -413,7 +414,7 @@ class AuthController extends Controller
             [
                 'success' => true,
                 'message' => 'Found ' . count($users) . ' users',
-                'data'    => UserResource::collection($users),
+                'data'    => fractal($users, UserTransformer::class),
             ], 200
         );
 
