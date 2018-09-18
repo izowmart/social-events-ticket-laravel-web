@@ -19,7 +19,7 @@ class NotificationController extends Controller
             return Response::json(array(
                     "success" => true,
                     "message" => "found " . count($notifications),
-                    "data" => NotificationResource::make($notifications),
+                    "data" => NotificationResource::collection($notifications),
                 )
 
             );
