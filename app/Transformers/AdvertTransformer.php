@@ -11,6 +11,8 @@ class AdvertTransformer extends TransformerAbstract
     /**
      * A Fractal transformer.
      *
+     * @param \App\Advert $advert
+     *
      * @return array
      */
     public function transform(Advert $advert)
@@ -18,7 +20,7 @@ class AdvertTransformer extends TransformerAbstract
         return [
             'id'          =>$advert->id,
             "title"       =>$advert->title,
-            "description" =>$advert->descritpion,
+            "description" =>$advert->description,
             "image_url"   =>$advert->image_url,
             "start_date"  =>Carbon::parse($advert->start_date)->toDateString(),
             "end_date"    =>Carbon::parse($advert->end_date)->toDateString(),

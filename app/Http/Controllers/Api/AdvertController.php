@@ -55,7 +55,7 @@ class AdvertController extends Controller
             return Response::json(array(
                     "success" => true,
                     "message" => "advert view created successfully",
-                    "data" => fractal($advert_view,AdvertTransformer::class,ArraySerializer::class),
+                    "data" => []//fractal($advert_view,AdvertTransformer::class,ArraySerializer::class),
                 )
 
             );
