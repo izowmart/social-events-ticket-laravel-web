@@ -113,8 +113,8 @@
                         </div>  
                         <div class="form-group">
                           <div id="location" style="height: 400px;"></div>
-                          <input type="hidden" class="form-control" name="latitude" style="width: 110px" id="location-lat" />
-                          <input type="hidden" class="form-control" name="longitude" style="width: 110px" id="location-lon" />
+                          <input type="hidden" class="form-control" value="-1.2920659" name="latitude" style="width: 110px" id="location-lat" />
+                          <input type="hidden" class="form-control" value="36.8219462" name="longitude" style="width: 110px" id="location-lon" />
                         </div>                                                      
                         
                     </div>
@@ -192,7 +192,7 @@
                     <div class="col-md-3">
                       <div class="form-group{{ $errors->has('tickets') ? ' has-error' : '' }}">
                           <label class="control-label">No. of tickets</label>
-                          <input class="form-control" type="number" id="tickets" name="tickets" value="{{ old('tickets') }}" placeholder="Maximum number of tickets"  required>
+                          <input class="form-control" type="number" id="tickets" name="tickets" value="{{ old('tickets') }}" placeholder="Maximum number of tickets">
                           @if ($errors->has('tickets'))
                               <span class="help-block">
                                   <strong>{{ $errors->first('tickets') }}</strong>
@@ -278,7 +278,7 @@
     });
 
     $('#start_date,#stop_date').datepicker({
-      	format: "dd/mm/yyyy",
+      	format: "yyyy-mm-dd",
       	autoclose: true,
       	todayHighlight: true
       });
@@ -295,12 +295,14 @@
             if (this.value == '2') {
                 $("#amount-row").slideDown("slow");
                 $('#amount').attr('required','required');
-                $('#regular').attr('required','required');                
+                $('#regular').attr('required','required');
+                $('#tickets').attr('required','required');                  
                 $('#vip').attr('required','required');
             }else {                
                 $("#amount-row").slideUp("slow");
                 $('#amount').removeAttr('required');
                 $('#regular').removeAttr('required');
+                $('#tickets').removeAttr('required');
                 $('#vip').removeAttr('required');
             }
         });

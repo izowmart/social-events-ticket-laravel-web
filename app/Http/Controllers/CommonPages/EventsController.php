@@ -32,7 +32,32 @@ class EventsController extends Controller
 
     public function showEditForm(Request $request){
         $event = Event::find($request->id);
-        return view('event_organizer.pages.edit_event')->with('event',$event);
+
+        //fetch category and price if it's a paid event
+        if ($event->type==2) {
+            $paid_event_category = PaidEventCategory::where('event_id',$request->id)->first();
+            $event_price = EventPrice::where('event_id',$request->id)->first();
+        }
+        $event_sponsor_media = EventSponsorMedia::where('event_id',$request->id)->first();
+        $event_date = EventDate::where('event_id',$request->id)->first();
+
+        if ($event->type==2) {
+            $data = array(
+                'event'=>$event,
+                'paid_event_category'=>$paid_event_category,
+                'event_price'=>$event_price,
+                'event_sponsor_media'=>$event_sponsor_media,
+                'event_date'=>$event_date
+            );
+        }else{
+            $data = array(
+                'event'=>$event,
+                'event_sponsor_media'=>$event_sponsor_media,
+                'event_date'=>$event_date
+            );
+        }
+
+        return view('event_organizer.pages.edit_event')->with($data);
 
     }
 
@@ -57,13 +82,6 @@ class EventsController extends Controller
             'category'=>'required'
         ]); 
         }
-
-        //join date and time
-        $join_start = $request->start_date.' '.$request->start_time.'00';
-        $join_stop = $request->stop_date.' '.$request->stop_time.'00';
-
-        $event_start = date("Y-m-d H:i:s", strtotime($join_start));
-        $event_stop = date("Y-m-d H:i:s", strtotime($join_stop));
 
         // Handle image upload
 
@@ -94,8 +112,10 @@ class EventsController extends Controller
 
         $event_date = new EventDate();
         $event_date->event_id = $event_id;
-        $event_date->start_date_time = $event_start;
-        $event_date->end_date_time = $event_stop;
+        $event_date->start_date = $request->start_date;
+        $event_date->end_date = $request->stop_date;
+        $event_date->start_time = date('H:i:s',strtotime($request->start_time));
+        $event_date->end_time = date('H:i:s',strtotime($request->stop_time));
         $event_date->save();
 
         $event_sponsor_media = new EventSponsorMedia();
@@ -103,21 +123,18 @@ class EventsController extends Controller
         $event_sponsor_media->media_url = $fileNameToStore;
         $event_sponsor_media->save();
 
-        $event_price = new EventPrice();
-        $event_price->event_id = $event_id;
+        //insert price and category if it's a paid event
         if($request->type==2){
+            $event_price = new EventPrice();
+            $event_price->event_id = $event_id;
             $event_price->price = $request->amount;
-        }
-        $event_price->save();
+            $event_price->save();
 
-        if($request->type==2){
             $paid_event_category = new PaidEventCategory();
             $paid_event_category->event_id = $event_id;
             $paid_event_category->category = $request->category;
             $paid_event_category->save();
-            
-        }      
-
+        }
 
         //Give message after successfull operation
         $request->session()->flash('status', 'Event added successfully');
@@ -130,19 +147,109 @@ class EventsController extends Controller
             'name'=>'required',
             'description'=>'required',            
             'location'=>'required',
-            'type'=>'required'
+            'type'=>'required',
+            'start_date'=>'required',
+            'start_time'=>'required',
+            'stop_date'=>'required',
+            'stop_time'=>'required'
         ]); 
+
+        //if its paid event, the amount and category is required
+        if($request->type==2){
+            $this->validate($request, [
+            'amount'=>'required',
+            'tickets'=>'required',
+            'category'=>'required'
+        ]); 
+        }
+
+        // check if image was updated
+        if ($request->hasFile('image')) {
+            // Handle image upload
+            $filenameWithExt = $request->file('image')->getClientOriginalName();
+            //get just file name
+            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+            //get just ext
+            $extension = $request->file('image')->getClientOriginalExtension();
+            //file name to store
+            $fileNameToStore = 'event'.'_'.time().'.'.$extension;
+            //upload image
+            $path = $request->file('image')->storeAs('public/images/events',$fileNameToStore);
+
+            //delete the previous image
+            unlink(public_path('storage/images/events/'.$request->previous_image_url));
+        }
 
         $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
 
         $event = Event::find($request->id);
+
+        //get previous event type before updating event
+        $prev_event_type = $event->type;
+
         $event->name = $request->name;
         $event->event_organizer_id = $event_organizer_id;
         $event->location = $request->location;
+        $event->longitude = $request->longitude;
+        $event->latitude = $request->latitude;
+        $event->no_of_tickets = $request->tickets;
         $event->description = $request->description;
         $event->type = $request->type;
 
         $event->save();
+
+        $event_id = $event->id;
+
+        $event_date = EventDate::where('event_id',$event_id)->first();
+        $event_date->start_date = $request->start_date;
+        $event_date->end_date = $request->stop_date;
+        $event_date->start_time = date('H:i:s',strtotime($request->start_time));
+        $event_date->end_time = date('H:i:s',strtotime($request->stop_time));
+        $event_date->save();
+
+        if ($request->hasFile('image')) {
+            $event_sponsor_media = EventSponsorMedia::where('event_id',$event_id)->first();
+            $event_sponsor_media->media_url = $fileNameToStore;
+            $event_sponsor_media->save();
+        }
+
+        //check if it was a paid event and changed to free. If so we will drop tables that belong to paid event
+        if($request->type==1 && $prev_event_type==2){
+            //delete paid_event_categories table
+            $paid_event_category = PaidEventCategory::where('event_id',$request->id);
+            $paid_event_category->delete();
+            
+            //delete event_prices table
+            $event_price = EventPrice::where('event_id',$request->id);
+            $event_price->delete();
+
+        }
+
+        //update price and category if it's a paid event
+        if($request->type==2){
+            //check if the event was previously free so you'll insert new data, hence update
+            if($prev_event_type==1){
+                $event_price = new EventPrice();
+                $event_price->event_id = $event_id;
+                $event_price->price = $request->amount;
+                $event_price->save();
+
+                $paid_event_category = new PaidEventCategory();
+                $paid_event_category->event_id = $event_id;
+                $paid_event_category->category = $request->category;
+                $paid_event_category->save();
+
+            }else{
+                $event_price = EventPrice::where('event_id',$event_id)->first();
+                $event_price->price = $request->amount;
+                $event_price->save();
+
+                $paid_event_category = PaidEventCategory::where('event_id',$event_id)->first();
+                $paid_event_category->category = $request->category;
+                $paid_event_category->save();
+
+            }            
+        }
 
         //Give message after successfull operation
         $request->session()->flash('status', 'Event updated successfully');
@@ -326,28 +433,27 @@ class EventsController extends Controller
 
         }
 
+        //check if its paid event
+        if($event->type==2){
+            //delete paid_event_categories table
+            $paid_event_category = PaidEventCategory::where('event_id',$request->id);
+            $paid_event_category->delete();
+            
+            //delete event_prices table
+            $event_price = EventPrice::where('event_id',$request->id);
+            $event_price->delete();
+        }
+
+        //delete event_sponsor_media table
+        $event_sponsor_media = EventSponsorMedia::where('event_id',$request->id);
+        $event_sponsor_media->delete();
+
         //delete event_dates table
         $event_dates = EventDate::where('event_id',$request->id);
         $event_dates->delete();
 
-        //delete event_sponsor_media table
-        $event_sponsor_media = EventSponsorMedia::where('event_id',$request->id);
-        $event_sponsor_media->delete();
-
-        //delete event_sponsor_media table
-        $event_sponsor_media = EventSponsorMedia::where('event_id',$request->id);
-        $event_sponsor_media->delete();
-
-        //check if its paid event
-        if($event->type==2){
-            //delete event_prices table
-            $event_price = EventPrice::where('event_id',$request->id);
-            $event_dates->delete();
-
-            //delete paid_event_categories table
-            $paid_event_category = PaidEventCategory::where('event_id',$request->id);
-            $paid_event_category->delete();
-        }
+        //delete image
+        unlink(public_path('storage/images/events/'.$event->image_url));
 
         //finally delete events table
         $event->delete();

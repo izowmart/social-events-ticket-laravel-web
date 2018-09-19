@@ -32,8 +32,7 @@
                     <div class="col-md-10">
                         <div class="form-group">
                             <label for="location">Venue name</label>
-                            <input type="text" class="form-control" aria-describedby="VenueHelp" value="Nairobi, Kenya" name="venue_name" id="location-address" aria-describedby="locationHelp" data-latitude-input="#location-lat" data-longitude-input="#location-lon" placeholder="The name of the venue" autofocus required>
-                           
+                            <input type="text" class="form-control" aria-describedby="VenueHelp" value="Nairobi, Kenya" name="venue_name" id="location-address" aria-describedby="locationHelp" data-latitude-input="#location-lat" data-longitude-input="#location-lon" placeholder="The name of the venue" autofocus required>                           
                             @if ($errors->has('venue_name'))
                                 <span class="help-block">
                                     <strong>{{ $errors->first('venue_name') }}</strong>
