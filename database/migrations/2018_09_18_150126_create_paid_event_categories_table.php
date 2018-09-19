@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateEventDatesTable extends Migration
+class CreatePaidEventCategoriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class CreateEventDatesTable extends Migration
      */
     public function up()
     {
-        Schema::create('event_dates', function (Blueprint $table) {
+        Schema::create('paid_event_categories', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('event_id')->unsigned();
             $table->foreign('event_id')->references('id')->on('events');
-            $table->dateTime('start_date_time');
-            $table->dateTime('end_date_time');
+            $table->integer('category')->comment("1: Regular,2: VIP");            
             $table->timestamps();
         });
     }
@@ -30,6 +29,6 @@ class CreateEventDatesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('event_dates');
+        Schema::dropIfExists('paid_event_categories');
     }
 }

@@ -1,12 +1,5 @@
 @extends('common_pages.layouts')
 
-@section('testing-styles')
-<style>
-
-</style>
-    
-@endsection
-
 @section('content')
     @include('includes.header')
     @include('includes.side-menu')
