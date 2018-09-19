@@ -27,6 +27,7 @@ class PostTransformer extends TransformerAbstract
             'like'              => (bool) count($post->like) == 0 ? false : true,
             'shared'            => (bool) $post->shared,
             'comment'           => $post->comment,
+            'status'            => $post->status,
         ];
     }
 }
