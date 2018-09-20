@@ -14,7 +14,7 @@
             <p class="details-location"><i style="font-size: 18px;" class="fa fa-map-marker"></i> {{$event->location}}</p><br>
 
             <p class="details-description">
-                {{$event->description}}
+                {!!$event->description!!}
             </p>
         </div>
     </div>         
