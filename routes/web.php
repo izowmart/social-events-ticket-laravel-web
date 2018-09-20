@@ -196,5 +196,6 @@ Route::group(['middleware' => 'event_organizer_auth','prefix'=>'event_organizer'
 
 Route::group(['prefix' => 'tickets'], function () {
     Route::get('/', 'TicketsController@index')->name('tickets_home');
+    Route::get('{slug}', 'TicketsController@show')->name('ticket_details');
     
 });

@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{{ asset('css/tickets-style.css') }}">    
 </head>
 <body>
-<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+<nav class="navbar navbar-expand-sm nav-color navbar-dark">
   <!-- Brand -->
   <a class="navbar-brand" href="#">FIKA</a>
 

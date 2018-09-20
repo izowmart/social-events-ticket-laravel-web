@@ -1,9 +1,6 @@
 @extends('common_pages.layouts')
 
-@section('other-styles')
-<style>
 <link rel="stylesheet" type="text/css" href="//github.com/downloads/lafeber/world-flags-sprite/flags16.css" />
-</style>
     
 @endsection
 
