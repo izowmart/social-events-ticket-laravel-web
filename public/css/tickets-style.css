@@ -1,5 +1,5 @@
 body{
-    background-color: rgb(241, 240, 240);
+    background-color: rgb(247, 245, 245);
 }
 .page-row{
     margin: 10px 35px 30px 35px;
@@ -23,6 +23,10 @@ body{
   height: 300px;
 
 }
+.image-details-container {
+  margin-top: 20px;
+
+}
 .card-image{
     width:100%;
     position: absolute;
@@ -40,6 +44,9 @@ body{
   padding-bottom: 0;
   color: #007D71;
   white-space: nowrap;
+}
+.fa {
+  color: #007D71;
 }
 .card .description {
   color: rgb(75, 74, 74);
@@ -90,4 +97,16 @@ body{
 }
 .card button:hover {
   opacity: 0.7;
+}
+.details-content .title{
+  padding-top: 10px;
+}
+.details-dates {
+  color: grey;
+}
+.details-location {
+  color: grey;
+}
+.details-description{
+  margin-right: 40px;
 }

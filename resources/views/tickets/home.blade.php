@@ -17,7 +17,7 @@
                         <p class="dates"><i class="fa fa-calendar-check-o"></i> {{date("jS M Y", strtotime($event->start_date))}}</p>
                     </div>
                     <div class="col-md-6">
-                        <p class="price"><i class="fa fa-money"></i> 
+                        <p class="price"><i style="font-size: 18px;" class="fa fa-money"></i> 
                         @if ($event->price==null)
                             {{'Free'}}
                         @else
@@ -27,7 +27,7 @@
 
                     </div>
                 </div>
-                <p class="location"><i class="fa fa-map-marker"></i> {{$event->location}}</p>
+                <p class="location"><i style="font-size: 18px;" class="fa fa-map-marker"></i> {{$event->location}}</p>
                 <p class="description">{{str_limit($event->description, $limit = 75, $end = '...')}}</p>
             </div>
             <button>Buy Now</button>
@@ -35,4 +35,19 @@
     </div>        
     @endforeach
 </div>
+@endsection
+
+@section('scripts')
+<script>
+  $(document).ready(function() {
+    $( ".card" ).hover(
+    function() {
+      $(this).addClass('shadow-lg'); 
+    }, function() {
+      $(this).removeClass('shadow-lg');
+    }
+  );
+  
+});
+</script>  
 @endsection
