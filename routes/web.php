@@ -21,13 +21,6 @@ Route::group(['prefix' => 'payments'], function () {
 });
 
 
-/*
-|--------------------------------------------------------------------------
-| Admin auth routes
-|--------------------------------------------------------------------------
-|
-*/
-//Logged in users cannot access or send requests these pages
 Route::group(['middleware' => 'guest'], function () {
     Route::group(['prefix'=>'admin'], function () {
         Route::get('login', 'AdminAuth\LoginController@showLoginForm')->name('admin_login_form');
@@ -199,4 +192,9 @@ Route::group(['middleware' => 'event_organizer_auth','prefix'=>'event_organizer'
 
 
     });
+});
+
+Route::group(['prefix' => 'tickets'], function () {
+    Route::get('/', 'TicketsController@index')->name('tickets_home');
+    
 });
