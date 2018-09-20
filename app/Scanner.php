@@ -17,6 +17,12 @@ class Scanner extends Authenticatable
         'password','remember_token'
     ];
 
+    public function events()
+    {
+        return $this->belongsToMany('App\Event','event_scanners','scanner_id','event_id');
+
+    }
+
     //Send password reset notification
     public function sendPasswordResetNotification($token)
     {
