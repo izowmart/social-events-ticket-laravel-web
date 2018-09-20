@@ -12,22 +12,27 @@ use Illuminate\Support\Facades\Response;
 
 class EventController extends Controller
 {
-    public function index()
+    public function events()
     {
         try {
-            $events = Event::all();
-            return Response::json(array(
+            $events = Event::join('event_dates','event_dates.event_id','=','events.id')
+                ->where('events.status', 1)//approved by admin
+                ->whereDate('event_dates.start_date','>=',now())
+                ->get();
+
+
+            return Response::json([
                     "success" => "true",
                     "message" => "found " . count($events),
-                    "data" => fractal($events, EventTransformer::class),
-                )
+                    "data"    => fractal($events, EventTransformer::class),
+                ]
 
             );
-        } catch (\Exception $exception) {
-            return Response::json(array(
+        } catch ( \Exception $exception ) {
+            return Response::json([
                     "success" => "false",
                     "message" => "error fetching events!" . $exception,
-                )
+                ]
 
             );
         }
@@ -45,15 +50,14 @@ class EventController extends Controller
                     'data'    => []
                 ], 200
             );
-        }
-        else{
+        } else {
             $events = $scanner->events;
 
             return response()->json(
                 [
                     'success' => true,
-                    'message' => 'You have '.count($events).' events to scan',
-                    'data'    => fractal($events,EventTransformer::class)
+                    'message' => 'You have ' . count($events) . ' events to scan',
+                    'data'    => fractal($events, EventTransformer::class)
                 ], 200
             );
 
