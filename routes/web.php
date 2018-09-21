@@ -13,6 +13,7 @@
 
 
 Route::get('/', 'HomeController@index')->name('home');
+// Route::get('/test_payment','')
 Route::group(['prefix' => 'payments'], function () {
     Route::post('encryption_url', 'HomeController@encryptData')->name('encryption_url');
     Route::post('success_url', 'HomeController@success')->name('success_url');
@@ -196,5 +197,6 @@ Route::group(['middleware' => 'event_organizer_auth','prefix'=>'event_organizer'
 
 Route::group(['prefix' => 'tickets'], function () {
     Route::get('/', 'TicketsController@index')->name('tickets_home');
+    Route::get('{slug}', 'TicketsController@show')->name('ticket_details');
     
 });
