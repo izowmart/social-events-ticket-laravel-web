@@ -1,9 +1,8 @@
 @extends('common_pages.layouts')
 
 @section('testing-styles')
-<style>
-
-</style>
+<link rel="stylesheet" href="{{ asset('css/buttons.bootstrap4.min.css') }}">
+<link rel="stylesheet" href="{{ asset('css/buttons.dataTables.min.css') }}">
     
 @endsection
 
@@ -32,6 +31,7 @@
                   <tr>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Phone</th>
                     <th>Birth year</th>
                     <th>Gender</th>
                     <th>Country</th>
@@ -44,6 +44,7 @@
                     <tr class="item">
                         <td>{{$user->first_name}} {{$user->last_name}}</td>
                         <td>{{$user->email}}</td>
+                        <td>{{$user->phone_number}}</td>
                         <td>{{$user->year_of_birth}}</td>
                         <td>
                             @if ($user->gender==1)
@@ -78,5 +79,18 @@
 <!-- Data table plugin-->
 <script type="text/javascript" src="{{ asset('js/plugins/jquery.dataTables.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/plugins/dataTables.bootstrap.min.js') }}"></script>
-<script type="text/javascript">$('#usersTable').DataTable();</script>
+<script type="text/javascript" src="{{ asset('js/plugins/dataTables.buttons.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/plugins/buttons.bootstrap4.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/plugins/buttons.flash.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/plugins/jszip.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/plugins/pdfmake.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/plugins/vfs_fonts.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/plugins/buttons.html5.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/plugins/buttons.print.min.js') }}"></script>
+<script type="text/javascript">$('#usersTable').DataTable({
+  dom: 'Bfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print'
+        ]
+});</script>
 @endsection
