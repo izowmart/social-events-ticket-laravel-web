@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\AdminPages;
 
 use App\Http\Controllers\Controller;
+use App\User;
+use Carbon\Carbon;
 
 class HomeController extends Controller
 {
@@ -19,6 +21,16 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('admin.pages.home'); 
+        //we seleect users registered between the last 1 week
+        $new_users = User::where('created_at','>',Carbon::now()->subDays(7)->toDateTimeString())->get();
+
+        $app_users = User::all();
+
+        $data = array(
+            'app_users'=>$app_users,
+            'new_users'=>$new_users
+        );
+
+        return view('admin.pages.home')->with($data); 
     }
 }

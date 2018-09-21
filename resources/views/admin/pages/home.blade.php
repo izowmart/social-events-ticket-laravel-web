@@ -16,12 +16,14 @@
       </div>
       <div class="row">
         <div class="col-md-6 col-lg-3 home-widget">
-            <a href="" data-toggle="tooltip" title="12 new users today">
-              <span class="pending text-center">12</span>
+            <a href="" @if ($new_users->count()>0) data-toggle="tooltip" title="{{$new_users->count()}} new user(s)" @endif>
+              @if ($new_users->count()>0)
+                  <span class="pending text-center">{{$new_users->count()}}</span>
+              @endif
               <div class="widget-small primary coloured-icon"><i class="icon fa fa-users fa-3x"></i>
                 <div class="info">
                   <h4>APP Users</h4>
-                  <p><b>500</b></p>
+                  <p><b>{{$app_users->count()}}</b></p>
                 </div>
               </div>
             </a>          
