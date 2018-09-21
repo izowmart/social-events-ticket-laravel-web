@@ -31,25 +31,25 @@
             currencyCode: "KES",
             accountNumber: "123456",
             serviceCode: "APISBX3857",
-            dueDate: "2018-08-24 11:09:59",
+            dueDate: "2018-09-24 11:09:59",
             serviceDescription: "Getting service/good x",
             accessKey: "$2a$08$Ga/jSxv1qturlAr8SkHhzOaprXnfOJUTqB6fLRrc/0nSYpRlAd96e",
             countryCode: "KE",
             languageCode: "en",
             successRedirectUrl: "{{route('success_url')}}",
             failRedirectUrl: "{{route('failure_url')}}",
-            paymentWebhookUrl: "http://a86f4457.ngrok.io/payments/process_payment"
+            paymentWebhookUrl: "https://7a6d2a34.ngrok.io/payments/process_payment"
         };
 
         // Provide the class name of where you would like to append the 'pay with mula' button. This example uses a div
-        MulaCheckout.addPayWithMulaButton({className: 'checkout-button', checkoutType: 'express'});
+        MulaCheckout.addPayWithMulaButton({className: 'checkout-button', checkoutType: 'modal'});
 
         // On click of the button provide the encrypted merchant properties as well as the checkoutType.
         document.querySelector('.mula-checkout-button').addEventListener('click', () => {
             console.log("button clicked");
             encrypt().then(merchantProperties => {
                 console.log("merchantproperties: "+merchantProperties);
-                MulaCheckout.renderMulaCheckout({merchantProperties: merchantProperties, checkoutType: 'express'})
+                MulaCheckout.renderMulaCheckout({merchantProperties: merchantProperties, checkoutType: 'modal'})
             })
 
         });
