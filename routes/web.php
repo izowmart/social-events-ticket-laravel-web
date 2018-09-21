@@ -13,6 +13,7 @@
 
 
 Route::get('/', 'HomeController@index')->name('home');
+// Route::get('/test_payment','')
 Route::group(['prefix' => 'payments'], function () {
     Route::post('encryption_url', 'HomeController@encryptData')->name('encryption_url');
     Route::post('success_url', 'HomeController@success')->name('success_url');

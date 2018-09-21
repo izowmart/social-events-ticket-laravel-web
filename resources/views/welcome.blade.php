@@ -38,7 +38,7 @@
             languageCode: "en",
             successRedirectUrl: "{{route('success_url')}}",
             failRedirectUrl: "{{route('failure_url')}}",
-            paymentWebhookUrl: "http://dc91f14b.ngrok.io/payments/process_payment"
+            paymentWebhookUrl: "http://a86f4457.ngrok.io/payments/process_payment"
         };
 
         // Provide the class name of where you would like to append the 'pay with mula' button. This example uses a div

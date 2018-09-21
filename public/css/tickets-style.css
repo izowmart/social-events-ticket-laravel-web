@@ -96,6 +96,9 @@
 .card button:hover {
   opacity: 0.7;
 }
+.details-content{
+  margin-top: 10px;
+}
 .details-content .title{
   padding-top: 10px;
 }
