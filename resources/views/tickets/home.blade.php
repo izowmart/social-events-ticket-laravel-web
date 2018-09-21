@@ -28,7 +28,7 @@
                     </div>
                 </div>
                 <p class="location"><i style="font-size: 18px;" class="fa fa-map-marker"></i> {{$event->location}}</p>
-                <p class="description">{{strip_tags(str_limit($event->description, $limit = 75, $end = '...'))}}</p>
+                <p class="description">{{str_limit(strip_tags($event->description), $limit = 75, $end = '...')}}</p>
             </div>
             <button>Buy Now</button>
         </div>
