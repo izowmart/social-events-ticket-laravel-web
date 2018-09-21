@@ -32,24 +32,31 @@ $api->version('v1', function ($api) {
         });
     });
 
-    $api->get('adverts', $base_url . 'Api\AdvertController@index');
-    $api->post('adverts_view', $base_url . 'Api\AdvertController@advert_view');
+    $api->group(['prefix'=> 'user'], function ($api) use ($base_url) {
+        $api->get('adverts', $base_url . 'Api\AdvertController@index');
+        $api->post('adverts_view', $base_url . 'Api\AdvertController@advert_view');
 
-    $api->get('countries', $base_url . 'Api\CountryController@index');
-    $api->get('events/{user_id}', $base_url . 'Api\EventController@index');
-    $api->get('notifications/{user_id}', $base_url . 'Api\NotificationController@index');
-    $api->post('notifications', $base_url . 'Api\NotificationController@markSeen');
+        $api->get('countries', $base_url . 'Api\CountryController@index');
+        $api->get('events/{user_id}', $base_url . 'Api\EventController@index');
+        $api->get('notifications/{user_id}', $base_url . 'Api\NotificationController@index');
+        $api->post('notifications', $base_url . 'Api\NotificationController@markSeen');
 
-    $api->get('venues/{user_id}', $base_url . 'Api\VenueController@index');
-    $api->post('follow_venue', $base_url . 'Api\VenueController@follow_venue');
+        $api->get('venues/{user_id}', $base_url . 'Api\VenueController@index');
+        $api->post('follow_venue', $base_url . 'Api\VenueController@follow_venue');
 
-    $api->get('posts/{user_id}', $base_url . 'Api\PostController@index');
-    $api->post('posts', $base_url . 'Api\PostController@store');
-    $api->post('delete_post', $base_url . 'Api\PostController@delete');
-    $api->post('like_post', $base_url . 'Api\PostController@like');
-    $api->post('report_abuse', $base_url . 'Api\PostController@report_abuse');
-    $api->get('user/{id}/relations', $base_url . 'Api\AuthController@user_relations');
-    $api->post('user/follow', $base_url . 'Api\AuthController@follow');
+        $api->get('posts/{user_id}', $base_url . 'Api\PostController@index');
+        $api->post('posts', $base_url . 'Api\PostController@store');
+        $api->post('delete_post', $base_url . 'Api\PostController@delete');
+        $api->post('like_post', $base_url . 'Api\PostController@like');
+        $api->post('report_abuse', $base_url . 'Api\PostController@report_abuse');
+        $api->get('user/{id}/relations', $base_url . 'Api\AuthController@user_relations');
+        $api->post('user/follow', $base_url . 'Api\AuthController@follow');
+    });
+
+    $api->group(['prefix'=> 'scanner'], function ($api) use ($base_url) {
+        $api->get('events/{scanner_id}',$base_url.'Api\EventController@scanner_events');
+
+    });
 
 });
 
