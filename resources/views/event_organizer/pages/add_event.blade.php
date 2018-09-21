@@ -1,8 +1,10 @@
 @extends('common_pages.layouts')
 
 @section('styles')
-<link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-timepicker.min.css') }}" />    
+<link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-timepicker.min.css') }}" />   
+<link rel="stylesheet" type="text/css" href="{{ asset('css/summernote-bs4.css') }}" /> 
 @endsection
+
 @section('content')
     @include('includes.header')
     @include('includes.side-menu')
@@ -43,7 +45,7 @@
                     <div class="col-md-10">
                         <div class="form-group{{ $errors->has('description') ? ' has-error' : '' }}">
                             <label class="control-label">Description</label>
-                            <textarea class="form-control" placeholder="The event decription here" id="description" name="description" rows="7" required>{{ old('description') }}</textarea>
+                            <textarea class="form-control summernote" placeholder="The event decription here" id="description" name="description" rows="7" required>{{ old('description') }}</textarea>
                             @if ($errors->has('description'))
                                 <span class="help-block">
                                     <strong>{{ $errors->first('description') }}</strong>
@@ -241,7 +243,28 @@
 <script src="{{ asset('js/plugins/jquery.placepicker.js') }}"></script>
 <script src="{{ asset('js/plugins/bootstrap-datepicker.min.js') }}"></script>
 <script src="{{ asset('js/plugins/bootstrap-timepicker.min.js') }}"></script>
+<script src="{{ asset('js/plugins/summernote-bs4.min.js') }}"></script>
 <script>
+    $('.summernote').summernote({
+        height: 350, // set editor height
+        minHeight: null, // set minimum height of editor
+        maxHeight: null, // set maximum height of editor
+        focus: false, // set focus to editable area after initializing summernote
+        placeholder: 'Event description',
+        toolbar: [
+        ['style', ['style']],
+        ['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', 'clear']],
+        ['fontname', ['fontname']],
+        ['fontsize', ['fontsize']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['height', ['height']],
+        ['table', ['table']],
+        ['insert', ['link', 'hr']],
+        ['view', ['fullscreen', ]],  
+        ['help', ['help']]
+        ]          
+    });
   function readURL(input) {
     if (input.files && input.files[0]) {
         var reader = new FileReader();

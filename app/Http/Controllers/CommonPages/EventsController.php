@@ -280,7 +280,7 @@ class EventsController extends Controller
                     ->where('events.status',0)
                     ->get();
         }else{
-            //we will search for events that belong to current evenet organizer only
+            //we will search for events that belong to current event organizer only
             $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
             $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
                     ->where('events.status',0)
