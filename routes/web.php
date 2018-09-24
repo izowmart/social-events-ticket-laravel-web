@@ -134,7 +134,11 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
         Route::post('delete', 'AdminPages\VenuesController@destroy')->name('delete_venue');
     });
 
-    Route::get('users', 'AdminPages\UsersController@index')->name('users');
+    Route::group(['prefix'=>'users'], function () {
+        Route::get('/', 'AdminPages\UsersController@index')->name('users');
+        Route::get('new_users_chart', 'AdminPages\HomeController@new_users_chart')->name('new_users_chart');
+
+    });
 
     Route::group(['prefix'=>'posts'], function () {
         Route::get('/', 'AdminPages\PostsController@index')->name('posts');

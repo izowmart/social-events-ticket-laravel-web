@@ -9,6 +9,7 @@ use App\Event;
 use App\Abuse;
 use App\Post;
 use Carbon\Carbon;
+use DB;
 
 class HomeController extends Controller
 {
@@ -59,6 +60,23 @@ class HomeController extends Controller
     }
 
     public function new_users_chart(){
+        // $users = User::select('id', 'created_at', DB::raw('count(*) as total'))
+        //                 ->where('created_at','>',Carbon::now()->subDays(7)->toDateTimeString())
+        //                 ->get()
+        //                 ->groupBy(function($date) {
+        //                     return Carbon::parse($date->created_at)->format('d'); // grouping by days
+        //                 });
+        $users = User::select('created_at', DB::raw('count(*) as total'))
+                        ->where('created_at', '>=', Carbon::now()->subDays(7)->toDateTimeString())
+                        ->groupBy(DB::raw('Date(created_at)'))
+                        ->orderBy('created_at', 'DESC')->get();
+        
+        $users_array = array();        
+        foreach($users as $user){
+            $users_array[] = $user;
+        }
+        return response()->json($users_array);
+        //dd($users_array);
         
     }
 }
