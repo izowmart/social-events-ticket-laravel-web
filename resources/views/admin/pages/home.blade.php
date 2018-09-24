@@ -16,7 +16,7 @@
       </div>
       <div class="row">
         <div class="col-md-6 col-lg-3 home-widget">
-            <a href="" @if ($new_users->count()>0) data-toggle="tooltip" title="{{$new_users->count()}} new user(s)" @endif>
+            <a href="{{ route('users') }}" @if ($new_users->count()>0) data-toggle="tooltip" title="{{$new_users->count()}} new user(s)" @endif>
               @if ($new_users->count()>0)
                   <span class="pending text-center">{{$new_users->count()}}</span>
               @endif
@@ -29,34 +29,52 @@
             </a>          
         </div>
         <div class="col-md-6 col-lg-3 home-widget">
-          <a href="" data-toggle="tooltip" title="3 pending event organizers">
-            <span class="pending text-center">3</span>
-            <div class="widget-small info coloured-icon"><i class="icon fa fa-thumbs-o-up fa-3x"></i>
+          <a @if ($pending_event_organizers->count()>0)
+              href="{{ route('unverified_event_organizers') }}"
+              data-toggle="tooltip" title="{{$pending_event_organizers->count()}} pending event organizer(s)"
+          @else
+              href"{{ route('verified_event_organizers') }}"
+          @endif>
+          @if ($pending_event_organizers->count()>0)
+            <span class="pending text-center">{{$pending_event_organizers->count()}}</span>              
+          @endif
+            <div class="widget-small info coloured-icon"><i class="icon fa fa-th-list fa-3x"></i>
               <div class="info">
                 <h4>EVENT ORGANIZERS</h4>
-                <p><b>25</b></p>
+                <p><b>{{$all_event_organizers->count()}}</b></p>
               </div>
             </div>
           </a>
         </div>
         <div class="col-md-6 col-lg-3 home-widget">
-          <a href="" data-toggle="tooltip" title="54 pending events">                
-            <span class="pending text-center">54</span>
-            <div class="widget-small warning coloured-icon"><i class="icon fa fa-files-o fa-3x"></i>
+          <a @if ($pending_events->count()>0)
+              href="{{ route('admin_unverified_events') }}"
+              data-toggle="tooltip" title="{{$pending_events->count()}} pending even organizer(s)"
+          @else
+              href"{{ route('admin_verified_paid_events') }}"
+          @endif>
+          @if ($pending_events->count()>0)
+            <span class="pending text-center">{{$pending_events->count()}}</span>              
+          @endif
+            <div class="widget-small warning coloured-icon"><i class="icon fa fa-calendar-check-o fa-3x"></i>
               <div class="info">
                 <h4>EVENTS</h4>
-                <p><b>102</b></p>
+                <p><b>{{$all_events->count()}}</b></p>
               </div>
             </div>
           </a>
         </div>
         <div class="col-md-6 col-lg-3 home-widget">
-          <a href="" data-toggle="tooltip" title="1 star 😊">
-            <span class="pending text-center">1</span>
-            <div class="widget-small danger coloured-icon"><i class="icon fa fa-star fa-3x"></i>
+          <a href="{{ route('posts') }}" @if ($abuses->count()>0)
+            data-toggle="tooltip" title="{{$abuses->count()}} abuse(s) from {{$posts_with_abuse->count()}} post(s)"
+          @endif >
+          @if ($abuses->count()>0)
+            <span class="pending text-center">{{$abuses->count()}}</span>              
+          @endif
+            <div class="widget-small danger coloured-icon"><i class="icon fa fa-gg fa-3x"></i>
               <div class="info">
-                <h4>Stars</h4>
-                <p><b>1</b></p>
+                <h4>Posts</h4>
+                <p><b>{{$posts->count()}}</b></p>
               </div>
             </div>
           </a>

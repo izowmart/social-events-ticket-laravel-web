@@ -19,5 +19,21 @@ class AbusesTableSeeder extends Seeder
             'created_at'    =>now(),
             'updated_at' => now()
         ]);
+
+        DB::table('abuses')->insert([
+            'user_id' => 1,
+            'post_id' => 1,
+            'type' => 3,
+            'created_at'    =>now(),
+            'updated_at' => now()
+        ]);
+
+        DB::table('abuses')->insert([
+            'user_id' => 1,
+            'post_id' => 1,
+            'type' => 3,
+            'created_at'    =>now(),
+            'updated_at' => now()
+        ]);
     }
 }
