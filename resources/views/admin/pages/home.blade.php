@@ -129,12 +129,27 @@
 {{-- Page specific scripts --}}
 <script type="text/javascript" src="{{ asset('js/plugins/chart.js') }}"></script>
 <script type="text/javascript">
+    var news_users_url = "{{ route('new_users_chart') }}";
+    var new_users_label = [];
+    var new_users_data = [];
+
+    $.get(news_users_url, function(response){
+      response.forEach(function(data){
+          var options = { month: 'long', day: 'numeric' };
+          var new_date  = new Date(data.created_at).toLocaleDateString("en-US", options);
+          new_users_label.push(new_date);
+          new_users_data.push(data.total);
+      });
+    }); 
+    
+    console.log("Labels length: "+new_users_label.length+"\nData length: "+new_users_data.length);
+    
     new Chart($("#newUsers"), {
     type: 'line',
     data: {
-        labels: ['1st sep','2nd sep','3rd sep','4th sep','5th sep'],
+        labels: new_users_label,
         datasets: [{ 
-            data: [30,35,25,40,45],
+            data: new_users_data,
             label: "New users",
             borderColor: "#3e95cd",
             fill: true
