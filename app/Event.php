@@ -32,4 +32,8 @@ class Event extends Model
         return $this->hasMany('App\EventScanner','event_id');
     }
 
+    public function tickets()
+    {
+        return $this->hasMany('App\EventTicketCategory','event_id');
+    }
 }
