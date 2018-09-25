@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Event;
 use App\Http\Traits\UniversalMethods;
+use App\PaymentRequest;
 use App\PaymentResponse;
 use App\TicketCustomer;
 use Illuminate\Http\Request;
@@ -101,7 +102,7 @@ class MulaPaymentController extends Controller
             "merchantTransactionID" => "" . uniqid("Trns:",true),
             "customerFirstName"     => $ticket_customer->first_name,
             "customerLastName"      => $ticket_customer->last_name,
-            "MSISDN"                => $ticket_customer->phone_number,
+            "MSISDN"                => UniversalMethods::formatPhoneNumber($ticket_customer->phone_number),
             "customerEmail"         => $ticket_customer->email,
             "amount"                => "100", //TODO::get the amount for the type of ticket the customer has decided to purchase
             "currencyCode"          => "KES",
@@ -117,10 +118,13 @@ class MulaPaymentController extends Controller
             "paymentWebhookUrl"     =>  route("process_payment"),
         ];
 
-
-
-
-        //$payload = json_decode($request->getContent());
+        //attach a pending payment request
+        PaymentRequest::create([
+            'merchantTransactionID'     => $payload['merchantTransactionID'],
+            'MSISDN'                    =>$payload['MSISDN'],
+            'customerEmail'             => $payload['customerEmail'],
+            'amount'                    => $payload['amount']
+        ]);
 
         //The encryption method to be used
         $encrypt_method = "AES-256-CBC";
@@ -143,6 +147,66 @@ class MulaPaymentController extends Controller
             'countryCode' => $payload['countryCode']
         ]);
 
+    }
+
+    public function processPayment(Request $request)
+    {
+        $payload = $request->getContent();
+        $result = json_decode($payload);
+        try {
+
+
+            //save the response to the db
+            PaymentResponse::create([
+                'type'     => 'webhook',
+                'response' => $payload
+            ]);
+
+            //log the response
+            logger("PROCESS PAYMENT::  " . $payload);
+
+
+            //confirm whether the payment should be accepted or not
+            //check whether the MSISDN is recognized
+            $pending_payment_request = PaymentRequest::where('merchantTransactionID', $result->merchantTransactionID)
+                ->where('MSISDN', UniversalMethods::formatPhoneNumber($result->MSISDN))
+                ->where('amount','=', $result->amountPaid)
+                ->where('pending', true)
+                ->first();
+
+            if ($pending_payment_request != null) {
+
+
+                //accept the payment
+                return response()->json([
+                    'checkoutRequestID'     => $result->checkoutRequestID,
+                    'merchantTransactionID' => $result->merchantTransactionID,
+                    'statusCode'            => 183,
+                    'statusDescription'     => "Successful Payment",
+                    'receiptNumber'         => $result->merchantTransactionID,
+                ]);
+            }else{
+                //reject the payment
+                return response()->json([
+                    'checkoutRequestID'     => $result->checkoutRequestID,
+                    'merchantTransactionID' => $result->merchantTransactionID,
+                    'statusCode'            => 180,
+                    'statusDescription'     => "Payment failed",
+                    'receiptNumber'         => $result->merchantTransactionID,
+                ]);
+            }
+
+        } catch ( \Exception $exception ) {
+            logger("PAYMENT PROCESS error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
+            //reject the payment
+            return response()->json([
+                'checkoutRequestID'     => $result->checkoutRequestID,
+                'merchantTransactionID' => $result->merchantTransactionID,
+                'statusCode'            => 180,
+                'statusDescription'     => "Payment declined",
+                'receiptNumber'         => $result->merchantTransactionID,
+            ]);
+        }
     }
 
     public function success(Request $request)
@@ -183,39 +247,5 @@ class MulaPaymentController extends Controller
         }
     }
 
-    public function processPayment(Request $request)
-    {
-        try {
-            $payload = $request->getContent();
 
-            //save the response to the db
-            PaymentResponse::create([
-                'type'     => 'webhook',
-                'response' => $payload
-            ]);
-
-            //log the response
-            logger("PROCESS PAYMENT::  " . $payload);
-
-            $result = json_decode($payload);
-            //confirm whether the payment should be accepted or not
-            //check whether the MSISDN is recognized
-            if ($result->MSISDN)
-
-
-            return response()->json([
-                'checkoutRequestID'     => $result->checkoutRequestID,
-                'merchantTransactionID' => $result->merchantTransactionID,
-                'statusCode'            => $result->requestStatusCode == 178 ? 183 : 180,
-                'statusDescription'     => $result->requestStatusCode == 178 ? "Payment Accepted" : "Payment declined",
-                'receiptNumber'         => $result->merchantTransactionID,
-            ]);
-
-        } catch ( \Exception $exception ) {
-            logger("PAYMENT PROCESS error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
-            return response()->json([
-                'error' => 'payment error: '.$exception->getMessage()
-            ]);
-        }
-    }
 }

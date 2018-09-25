@@ -26,6 +26,17 @@ trait UniversalMethods
         return $error_strings;
     }
 
+    public static function formatPhoneNumber($phone_number)
+    {
+        if(starts_with($phone_number, "7")){
+            return "254".$phone_number;
+        }elseif (starts_with($phone_number,"07")){
+            return "254" . substr($phone_number, 1);
+        } elseif (starts_with($phone_number,"+2547")){
+            return substr($phone_number,1);
+        }elseif (starts_with($phone_number,"2547")){
+            return $phone_number;
+        }
 
-
+    }
 }
