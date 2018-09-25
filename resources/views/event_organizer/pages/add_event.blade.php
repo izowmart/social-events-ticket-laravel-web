@@ -118,11 +118,9 @@
                             <label class="control-label">Category</label>
                             <div class="form-group{{ $errors->has('category') ? ' has-error' : '' }}">    
                                 <select class="selectpicker" id="category" name="category[]" multiple>
-                                    <option value="1">Regular Match</option>
-                                    <option value="2">Vip Ticket</option>
-                                    <option value="3">Season</option>
-                                    <option value="4">VVip</option>
-                                    <option value="5">Match</option>
+                                    @foreach ($ticket_categories as $ticket_category)
+                                        <option value="{{$ticket_category->id}}">{{$ticket_category->name}}</option>                                        
+                                    @endforeach
                                 </select>
                                 @if ($errors->has('type'))
                                     <span class="help-block">

@@ -12,6 +12,7 @@ use App\EventDate;
 use App\EventPrice;
 use App\Scanner;
 use App\EventScanner;
+use App\TicketCategory;
 
 class EventsController extends Controller
 {
@@ -26,7 +27,8 @@ class EventsController extends Controller
     protected $EventOrganizerUnverifiedredirectPath = 'event_organizer/events/unverified';
 
     public function showAddForm(){
-        return view('event_organizer.pages.add_event');
+        $ticket_categories = TicketCategory::all();
+        return view('event_organizer.pages.add_event')->with('ticket_categories',$ticket_categories);
 
     }
 
