@@ -1,8 +1,9 @@
 @extends('common_pages.layouts')
 
 @section('styles')
-<link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-timepicker.min.css') }}" />   
-<link rel="stylesheet" type="text/css" href="{{ asset('css/summernote-bs4.css') }}" /> 
+<link rel="stylesheet" type="text/css" href="{{ asset('css/summernote-bs4.css') }}" />   
+<link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-datetimepicker-standalone.min.css') }}" /> 
+<link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-select.min.css') }}" /> 
 @endsection
 
 @section('content')
@@ -59,44 +60,81 @@
                       <div class="row">
                         <div class="col-md-4">
                             <label class="control-label">Event Start</label>
-                            <div class="form-group{{ $errors->has('start_date') ? ' has-error' : '' }}">
-                                <input class="form-control" type="text" id="start_date" name="start_date" value="{{ old('start_date') }}" placeholder="Select start date"  required>
-                                @if ($errors->has('start_date'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('start_date') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                            <div class="form-group{{ $errors->has('start_time') ? ' has-error' : '' }}">
-                                <input class="form-control" type="text" id="start_time" name="start_time" value="{{ old('start_time') }}" placeholder="Select start time"  required>
-                                @if ($errors->has('start_time'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('start_time') }}</strong>
-                                    </span>
-                                @endif
+                            <div class="form-group{{ $errors->has('start') ? ' has-error' : '' }}">
+                                <div class='input-group date' id='datetimepicker1'>
+                                    <input class="form-control datetimepicker" type="text" id="start" name="start" value="{{ old('start') }}" placeholder="Select start date"  required>
+                                   
+                                    @if ($errors->has('start'))
+                                        <span class="help-block">
+                                            <strong>{{ $errors->first('start') }}</strong>
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-4"></div>
                         <div class="col-md-4">
-                            <div class="form-group{{ $errors->has('stop_date') ? ' has-error' : '' }}">
+                            <div class="form-group{{ $errors->has('stop') ? ' has-error' : '' }}">
                                 <label class="control-label">Event Stop</label>
-                                <input class="form-control" type="text" id="stop_date" name="stop_date" value="{{ old('stop_date') }}" placeholder="Select stop date"  required>
+                                <input class="form-control datetimepicker" type="text" id="stop" name="stop" value="{{ old('stop') }}" placeholder="Select stop date"  required>
                                 @if ($errors->has('stop'))
                                     <span class="help-block">
-                                        <strong>{{ $errors->first('stop_date') }}</strong>
+                                        <strong>{{ $errors->first('stop') }}</strong>
                                     </span>
                                 @endif
-                            </div> 
-                            <div class="form-group{{ $errors->has('stop_time') ? ' has-error' : '' }}">
-                                <input class="form-control" type="text" id="stop_time" name="stop_time" value="{{ old('stop_time') }}" placeholder="Select stop time"  required autofocus>
-                                @if ($errors->has('stop_time'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('stop_time') }}</strong>
-                                    </span>
-                                @endif
-                            </div>                           
+                            </div>                          
                         </div>
                       </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group{{ $errors->has('type') ? ' has-error' : '' }}">
+                          <label class="control-label">Event type</label>
+                          <div class="form-group{{ $errors->has('type') ? ' has-error' : '' }}">
+                            <div class="animated-radio-button form-check-inline">
+                              <label>
+                                <input type="radio" value="1" @if(old('type')) checked @endif name="type" required><span class="label-text">Free</span>
+                              </label>
+                            </div>
+                            <div class="animated-radio-button form-check-inline">
+                              <label>
+                                <input type="radio" value="2" name="type" required><span class="label-text">Paid</span>
+                              </label>
+                            </div>
+                            @if ($errors->has('type'))
+                                <span class="help-block">
+                                    <strong>{{ $errors->first('type') }}</strong>
+                                </span>
+                            @endif
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="paid-row">
+                    <div class="row" id="category-row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label">Category</label>
+                            <div class="form-group{{ $errors->has('category') ? ' has-error' : '' }}">    
+                                <select class="selectpicker" id="category" name="category[]" multiple>
+                                    <option value="1">Regular Match</option>
+                                    <option value="2">Vip Ticket</option>
+                                    <option value="3">Season</option>
+                                    <option value="4">VVip</option>
+                                    <option value="5">Match</option>
+                                </select>
+                                @if ($errors->has('type'))
+                                    <span class="help-block">
+                                        <strong>{{ $errors->first('category') }}</strong>
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div id="append-row">
+                    
                     </div>
                   </div>
                   <div class="row">
@@ -148,84 +186,8 @@
                       </div>
                     </div>
                   </div>
-                  <div class="row">
-                    <div class="col-md-4">
-                      <div class="form-group{{ $errors->has('type') ? ' has-error' : '' }}">
-                          <label class="control-label">Event type</label>
-                          <div class="form-group{{ $errors->has('type') ? ' has-error' : '' }}">
-                            <div class="animated-radio-button form-check-inline">
-                              <label>
-                                <input type="radio" value="1" @if(old('type')) checked @endif name="type" required><span class="label-text">Free</span>
-                              </label>
-                            </div>
-                            <div class="animated-radio-button form-check-inline">
-                              <label>
-                                <input type="radio" value="2" name="type" required><span class="label-text">Paid</span>
-                              </label>
-                            </div>
-                            @if ($errors->has('type'))
-                                <span class="help-block">
-                                    <strong>{{ $errors->first('type') }}</strong>
-                                </span>
-                            @endif
-                          </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row" id="amount-row">                    
-                    <div class="col-md-4">
-                      <div class="form-group">
-                        <label class="control-label">Amount</label>
-                        <div class="form-group{{ $errors->has('amount') ? ' has-error' : '' }}">
-                          <label class="sr-only" for="exampleInputAmount">Amount (in shillings)</label>
-                          <div class="input-group">
-                            <div class="input-group-prepend"><span class="input-group-text">Ksh</span></div>
-                            <input class="form-control" id="amount" value="{{ old('amount') }}" name="amount" type="number" min="1" placeholder="Amount to be paid">
-                            <div class="input-group-append"><span class="input-group-text">.00</span></div>
-                          </div>
-                          @if ($errors->has('type'))
-                                <span class="help-block">
-                                    <strong>{{ $errors->first('amount') }}</strong>
-                                </span>
-                            @endif
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-3">
-                      <div class="form-group{{ $errors->has('tickets') ? ' has-error' : '' }}">
-                          <label class="control-label">No. of tickets</label>
-                          <input class="form-control" type="number" id="tickets" name="tickets" value="{{ old('tickets') }}" placeholder="Maximum number of tickets">
-                          @if ($errors->has('tickets'))
-                              <span class="help-block">
-                                  <strong>{{ $errors->first('tickets') }}</strong>
-                              </span>
-                          @endif
-                      </div>    
-                    </div>
-                    <div class="col-md-4">
-                      <div class="form-group">
-                          <label class="control-label">Category</label>
-                          <div class="form-group{{ $errors->has('category') ? ' has-error' : '' }}">
-                            <div class="animated-radio-button form-check-inline">
-                              <label>
-                                <input type="radio" value="1" name="category" id="regular"><span class="label-text">Regular</span>
-                              </label>
-                            </div>
-                            <div class="animated-radio-button form-check-inline">
-                              <label>
-                                <input type="radio" value="2" name="category" id="vip"><span class="label-text">VIP</span>
-                              </label>
-                            </div>
-                            @if ($errors->has('type'))
-                                <span class="help-block">
-                                    <strong>{{ $errors->first('category') }}</strong>
-                                </span>
-                            @endif
-                          </div>
-                      </div>
-                    </div>
-                  </div>
-                  
+                  <div class="container">
+          
                   <div class="tile-footer">
                     <button class="btn btn-primary" type="submit">Submit</button>
                   </div>
@@ -241,9 +203,10 @@
 @section('other-scripts')
 <script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=true&libraries=places&key=AIzaSyBO5Else2rW4UNyXiCMp3y20JV7BseTMys"></script>
 <script src="{{ asset('js/plugins/jquery.placepicker.js') }}"></script>
-<script src="{{ asset('js/plugins/bootstrap-datepicker.min.js') }}"></script>
-<script src="{{ asset('js/plugins/bootstrap-timepicker.min.js') }}"></script>
+<script src="{{ asset('js/plugins/moment.min.js') }}"></script>
+<script src="{{ asset('js/plugins/bootstrap-datetimepicker.min.js') }}"></script>
 <script src="{{ asset('js/plugins/summernote-bs4.min.js') }}"></script>
+<script src="{{ asset('js/plugins/bootstrap-select.min.js') }}"></script>
 <script>
     $('.summernote').summernote({
         height: 350, // set editor height
@@ -281,7 +244,60 @@
   }
 
   $(document).ready(function() {
-    $("#amount-row").hide();
+    var selectedItems = [];
+    $("#category-row").hide();
+    $("#append-row").hide();
+    $('#category').selectpicker();
+    $('#category').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+        
+        if (isSelected==true) {
+             $('#category option:selected').each(function () {
+                  var text = $(this).text();
+                 if (!selectedItems.includes(text)) {
+                    selectedItems.push(text);
+                    var value = $(this).val();
+                    console.log("Clicked index: "+clickedIndex+"\tSelected value:"+value+"\tSelected text: "+text+"\t"+"\n");
+                    appendRows(text);
+                 }
+             }); 
+            
+        }else{
+            console.log(previousValue.toString());
+            console.log("Unselect click index: "+clickedIndex);
+           
+            previousValue.forEach(Individual);
+            function Individual(value) {
+                // $('#category option:not(:selected)').each(function () { 
+                var previous_text = $('#category option[value='+value+']').text();
+                var array_legth = previousValue.length;
+                console.log("Previously selected value: "+value+"\tPreviously selected text: "+previous_text+"\tArray length: "+array_legth+"\n");
+                var name = previous_text.toLowerCase().split(' ').join('_')+"_div";
+               // });
+                //var value = previousValue;
+                $("#"+name).remove();    
+
+                for(var i = selectedItems.length - 1; i >= 0; i--) {
+                    if(selectedItems[i] === previous_text) {
+                        console.log(selectedItems[i]+" removed!\n");
+                        selectedItems.splice(i, 1);
+                    }
+                }          
+                
+            }
+
+             $('#category option:selected').each(function () {
+                  var text = $(this).text();
+                 if (!selectedItems.includes(text)) {
+                    selectedItems.push(text);
+                    var value = $(this).val();
+                    console.log("Clicked index: "+clickedIndex+"\tSelected value:"+value+"\tSelected text: "+text+"\t"+"\n");
+                    appendRows(text);
+                 }
+             }); 
+
+        }
+        
+    });
         
     $("#location-address").each(function() {
       var target = this;
@@ -300,38 +316,44 @@
       }).data('placepicker');
     });
 
-    $('#start_date,#stop_date').datepicker({
-      	format: "yyyy-mm-dd",
-      	autoclose: true,
-      	todayHighlight: true
-      });
-    $('#start_time,#stop_time').timepicker({
-      defaultTime : false,
-      icons: {
-                up: 'fa fa-angle-up',
-                down: 'fa fa-angle-down'
-            }
+    $('.datetimepicker').datetimepicker({
+        icons: {
+            time: "fa fa-clock-o",
+            date: "fa fa-calendar",
+            up: "fa fa-arrow-up",
+            down: "fa fa-arrow-down",
+            previous: "	fa fa-angle-left",
+            next: "	fa fa-angle-right"
+        }
     });
 
-    $(document).ready(function(){
         $('input[type=radio][name=type]').change(function() {
             if (this.value == '2') {
-                $("#amount-row").slideDown("slow");
+                $("#category-row").slideDown("slow");
                 $('#amount').attr('required','required');
-                $('#regular').attr('required','required');
-                $('#tickets').attr('required','required');                  
-                $('#vip').attr('required','required');
-            }else {                
-                $("#amount-row").slideUp("slow");
+                $('#tickets').attr('required','required');  
+            }else {          
+                $("#vip-row").slideUp("slow");
+                $("#regular-row").slideUp("slow");      
+                $("#category-row").slideUp("slow");
                 $('#amount').removeAttr('required');
                 $('#regular').removeAttr('required');
                 $('#tickets').removeAttr('required');
                 $('#vip').removeAttr('required');
             }
         });
-     });
 
   }); 
+
+  function appendRows(category_name) {
+      name = category_name.toLowerCase().split(' ').join('_');
+      id = name+"_category".split(' ').join('_');
+      label = category_name;
+      var content = "<div class='row' id='"+name+"_div'><div class='col-md-4'><div class='form-group'><label class='control-label'>"+label+" Amount</label><div class='form-group'><label class='sr-only' for='exampleInputAmount'>Amount (in shillings)</label><div class='input-group'><div class='input-group-prepend'><span class='input-group-text'>Ksh</span></div><input class='form-control' id='"+id+"_amount' value='' name='"+name+"amount' type='number' min='1' placeholder='Amount to be paid' required><div class='input-group-append'><span class='input-group-text'>.00</span></div></div></div></div></div><div class='col-md-3'><div class='form-group'><label class='control-label'>"+label+" No. of tickets</label><input class='form-control' type='number' id='"+id+"_tickets' name='"+name+"_tickets' value='' placeholder='Maximum number of tickets' required></div></div><div class='col-md-3'><label class='control-label'>"+label+" Ticket sale end date</label><div class='form-group'><div class='input-group date' id='datetimepicker1'><input class='form-control datetimepicker' type='text' id='"+id+"_ticket_sale_end_date' name='"+name+"_ticket_sale_end_date' value='' placeholder='Select date'  required></div></div></div></div>";     
+      $("#append-row").append(content).slideDown("slow");
+      $("#"+name+"_div").hide();
+      $("#"+name+"_div").slideDown("slow");
+  }
 
 </script>
 @endsection
