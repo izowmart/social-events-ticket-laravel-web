@@ -60,5 +60,6 @@ $api->version('v1', function ($api) {
 
     });
 
+    $api->get('payments/{user_id}/{event_id}', $base_url . 'Api\MulaPaymentController@initiate_payment');
 });
 
