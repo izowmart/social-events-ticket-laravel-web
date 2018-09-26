@@ -21,7 +21,7 @@
           <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
           <li class="breadcrumb-item"><a href="{{ route('admin_home') }}">Home</a></li>
           <li class="breadcrumb-item"><a href="{{ route('venues') }}">Venues</a></li>
-          <li class="breadcrumb-item"><a href="{{ route('edit_venue') }}">Edit</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('edit_venue',['slug'=>$venue->slug]) }}">Edit</a></li>
         </ul>
       </div>
       <div class="row">
@@ -140,6 +140,10 @@
         map: $map.get(0),
         placeChanged: function(place) {
           //console.log("place changed: ", place.formatted_editress, this.getLocation());
+          var latitude = this.getLocation().latitude;
+          var longitude = this.getLocation().longitude;
+          $('#location-lat').val(latitude);
+          $('#location-lon').val(longitude);
         }
       }).data('placepicker');
     });

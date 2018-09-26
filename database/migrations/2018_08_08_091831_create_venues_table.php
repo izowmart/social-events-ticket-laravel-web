@@ -24,6 +24,7 @@ class CreateVenuesTable extends Migration
             $table->string('contact_person_phone');
             $table->string('contact_person_email');
             $table->integer('status')->default(1)->comment('0- inactive, 1 - active, 2 - deactivated');
+            $table->string('slug');
             $table->timestamps();
         });
     }

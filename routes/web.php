@@ -131,8 +131,8 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
         Route::get('/', 'AdminPages\VenuesController@index')->name('venues');
         Route::get('add', 'AdminPages\VenuesController@showAddForm')->name('add_venue');
         Route::post('add', 'AdminPages\VenuesController@store')->name('add_venue_post');
-        Route::post('edit', 'AdminPages\VenuesController@showEditForm')->name('edit_venue');
-        Route::post('edit/update', 'AdminPages\VenuesController@update')->name('edit_venue_post');
+        Route::get('edit/{slug}', 'AdminPages\VenuesController@showEditForm')->name('edit_venue');
+        Route::post('edit', 'AdminPages\VenuesController@update')->name('edit_venue_post');
         Route::post('delete', 'AdminPages\VenuesController@destroy')->name('delete_venue');
         Route::get('active_venues_chart', 'AdminPages\HomeController@active_venues_chart')->name('active_venues_chart');
     });
