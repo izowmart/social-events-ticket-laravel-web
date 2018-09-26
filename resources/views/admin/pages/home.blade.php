@@ -128,39 +128,40 @@
 @section('other-scripts')
 {{-- Page specific scripts --}}
 <script type="text/javascript" src="{{ asset('js/plugins/chart.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/plugins/moment.min.js') }}"></script>
 <script type="text/javascript">
-    var news_users_url = "{{ route('new_users_chart') }}";
-    var new_users_label = [];
-    var new_users_data = [];
-
-    $.get(news_users_url, function(response){
-      response.forEach(function(data){
-          var options = { month: 'long', day: 'numeric' };
-          var new_date  = new Date(data.created_at).toLocaleDateString("en-US", options);
-          new_users_label.push(new_date);
-          new_users_data.push(data.total);
-      });
-    }); 
-    
-    console.log("Labels length: "+new_users_label.length+"\nData length: "+new_users_data.length);
-    
-    new Chart($("#newUsers"), {
-    type: 'line',
-    data: {
-        labels: new_users_label,
-        datasets: [{ 
-            data: new_users_data,
-            label: "New users",
-            borderColor: "#3e95cd",
-            fill: true
+  $(document).ready(function() {
+    $.ajax({
+        url: "{{ route('new_users_chart') }}",
+        type: "get",
+        success: function(response) {
+          var new_users_label = [];
+          var new_users_data = [];
+            response.forEach(function(data){
+                var new_date  = moment(data.created_at).format('Do MMM');
+                new_users_label.push(new_date);
+                new_users_data.push(data.total);
+            });
+            NewUsersChart(new_users_label,new_users_data);
         }
-        ]
-    },
-    options: {
-        
-    }
     });
 
+    function NewUsersChart(label,data) {
+      new Chart($("#newUsers"), {
+      type: 'line',
+      data: {
+          labels: label,
+          datasets: [{ 
+              data: data,
+              label: "New users",
+              borderColor: "#3e95cd",
+              fill: true
+          }
+          ]
+      }
+      });
+    }
+        
     new Chart($("#MostActiveUsers"), {
         type: 'horizontalBar',
         data: {
@@ -228,6 +229,7 @@
         legend: { display: false }
         }
     });
+  });
     
 </script>
   

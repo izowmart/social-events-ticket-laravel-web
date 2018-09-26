@@ -60,16 +60,10 @@ class HomeController extends Controller
     }
 
     public function new_users_chart(){
-        // $users = User::select('id', 'created_at', DB::raw('count(*) as total'))
-        //                 ->where('created_at','>',Carbon::now()->subDays(7)->toDateTimeString())
-        //                 ->get()
-        //                 ->groupBy(function($date) {
-        //                     return Carbon::parse($date->created_at)->format('d'); // grouping by days
-        //                 });
         $users = User::select('created_at', DB::raw('count(*) as total'))
                         ->where('created_at', '>=', Carbon::now()->subDays(7)->toDateTimeString())
-                        ->groupBy(DB::raw('Date(created_at)'))
-                        ->orderBy('created_at', 'DESC')->get();
+                        ->groupBy(DB::raw('DATE_FORMAT(created_at, "%Y-%M-%D")'))
+                        ->orderBy('created_at', 'ASC')->get();
         
         $users_array = array();        
         foreach($users as $user){
