@@ -24,7 +24,7 @@ class VenuesController extends Controller
      */
     public function index()
     {
-        $venues = Venue::select('venues.id','venues.name as venue_name','venues.contact_person_name','venues.contact_person_phone','venues.contact_person_email','venues.latitude','venues.longitude','towns.name as town_name')
+        $venues = Venue::select('venues.id','venues.slug','venues.name as venue_name','venues.contact_person_name','venues.contact_person_phone','venues.contact_person_email','venues.latitude','venues.longitude','towns.name as town_name')
                 ->join('towns', 'towns.id', '=', 'venues.town_id')
                 ->get();
         return view('admin.pages.venues')->with('venues',$venues); 
@@ -36,11 +36,11 @@ class VenuesController extends Controller
         return view('admin.pages.add_venue')->with('towns',$towns); 
     }
 
-    public function showEditForm(Request $request)
+    public function showEditForm($slug)
     {
-        $venue = Venue::select('venues.id as venue_id','venues.name as venue_name','venues.contact_person_name','venues.contact_person_phone','venues.contact_person_email','towns.id as town_id','towns.name as town_name')
+        $venue = Venue::select('venues.id as venue_id','venues.slug','venues.name as venue_name','venues.contact_person_name','venues.contact_person_phone','venues.contact_person_email','towns.id as town_id','towns.name as town_name')
                 ->join('towns', 'towns.id', '=', 'venues.town_id')
-                ->where('venues.id',$request->id)
+                ->where('venues.slug',$slug)
                 ->first();
         $town_name = $venue->town_name;    
 

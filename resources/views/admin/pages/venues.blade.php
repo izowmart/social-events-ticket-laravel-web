@@ -52,12 +52,8 @@
                             <a target="_blank" href="https://maps.google.com/maps?q={{$venue->latitude}},{{$venue->longitude}}" class="btn btn-sm btn-outline-primary">View</a>
                         </td>
                         <td>
-                          <button onClick="document.getElementById('edit_form_{{$venue->id}}').submit();" class="btn btn-sm btn-outline-primary">Edit</button>
-                          <form id="edit_form_{{$venue->id}}" action="{{ route('edit_venue') }}" method="POST" style="display: none;">
-                              {{ csrf_field() }}
-                              <input type="hidden" name="id" value="{{$venue->id}}">
-                          </form>
-
+                          <a href="{{ route('edit_venue', ['slug'=>$venue->slug]) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                         
                           <button onClick="deleteBtn({{$venue->id}})" class="btn btn-sm btn-outline-danger">Delete</button>
                           <form id="delete_form_{{$venue->id}}" action="{{ route('delete_venue') }}" method="POST" style="display: none;">
                               {{ csrf_field() }}

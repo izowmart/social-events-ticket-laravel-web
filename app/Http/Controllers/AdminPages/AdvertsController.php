@@ -24,7 +24,7 @@ class AdvertsController extends Controller
      */
     public function index()
     {
-        $adverts = Advert::select('adverts.id','adverts.title','adverts.description','adverts.image_url','adverts.start_date','adverts.end_date','adverts.status','admins.first_name','admins.last_name')
+        $adverts = Advert::select('adverts.id','adverts.slug','adverts.title','adverts.description','adverts.image_url','adverts.start_date','adverts.end_date','adverts.status','admins.first_name','admins.last_name')
                 ->join('admins', 'admins.id', '=', 'adverts.admin_id')
                 ->get();
         return view('admin.pages.adverts')->with('adverts',$adverts); 
@@ -36,11 +36,11 @@ class AdvertsController extends Controller
         return view('admin.pages.add_advert'); 
     }
 
-    public function showEditForm(Request $request)
+    public function showEditForm($slug)
     {
-        $advert = Advert::find($request->id);     
+        $advert = Advert::where('slug',$slug)->first();
         return view('admin.pages.edit_advert')->with('advert',$advert); 
-        
+                
     }
 
     public function store(Request $request)

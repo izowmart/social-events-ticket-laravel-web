@@ -124,8 +124,8 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
         Route::get('/', 'AdminPages\AdvertsController@index')->name('adverts');
         Route::get('add', 'AdminPages\AdvertsController@showAddForm')->name('add_advert');
         Route::post('add', 'AdminPages\AdvertsController@store')->name('add_advert_post'); 
-        Route::post('edit', 'AdminPages\AdvertsController@showEditForm')->name('edit_advert');
-        Route::post('edit/update', 'AdminPages\AdvertsController@update')->name('edit_advert_post');
+        Route::get('edit/{slug}', 'AdminPages\AdvertsController@showEditForm')->name('edit_advert');
+        Route::post('edit', 'AdminPages\AdvertsController@update')->name('edit_advert_post');
         Route::post('delete', 'AdminPages\AdvertsController@destroy')->name('delete_advert');  
     });
 
@@ -133,8 +133,8 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
         Route::get('/', 'AdminPages\VenuesController@index')->name('venues');
         Route::get('add', 'AdminPages\VenuesController@showAddForm')->name('add_venue');
         Route::post('add', 'AdminPages\VenuesController@store')->name('add_venue_post');
-        Route::post('edit', 'AdminPages\VenuesController@showEditForm')->name('edit_venue');
-        Route::post('edit/update', 'AdminPages\VenuesController@update')->name('edit_venue_post');
+        Route::get('edit/{slug}', 'AdminPages\VenuesController@showEditForm')->name('edit_venue');
+        Route::post('edit', 'AdminPages\VenuesController@update')->name('edit_venue_post');
         Route::post('delete', 'AdminPages\VenuesController@destroy')->name('delete_venue');
         Route::get('active_venues_chart', 'AdminPages\HomeController@active_venues_chart')->name('active_venues_chart');
     });
@@ -149,7 +149,7 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
     Route::group(['prefix'=>'posts'], function () {
         Route::get('/', 'AdminPages\PostsController@index')->name('posts');
         Route::post('block', 'AdminPages\PostsController@block')->name('block_post');
-        Route::post('abuses', 'AdminPages\AbusesController@index')->name('abuses');
+        Route::get('abuses/{id}', 'AdminPages\AbusesController@index')->name('abuses');
     });
 
     Route::group(['prefix'=>'event_organizers'], function () {

@@ -23,6 +23,7 @@ class CreateAdvertsTable extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->integer('status')->default(1)->comment('0- inactive, 1 - active, 2 - deactivated');
+            $table->string('slug');
             $table->timestamps();
         });
     }
