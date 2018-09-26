@@ -8,6 +8,8 @@ use App\EventOrganizer;
 use App\Event;
 use App\Abuse;
 use App\Post;
+use App\Town;
+use App\Country;
 use Carbon\Carbon;
 use DB;
 
@@ -60,23 +62,81 @@ class HomeController extends Controller
     }
 
     public function new_users_chart(){
-        // $users = User::select('id', 'created_at', DB::raw('count(*) as total'))
-        //                 ->where('created_at','>',Carbon::now()->subDays(7)->toDateTimeString())
-        //                 ->get()
-        //                 ->groupBy(function($date) {
-        //                     return Carbon::parse($date->created_at)->format('d'); // grouping by days
-        //                 });
         $users = User::select('created_at', DB::raw('count(*) as total'))
                         ->where('created_at', '>=', Carbon::now()->subDays(7)->toDateTimeString())
-                        ->groupBy(DB::raw('Date(created_at)'))
-                        ->orderBy('created_at', 'DESC')->get();
+                        ->groupBy(DB::raw('DATE_FORMAT(created_at, "%Y-%M-%D")'))
+                        ->orderBy('created_at', 'ASC')->get();
         
         $users_array = array();        
         foreach($users as $user){
             $users_array[] = $user;
         }
         return response()->json($users_array);
-        //dd($users_array);
+        
+    }
+
+    public function active_users_chart(){
+        $users = Post::select('users.first_name', DB::raw('count(posts.user_id) as total'))
+                        ->orderBy('total', 'DESC')
+                        ->join('users','users.id','=','posts.user_id')
+                        ->groupBy(DB::raw('posts.user_id'))
+                        ->take(5)
+                        ->get();
+        
+        $users_array = array();        
+        foreach($users as $user){
+            $users_array[] = $user;
+        }
+        return response()->json($users_array);
+        
+    }
+
+    public function active_venues_chart(){
+        $venues = Post::select('venues.name', DB::raw('count(posts.venue_id) as total'))
+                        ->orderBy('total', 'DESC')
+                        ->join('venues','venues.id','=','posts.venue_id')
+                        ->groupBy(DB::raw('posts.venue_id'))
+                        ->take(5)
+                        ->get();
+        
+        $venues_array = array();        
+        foreach($venues as $user){
+            $venues_array[] = $user;
+        }
+        return response()->json($venues_array);
+        
+    }
+
+    public function country_most_users_chart(){
+        $venues = Country::select('countries.name', DB::raw('count(users.country_id) as total'))
+                        ->orderBy('total', 'DESC')
+                        ->join('users','users.country_id','=','countries.id')
+                        ->groupBy(DB::raw('countries.name'))
+                        ->take(5)
+                        ->get();
+        
+        $venues_array = array();        
+        foreach($venues as $user){
+            $venues_array[] = $user;
+        }
+        return response()->json($venues_array);
+        
+    }
+
+    public function town_most_users_chart(){
+        $venues = Town::select('towns.name', DB::raw('count(venues.town_id) as total'))
+                        ->orderBy('total', 'DESC')
+                        ->join('venues','venues.town_id','=','towns.id')
+                        ->join('posts','posts.venue_id','=','venues.id')
+                        ->groupBy(DB::raw('venues.town_id'))
+                        ->take(5)
+                        ->get();
+        
+        $venues_array = array();        
+        foreach($venues as $user){
+            $venues_array[] = $user;
+        }
+        return response()->json($venues_array);
         
     }
 }

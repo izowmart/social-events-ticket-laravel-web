@@ -105,6 +105,7 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
         Route::get('edit/{name}', 'AdminPages\CountriesController@showEditForm')->name('edit_country');
         Route::post('edit', 'AdminPages\CountriesController@update')->name('edit_country_post');
         Route::post('delete', 'AdminPages\CountriesController@destroy')->name('delete_country');
+        Route::get('most_users_chart', 'AdminPages\HomeController@country_most_users_chart')->name('country_most_users_chart');
     });
 
     Route::group(['prefix'=>'towns'], function () {
@@ -113,7 +114,8 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
         Route::post('add', 'AdminPages\TownsController@store')->name('add_town_post');
         Route::get('edit/{coutry}/{town}', 'AdminPages\TownsController@showEditForm')->name('edit_town');
         Route::post('edit', 'AdminPages\TownsController@update')->name('edit_town_post');
-        Route::post('delete', 'AdminPages\TownsController@destroy')->name('delete_town');  
+        Route::post('delete', 'AdminPages\TownsController@destroy')->name('delete_town');       
+        Route::get('most_users_chart', 'AdminPages\HomeController@town_most_users_chart')->name('town_most_users_chart');  
     }); 
     
     Route::group(['prefix'=>'adverts'], function () {
@@ -132,11 +134,13 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
         Route::post('edit', 'AdminPages\VenuesController@showEditForm')->name('edit_venue');
         Route::post('edit/update', 'AdminPages\VenuesController@update')->name('edit_venue_post');
         Route::post('delete', 'AdminPages\VenuesController@destroy')->name('delete_venue');
+        Route::get('active_venues_chart', 'AdminPages\HomeController@active_venues_chart')->name('active_venues_chart');
     });
 
     Route::group(['prefix'=>'users'], function () {
         Route::get('/', 'AdminPages\UsersController@index')->name('users');
         Route::get('new_users_chart', 'AdminPages\HomeController@new_users_chart')->name('new_users_chart');
+        Route::get('active_users_chart', 'AdminPages\HomeController@active_users_chart')->name('active_users_chart');
 
     });
 

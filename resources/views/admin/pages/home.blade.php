@@ -128,106 +128,182 @@
 @section('other-scripts')
 {{-- Page specific scripts --}}
 <script type="text/javascript" src="{{ asset('js/plugins/chart.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/plugins/moment.min.js') }}"></script>
 <script type="text/javascript">
-    var news_users_url = "{{ route('new_users_chart') }}";
-    var new_users_label = [];
-    var new_users_data = [];
+  $(document).ready(function() {
+    // start new users script
+    $.ajax({
+        url: "{{ route('new_users_chart') }}",
+        type: "get",
+        success: function(response) {
+          var new_users_label = [];
+          var new_users_data = [];
+            response.forEach(function(data){
+                var new_date  = moment(data.created_at).format('Do MMM');
+                new_users_label.push(new_date);
+                new_users_data.push(data.total);
+            });
+            NewUsersChart(new_users_label,new_users_data);
+        }
+    });
 
-    $.get(news_users_url, function(response){
-      response.forEach(function(data){
-          var options = { month: 'long', day: 'numeric' };
-          var new_date  = new Date(data.created_at).toLocaleDateString("en-US", options);
-          new_users_label.push(new_date);
-          new_users_data.push(data.total);
+    function NewUsersChart(label,data) {
+      new Chart($("#newUsers"), {
+      type: 'line',
+      data: {
+          labels: label,
+          datasets: [{ 
+              data: data,
+              label: "New users",
+              borderColor: "#3e95cd",
+              fill: true
+          }
+          ]
+      }
       });
-    }); 
-    
-    console.log("Labels length: "+new_users_label.length+"\nData length: "+new_users_data.length);
-    
-    new Chart($("#newUsers"), {
-    type: 'line',
-    data: {
-        labels: new_users_label,
-        datasets: [{ 
-            data: new_users_data,
-            label: "New users",
-            borderColor: "#3e95cd",
-            fill: true
-        }
-        ]
-    },
-    options: {
-        
     }
-    });
+    //end new users script
 
-    new Chart($("#MostActiveUsers"), {
-        type: 'horizontalBar',
-        data: {
-        labels: ["John", "Kim", "Jane", "Peter", "Linda"],
-        datasets: [
-            {
-            label: "Comments and posts",
-            backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
-            data: [34,57,74,78,43]
-            }
-        ]
-        },
-        options: {
-        legend: { display: false }
+     // start active users script
+    $.ajax({
+        url: "{{ route('active_users_chart') }}",
+        type: "get",
+        success: function(response) {
+          var active_users_label = [];
+          var active_users_data = [];
+            response.forEach(function(data){
+                active_users_label.push(data.first_name);
+                active_users_data.push(data.total);
+            });
+            ActiveUsersChart(active_users_label,active_users_data);
         }
     });
 
-    new Chart($("#MostActiveVenues"), {
-        type: 'horizontalBar',
-        data: {
-        labels: ["CityHall", "Uhuru park", "Archives", "Hilton", "Kempinski"],
-        datasets: [
-            {
-            label: "Posts",
-            backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
-            data: [87,127,154,108,120]
-            }
-        ]
-        },
-        options: {
-        legend: { display: false }
+    function ActiveUsersChart(label,data) {
+      new Chart($("#MostActiveUsers"), {
+          type: 'horizontalBar',
+          data: {
+          labels: label,
+          datasets: [
+              {
+              label: "Posts",
+              backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+              data: data
+              }
+          ]
+          },
+          options: {
+          legend: { display: false }
+          }
+      });
+    }
+    //end active users script
+
+     // start active venues script
+    $.ajax({
+        url: "{{ route('active_venues_chart') }}",
+        type: "get",
+        success: function(response) {
+          var active_venues_label = [];
+          var active_venues_data = [];
+            response.forEach(function(data){
+                active_venues_label.push(data.name);
+                active_venues_data.push(data.total);
+            });
+            ActiveVenuesChart(active_venues_label,active_venues_data);
         }
     });
 
-    new Chart($("#CountryWithMostUsers"), {
-        type: 'horizontalBar',
-        data: {
-        labels: ["Kenya", "Uganda", "Tanzania", "Sweden", "Nigeria"],
-        datasets: [
-            {
-            label: "Posts",
-            backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
-            data: [870,427,554,138,450]
-            }
-        ]
-        },
-        options: {
-        legend: { display: false }
+    function ActiveVenuesChart(label,data) {
+      new Chart($("#MostActiveVenues"), {
+          type: 'horizontalBar',
+          data: {
+          labels: label,
+          datasets: [
+              {
+              label: "Posts",
+              backgroundColor: ["#3cba9f", "#c45850","#8e5ea2","#e8c3b9","#3e95cd"],
+              data: data
+              }
+          ]
+          },
+          options: {
+          legend: { display: false }
+          }
+      });
+    }
+    //end active venues script
+
+     // start country with most users script
+    $.ajax({
+        url: "{{ route('country_most_users_chart') }}",
+        type: "get",
+        success: function(response) {
+          var country_most_users_label = [];
+          var country_most_users_data = [];
+            response.forEach(function(data){
+                country_most_users_label.push(data.name);
+                country_most_users_data.push(data.total);
+            });
+            CountryMostUsersChart(country_most_users_label,country_most_users_data);
         }
     });
 
-    new Chart($("#TownWithMostUsers"), {
-        type: 'horizontalBar',
-        data: {
-        labels: ["Nairobi", "Arusha", "Kampala", "Nakuru", "Lagos"],
-        datasets: [
-            {
-            label: "Posts",
-            backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
-            data: [520,227,174,348,350]
-            }
-        ]
-        },
-        options: {
-        legend: { display: false }
+    function CountryMostUsersChart(label,data) {
+      new Chart($("#CountryWithMostUsers"), {
+          type: 'horizontalBar',
+          data: {
+          labels: label,
+          datasets: [
+              {
+              label: "Posts",
+              backgroundColor: ["#3cba9f", "#c45850","#3e95cd","#e8c3b9","#8e5ea2"],
+              data: data
+              }
+          ]
+          },
+          options: {
+          legend: { display: false }
+          }
+      });
+    }
+    //end country with most users script
+
+     // start town with most users script
+    $.ajax({
+        url: "{{ route('town_most_users_chart') }}",
+        type: "get",
+        success: function(response) {
+          var town_most_users_label = [];
+          var town_most_users_data = [];
+            response.forEach(function(data){
+                town_most_users_label.push(data.name);
+                town_most_users_data.push(data.total);
+            });
+            TownMostUsersChart(town_most_users_label,town_most_users_data);
         }
     });
+
+    function TownMostUsersChart(label,data) {
+      new Chart($("#TownWithMostUsers"), {
+          type: 'horizontalBar',
+          data: {
+          labels: label,
+          datasets: [
+              {
+              label: "Posts",
+              backgroundColor: ["#3cba9f", "#c45850","#3e95cd","#e8c3b9","#8e5ea2"],
+              data: data
+              }
+          ]
+          },
+          options: {
+          legend: { display: false }
+          }
+      });
+    }
+    //end town with most users script
+  });
     
 </script>
   
