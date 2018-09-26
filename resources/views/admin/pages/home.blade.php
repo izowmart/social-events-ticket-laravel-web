@@ -234,22 +234,40 @@
     }
     //end active venues script
 
-    new Chart($("#CountryWithMostUsers"), {
-        type: 'horizontalBar',
-        data: {
-        labels: ["Kenya", "Uganda", "Tanzania", "Sweden", "Nigeria"],
-        datasets: [
-            {
-            label: "Posts",
-            backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
-            data: [870,427,554,138,450]
-            }
-        ]
-        },
-        options: {
-        legend: { display: false }
+     // start country with most users script
+    $.ajax({
+        url: "{{ route('country_most_users_chart') }}",
+        type: "get",
+        success: function(response) {
+          var country_most_users_label = [];
+          var country_most_users_data = [];
+            response.forEach(function(data){
+                country_most_users_label.push(data.name);
+                country_most_users_data.push(data.total);
+            });
+            CountryMostUsersChart(country_most_users_label,country_most_users_data);
         }
     });
+
+    function CountryMostUsersChart(label,data) {
+      new Chart($("#CountryWithMostUsers"), {
+          type: 'horizontalBar',
+          data: {
+          labels: label,
+          datasets: [
+              {
+              label: "Posts",
+              backgroundColor: ["#3cba9f", "#c45850","#3e95cd","#e8c3b9","#8e5ea2"],
+              data: data
+              }
+          ]
+          },
+          options: {
+          legend: { display: false }
+          }
+      });
+    }
+    //end country with most users script
 
     new Chart($("#TownWithMostUsers"), {
         type: 'horizontalBar',

@@ -8,6 +8,7 @@ use App\EventOrganizer;
 use App\Event;
 use App\Abuse;
 use App\Post;
+use App\Country;
 use Carbon\Carbon;
 use DB;
 
@@ -94,6 +95,22 @@ class HomeController extends Controller
                         ->orderBy('total', 'DESC')
                         ->join('venues','venues.id','=','posts.venue_id')
                         ->groupBy(DB::raw('posts.venue_id'))
+                        ->take(5)
+                        ->get();
+        
+        $venues_array = array();        
+        foreach($venues as $user){
+            $venues_array[] = $user;
+        }
+        return response()->json($venues_array);
+        
+    }
+
+    public function most_users_chart(){
+        $venues = Country::select('countries.name', DB::raw('count(users.country_id) as total'))
+                        ->orderBy('total', 'DESC')
+                        ->join('users','users.country_id','=','countries.id')
+                        ->groupBy(DB::raw('countries.name'))
                         ->take(5)
                         ->get();
         
