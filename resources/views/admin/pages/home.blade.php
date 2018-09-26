@@ -269,22 +269,40 @@
     }
     //end country with most users script
 
-    new Chart($("#TownWithMostUsers"), {
-        type: 'horizontalBar',
-        data: {
-        labels: ["Nairobi", "Arusha", "Kampala", "Nakuru", "Lagos"],
-        datasets: [
-            {
-            label: "Posts",
-            backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
-            data: [520,227,174,348,350]
-            }
-        ]
-        },
-        options: {
-        legend: { display: false }
+     // start town with most users script
+    $.ajax({
+        url: "{{ route('town_most_users_chart') }}",
+        type: "get",
+        success: function(response) {
+          var town_most_users_label = [];
+          var town_most_users_data = [];
+            response.forEach(function(data){
+                town_most_users_label.push(data.name);
+                town_most_users_data.push(data.total);
+            });
+            TownMostUsersChart(town_most_users_label,town_most_users_data);
         }
     });
+
+    function TownMostUsersChart(label,data) {
+      new Chart($("#TownWithMostUsers"), {
+          type: 'horizontalBar',
+          data: {
+          labels: label,
+          datasets: [
+              {
+              label: "Posts",
+              backgroundColor: ["#3cba9f", "#c45850","#3e95cd","#e8c3b9","#8e5ea2"],
+              data: data
+              }
+          ]
+          },
+          options: {
+          legend: { display: false }
+          }
+      });
+    }
+    //end town with most users script
   });
     
 </script>

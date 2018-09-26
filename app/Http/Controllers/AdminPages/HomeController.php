@@ -8,6 +8,7 @@ use App\EventOrganizer;
 use App\Event;
 use App\Abuse;
 use App\Post;
+use App\Town;
 use App\Country;
 use Carbon\Carbon;
 use DB;
@@ -106,11 +107,28 @@ class HomeController extends Controller
         
     }
 
-    public function most_users_chart(){
+    public function country_most_users_chart(){
         $venues = Country::select('countries.name', DB::raw('count(users.country_id) as total'))
                         ->orderBy('total', 'DESC')
                         ->join('users','users.country_id','=','countries.id')
                         ->groupBy(DB::raw('countries.name'))
+                        ->take(5)
+                        ->get();
+        
+        $venues_array = array();        
+        foreach($venues as $user){
+            $venues_array[] = $user;
+        }
+        return response()->json($venues_array);
+        
+    }
+
+    public function town_most_users_chart(){
+        $venues = Town::select('towns.name', DB::raw('count(venues.town_id) as total'))
+                        ->orderBy('total', 'DESC')
+                        ->join('venues','venues.town_id','=','towns.id')
+                        ->join('posts','posts.venue_id','=','venues.id')
+                        ->groupBy(DB::raw('venues.town_id'))
                         ->take(5)
                         ->get();
         

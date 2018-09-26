@@ -14,7 +14,7 @@ class PostsTableSeeder extends Seeder
     {
         DB::table('posts')->insert([
             'user_id' => 1,
-            'venue_id' => 1,
+            'venue_id' => 4,
             'media_type' => 1,
             'media_url' => "1_5ba0f9bf5f78b.png", //TODO:: add relevant filename
             'comment' => "This is a test comment. No big deal!",
@@ -56,7 +56,7 @@ class PostsTableSeeder extends Seeder
 
         DB::table('posts')->insert([
             'user_id' => 3,
-            'venue_id' => 2,
+            'venue_id' => 4,
             'media_type' => 1,
             'media_url' => "image.jpg", //TODO:: add relevant filename
             'comment' => "This is a test comment for a image. No big deal!",
@@ -84,7 +84,7 @@ class PostsTableSeeder extends Seeder
 
         DB::table('posts')->insert([
             'user_id' => 4,
-            'venue_id' => 4,
+            'venue_id' => 1,
             'media_type' => 2,
             'media_url' => "image.jpg", //TODO:: add relevant filename
             'comment' => "This is a test comment for a image. No big deal!",
@@ -98,7 +98,7 @@ class PostsTableSeeder extends Seeder
 
         DB::table('posts')->insert([
             'user_id' => 1,
-            'venue_id' => 1,
+            'venue_id' => 2,
             'media_type' => 1,
             'media_url' => "image.jpg", //TODO:: add relevant filename
             'comment' => "This is a test comment for a image. No big deal!",

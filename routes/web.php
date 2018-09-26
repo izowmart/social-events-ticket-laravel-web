@@ -105,7 +105,7 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
         Route::get('edit/{name}', 'AdminPages\CountriesController@showEditForm')->name('edit_country');
         Route::post('edit', 'AdminPages\CountriesController@update')->name('edit_country_post');
         Route::post('delete', 'AdminPages\CountriesController@destroy')->name('delete_country');
-        Route::get('most_users_chart', 'AdminPages\HomeController@most_users_chart')->name('country_most_users_chart');
+        Route::get('most_users_chart', 'AdminPages\HomeController@country_most_users_chart')->name('country_most_users_chart');
     });
 
     Route::group(['prefix'=>'towns'], function () {
@@ -114,7 +114,8 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
         Route::post('add', 'AdminPages\TownsController@store')->name('add_town_post');
         Route::get('edit/{coutry}/{town}', 'AdminPages\TownsController@showEditForm')->name('edit_town');
         Route::post('edit', 'AdminPages\TownsController@update')->name('edit_town_post');
-        Route::post('delete', 'AdminPages\TownsController@destroy')->name('delete_town');  
+        Route::post('delete', 'AdminPages\TownsController@destroy')->name('delete_town');       
+        Route::get('most_users_chart', 'AdminPages\HomeController@town_most_users_chart')->name('town_most_users_chart');  
     }); 
     
     Route::group(['prefix'=>'adverts'], function () {
