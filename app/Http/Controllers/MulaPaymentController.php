@@ -99,7 +99,7 @@ class MulaPaymentController extends Controller
         $ticket_customer = TicketCustomer::find($ticket_customer_id);
 
         $payload = [
-            "merchantTransactionID" => "" . uniqid("Trns:",true),
+            "merchantTransactionID" => now()->timestamp."". uniqid(),
             "customerFirstName"     => $ticket_customer->first_name,
             "customerLastName"      => $ticket_customer->last_name,
             "MSISDN"                => UniversalMethods::formatPhoneNumber($ticket_customer->phone_number),

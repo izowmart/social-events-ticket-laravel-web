@@ -22,6 +22,8 @@ $api->version('v1', function ($api) {
             $api->post('register', $base_url . 'Api\AuthController@register_user');
             $api->post('login', $base_url . 'Api\AuthController@login_user');
             $api->post('reset_password_email', $base_url . 'Api\AuthController@reset_password_user');
+            $api->post('update_auto_follow_status', $base_url . 'Api\AuthController@update_auto_follow_status');
+            $api->post('update_fcm_token', $base_url . 'Api\AuthController@update_fcm_token');
         });
 
         $api->group(['prefix' => 'scanner'], function ($api) use ($base_url) {
@@ -58,5 +60,6 @@ $api->version('v1', function ($api) {
 
     });
 
+    $api->get('payments/{user_id}/{event_id}', $base_url . 'Api\MulaPaymentController@initiate_payment');
 });
 
