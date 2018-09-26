@@ -73,7 +73,7 @@
         const encryptionURL = "{{route('encryption_url')}}";
 
         // Provide the class name of where you would like to append the 'pay with mula' button. This example uses a div
-        MulaCheckout.addPayWithMulaButton({className: 'checkout-button', checkoutType: 'express'});
+        MulaCheckout.addPayWithMulaButton({className: 'checkout-button', checkoutType: 'modal'});
 
         const params = {
           "customer_id" : 1,
@@ -85,7 +85,7 @@
             console.log("button clicked");
             encrypt().then(response => {
                 console.log("response: "+JSON.stringify(response));
-                MulaCheckout.renderMulaCheckout({merchantProperties: response, checkoutType: 'express'})
+                MulaCheckout.renderMulaCheckout({merchantProperties: response, checkoutType: 'modal'})
             })
 
         });
