@@ -60,12 +60,8 @@
                         </td>
                         <td>{{$advert->first_name}} {{$advert->last_name}}</td>
                         <td>
-                          <button onClick="document.getElementById('edit_form_{{$advert->id}}').submit();" class="btn btn-sm btn-outline-primary">Edit</button>
-                          <form id="edit_form_{{$advert->id}}" action="{{ route('edit_advert') }}" method="POST" style="display: none;">
-                              {{ csrf_field() }}
-                              <input type="hidden" name="id" value="{{$advert->id}}">
-                          </form>
-
+                          <a href="{{ route('edit_advert', ['slug'=>$advert->slug]) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                          
                           <button onClick="deleteBtn({{$advert->id}})" class="btn btn-sm btn-outline-danger">Delete</button>
                           <form id="delete_form_{{$advert->id}}" action="{{ route('delete_advert') }}" method="POST" style="display: none;">
                               {{ csrf_field() }}

@@ -21,7 +21,7 @@
         <div class="col-md-12">
           <div class="tile">              
             <div class="tile-body">
-              <form method="POST" action="{{ route('add_advert_post') }}" enctype="multipart/form-data">
+              <form autocomplete="off" method="POST" action="{{ route('add_advert_post') }}" enctype="multipart/form-data">
                 {{ csrf_field() }}
                     <div class="col-md-10">
                         <div class="form-group{{ $errors->has('title') ? ' has-error' : '' }}">

@@ -122,8 +122,8 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
         Route::get('/', 'AdminPages\AdvertsController@index')->name('adverts');
         Route::get('add', 'AdminPages\AdvertsController@showAddForm')->name('add_advert');
         Route::post('add', 'AdminPages\AdvertsController@store')->name('add_advert_post'); 
-        Route::post('edit', 'AdminPages\AdvertsController@showEditForm')->name('edit_advert');
-        Route::post('edit/update', 'AdminPages\AdvertsController@update')->name('edit_advert_post');
+        Route::get('edit/{slug}', 'AdminPages\AdvertsController@showEditForm')->name('edit_advert');
+        Route::post('edit', 'AdminPages\AdvertsController@update')->name('edit_advert_post');
         Route::post('delete', 'AdminPages\AdvertsController@destroy')->name('delete_advert');  
     });
 
