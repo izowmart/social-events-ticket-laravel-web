@@ -25,45 +25,7 @@ class MulaPaymentController extends Controller
 
     public function index()
     {
-        /**
-        $amount = "1000";
-
-        $ticket_customer = TicketCustomer::findOrFail(1);
-
-        /**
-         *
-         * TODO::based on the event_organizer id fetch their
-         *       - first and last name
-         *       - phone number
-         *       - email
-         *
-         *
-        $payload = [
-            "merchantTransactionID" => "" . uniqid("Trans:"),
-            "customerFirstName"     => $ticket_customer->first_name,
-            "customerLastName"      => $ticket_customer->last_name,
-            "MSISDN"                => $ticket_customer->phone_number,
-            "customerEmail"         => $ticket_customer->email,
-            "amount"                => $amount,
-            "currencyCode"          => "KES",
-            "accountNumber"         => "123456",
-            "serviceCode"           => "APISBX3857",
-            "dueDate"               => "2018-08-24 11:09:59",
-            "serviceDescription"    => "Getting service/good x",
-            "accessKey"             => '$2a$08$Ga/jSxv1qturlAr8SkHhzOaprXnfOJUTqB6fLRrc/0nSYpRlAd96e',
-            "countryCode"           => "KE",
-            "languageCode"          => "en",
-            "successRedirectUrl"    => "http://dc91f14b.ngrok.io/payments/success_url",
-            "failRedirectUrl"       => "http://dc91f14b.ngrok.io/payments/failure_url",
-            "paymentWebhookUrl"     => "http://dc91f14b.ngrok.io/payments/process_payment"
-        ];
-
-
-        return view('welcome',compact('payload'));
-         */
-
-        return view('welcome');
-
+        return view('payments.button');
     }
 
     public function encryptData(Request $request)
@@ -223,6 +185,7 @@ class MulaPaymentController extends Controller
 
             //display a success message to the user
             return view('payments.success');
+
         } catch ( \Exception $exception ) {
             logger("PAYMENT SUCCESS error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
         }
@@ -247,5 +210,46 @@ class MulaPaymentController extends Controller
         }
     }
 
+    /*
+     * Mobile METHODS
+     */
 
+    public function mobile_success(Request $request)
+    {
+        try {
+            $payload = $request->getContent();
+            //save the response to the db
+            PaymentResponse::create([
+                'type'     => 'mobile_success',
+                'response' => $payload
+            ]);
+            //log the payment
+            logger("PAYMENT SUCCESS::  " . $payload);
+
+            //display a success message to the user
+            return view('payments.mobile_success');
+
+        } catch ( \Exception $exception ) {
+            logger("PAYMENT SUCCESS error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
+        }
+    }
+
+    public function mobile_failure(Request $request)
+    {
+        try {
+            $payload = $request->getContent();
+            //save the response to the db
+            PaymentResponse::create([
+                'type'     => 'mobile_failure',
+                'response' => $payload
+            ]);
+            //log the payment
+            logger("PAYMENT FAILURE::  " . $payload);
+
+            //display a success message to the user
+            return view('payments.mobile_failure');
+        } catch ( \Exception $exception ) {
+            logger("PAYMENT FAILURE error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
+        }
+    }
 }

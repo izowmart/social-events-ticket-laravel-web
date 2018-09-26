@@ -6,9 +6,7 @@
         @endcomponent
     </h1>
     <p class="lead">
-        Sorry! Your payment was unsuccessful.
+        Sorry! Your payment was unsuccessful. Kindly retry.
     </p>
-    <p class="lead">
-        <a href="{{route('payment_home')}}" class="btn btn-lg btn-secondary">Home</a>
-    </p>
+
 @endsection()

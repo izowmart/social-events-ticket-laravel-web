@@ -12,7 +12,9 @@ namespace App\Http\Controllers\Api;
 use App\Event;
 use App\Http\Traits\UniversalMethods;
 use App\PaymentRequest;
+use App\PaymentResponse;
 use App\TicketCustomer;
+use Illuminate\Support\Facades\Request;
 
 class MulaPaymentController
 {
@@ -59,7 +61,7 @@ class MulaPaymentController
 
 
         $payload = [
-            "merchantTransactionID" => now()->getTimestamp().uniqid(),
+            "merchantTransactionID" => now()->timestamp."".uniqid(),
             "customerFirstName"     => $ticket_customer->first_name,
             "customerLastName"      => $ticket_customer->last_name,
             "MSISDN"                => UniversalMethods::formatPhoneNumber($ticket_customer->phone_number),
@@ -73,8 +75,8 @@ class MulaPaymentController
             "accessKey"             => '$2a$08$Ga/jSxv1qturlAr8SkHhzOaprXnfOJUTqB6fLRrc/0nSYpRlAd96e',
             "countryCode"           => "KE",
             "languageCode"          => "en",
-            "successRedirectUrl"    =>  route("success_url"),
-            "failRedirectUrl"       =>  route("failure_url"),
+            "successRedirectUrl"    =>  route("mobile_success_url"),
+            "failRedirectUrl"       =>  route("mobile_failure_url"),
             "paymentWebhookUrl"     =>  route("process_payment"),
         ];
 
@@ -101,7 +103,7 @@ class MulaPaymentController
         //Base 64 Encode the encrypted payload
         $encryptedPayload = base64_encode($encrypted);
 
-        /*
+//        /*
         return response()->json([
             'success'   =>  true,
             'message'   => 'params fetched successfully',
@@ -111,18 +113,18 @@ class MulaPaymentController
                 'countryCode' => $payload['countryCode']
             ]
             ]
-        ); */
+        );
+//         */
+
+        /*
         $data =json_encode( [
             'params' => $encryptedPayload,
             'accessKey' => $payload['accessKey'],
             'countryCode' => $payload['countryCode']
         ]);
 
-
-
         return view('payments.mobile',compact('data'));
-
-
+        */
     }
 
 }
