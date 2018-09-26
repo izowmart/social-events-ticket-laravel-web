@@ -101,6 +101,17 @@ class MulaPaymentController
         //Base 64 Encode the encrypted payload
         $encryptedPayload = base64_encode($encrypted);
 
+        /*
+        return response()->json([
+            'success'   =>  true,
+            'message'   => 'params fetched successfully',
+            'datum'     => [
+                'params' => $encryptedPayload,
+                'accessKey' => $payload['accessKey'],
+                'countryCode' => $payload['countryCode']
+            ]
+            ]
+        ); */
         $data =json_encode( [
             'params' => $encryptedPayload,
             'accessKey' => $payload['accessKey'],
