@@ -132,6 +132,7 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
         Route::post('edit', 'AdminPages\VenuesController@showEditForm')->name('edit_venue');
         Route::post('edit/update', 'AdminPages\VenuesController@update')->name('edit_venue_post');
         Route::post('delete', 'AdminPages\VenuesController@destroy')->name('delete_venue');
+        Route::get('active_venues_chart', 'AdminPages\HomeController@active_venues_chart')->name('active_venues_chart');
     });
 
     Route::group(['prefix'=>'users'], function () {

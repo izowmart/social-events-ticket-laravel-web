@@ -198,23 +198,41 @@
       });
     }
     //end active users script
-        
-    new Chart($("#MostActiveVenues"), {
-        type: 'horizontalBar',
-        data: {
-        labels: ["CityHall", "Uhuru park", "Archives", "Hilton", "Kempinski"],
-        datasets: [
-            {
-            label: "Posts",
-            backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
-            data: [87,127,154,108,120]
-            }
-        ]
-        },
-        options: {
-        legend: { display: false }
+
+     // start active venues script
+    $.ajax({
+        url: "{{ route('active_venues_chart') }}",
+        type: "get",
+        success: function(response) {
+          var active_venues_label = [];
+          var active_venues_data = [];
+            response.forEach(function(data){
+                active_venues_label.push(data.name);
+                active_venues_data.push(data.total);
+            });
+            ActiveVenuesChart(active_venues_label,active_venues_data);
         }
     });
+
+    function ActiveVenuesChart(label,data) {
+      new Chart($("#MostActiveVenues"), {
+          type: 'horizontalBar',
+          data: {
+          labels: label,
+          datasets: [
+              {
+              label: "Posts",
+              backgroundColor: ["#3cba9f", "#c45850","#8e5ea2","#e8c3b9","#3e95cd"],
+              data: data
+              }
+          ]
+          },
+          options: {
+          legend: { display: false }
+          }
+      });
+    }
+    //end active venues script
 
     new Chart($("#CountryWithMostUsers"), {
         type: 'horizontalBar',
