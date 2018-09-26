@@ -131,6 +131,7 @@
 <script type="text/javascript" src="{{ asset('js/plugins/moment.min.js') }}"></script>
 <script type="text/javascript">
   $(document).ready(function() {
+    // start new users script
     $.ajax({
         url: "{{ route('new_users_chart') }}",
         type: "get",
@@ -161,24 +162,43 @@
       }
       });
     }
-        
-    new Chart($("#MostActiveUsers"), {
-        type: 'horizontalBar',
-        data: {
-        labels: ["John", "Kim", "Jane", "Peter", "Linda"],
-        datasets: [
-            {
-            label: "Comments and posts",
-            backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
-            data: [34,57,74,78,43]
-            }
-        ]
-        },
-        options: {
-        legend: { display: false }
+    //end new users script
+
+     // start active users script
+    $.ajax({
+        url: "{{ route('active_users_chart') }}",
+        type: "get",
+        success: function(response) {
+          var active_users_label = [];
+          var active_users_data = [];
+            response.forEach(function(data){
+                active_users_label.push(data.first_name);
+                active_users_data.push(data.total);
+            });
+            ActiveUsersChart(active_users_label,active_users_data);
         }
     });
 
+    function ActiveUsersChart(label,data) {
+      new Chart($("#MostActiveUsers"), {
+          type: 'horizontalBar',
+          data: {
+          labels: label,
+          datasets: [
+              {
+              label: "Posts",
+              backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+              data: data
+              }
+          ]
+          },
+          options: {
+          legend: { display: false }
+          }
+      });
+    }
+    //end active users script
+        
     new Chart($("#MostActiveVenues"), {
         type: 'horizontalBar',
         data: {

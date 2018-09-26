@@ -70,7 +70,22 @@ class HomeController extends Controller
             $users_array[] = $user;
         }
         return response()->json($users_array);
-        //dd($users_array);
+        
+    }
+
+    public function active_users_chart(){
+        $users = Post::select('users.first_name', DB::raw('count(posts.user_id) as total'))
+                        ->orderBy('total', 'DESC')
+                        ->join('users','users.id','=','posts.user_id')
+                        ->groupBy(DB::raw('posts.user_id'))
+                        ->take(5)
+                        ->get();
+        
+        $users_array = array();        
+        foreach($users as $user){
+            $users_array[] = $user;
+        }
+        return response()->json($users_array);
         
     }
 }

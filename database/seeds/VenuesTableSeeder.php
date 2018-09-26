@@ -26,5 +26,61 @@ class VenuesTableSeeder extends Seeder
                 'updated_at'        => now(),
             ]
         );
+
+        Venue::create(
+            [
+                'name' => 'Venue test',
+                'town_id'=> Town::all()->first()->id,
+                'latitude' => '-1.3698',
+                'longitude' => '36.56566',
+                'contact_person_name'  => 'John Contact',
+                'contact_person_phone' => '254711110128',
+                'contact_person_email'  => 'johncontact@gmail.com',
+                'created_at'        => now(),
+                'updated_at'        => now(),
+            ]
+        );
+
+        Venue::create(
+            [
+                'name' => 'Venue test 2',
+                'town_id'=> 3,
+                'latitude' => '-1.36448',
+                'longitude' => '36.46566',
+                'contact_person_name'  => 'John Contact',
+                'contact_person_phone' => '254711110128',
+                'contact_person_email'  => 'johncontact@gmail.com',
+                'created_at'        => now(),
+                'updated_at'        => now(),
+            ]
+        );
+
+        Venue::create(
+            [
+                'name' => 'Venue test 3',
+                'town_id'=> 5,
+                'latitude' => '-1.36448',
+                'longitude' => '36.46566',
+                'contact_person_name'  => 'John Contact',
+                'contact_person_phone' => '254711110128',
+                'contact_person_email'  => 'johncontact@gmail.com',
+                'created_at'        => now(),
+                'updated_at'        => now(),
+            ]
+        );
+
+        Venue::create(
+            [
+                'name' => 'Venue test 4',
+                'town_id'=> 2,
+                'latitude' => '-1.36448',
+                'longitude' => '36.46566',
+                'contact_person_name'  => 'John Contact',
+                'contact_person_phone' => '254711110128',
+                'contact_person_email'  => 'johncontact@gmail.com',
+                'created_at'        => now(),
+                'updated_at'        => now(),
+            ]
+        );
     }
 }
