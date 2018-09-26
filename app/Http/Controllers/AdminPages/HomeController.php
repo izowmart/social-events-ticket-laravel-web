@@ -88,4 +88,20 @@ class HomeController extends Controller
         return response()->json($users_array);
         
     }
+
+    public function active_venues_chart(){
+        $venues = Post::select('venues.name', DB::raw('count(posts.venue_id) as total'))
+                        ->orderBy('total', 'DESC')
+                        ->join('venues','venues.id','=','posts.venue_id')
+                        ->groupBy(DB::raw('posts.venue_id'))
+                        ->take(5)
+                        ->get();
+        
+        $venues_array = array();        
+        foreach($venues as $user){
+            $venues_array[] = $user;
+        }
+        return response()->json($venues_array);
+        
+    }
 }
