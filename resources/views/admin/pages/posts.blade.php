@@ -57,11 +57,8 @@
                         </td>
                         <td>{{ $post->abuses->count() }}
                             @if ($post->abuses->count()>0)
-                                <a href="{{ route('abuses') }}" onclick="event.preventDefault(); document.getElementById('abuse-form').submit();" class="btn btn-sm btn-outline-primary">View</a>
-                                <form id="abuse-form" action="{{ route('abuses') }}" method="POST" style="display: none;">
-                                    {{ csrf_field() }}
-                                    <input type="hidden" name="id" value="{{$post->id}}">
-                                </form>
+                                <a href="{{ route('abuses',['id'=>$post->id]) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                
                             @endif
                         </td>
                     </tr>                        

@@ -147,7 +147,7 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
     Route::group(['prefix'=>'posts'], function () {
         Route::get('/', 'AdminPages\PostsController@index')->name('posts');
         Route::post('block', 'AdminPages\PostsController@block')->name('block_post');
-        Route::post('abuses', 'AdminPages\AbusesController@index')->name('abuses');
+        Route::get('abuses/{id}', 'AdminPages\AbusesController@index')->name('abuses');
     });
 
     Route::group(['prefix'=>'event_organizers'], function () {

@@ -18,7 +18,7 @@
           <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
           <li class="breadcrumb-item"><a href="{{ route('admin_home') }}">Home</a></li>
           <li class="breadcrumb-item"><a href="{{ route('posts') }}">Posts</a></li>
-          <li class="breadcrumb-item"><a href="{{ route('abuses') }}">Abuses</a></li>
+          <li class="breadcrumb-item"><a href="#">Abuses</a></li>
         </ul>
       </div>
       <div class="row">
