@@ -29,7 +29,10 @@ class UserTransformer extends TransformerAbstract
             'auto_follow_status'    => (bool) $user->auto_follow_status,
             'app_version_code'      => $user->app_version_code,
             'is_first_time_login'   => (bool) $user->first_time_login,
-            'created_at'            => Carbon::parse($user->created_at)->toDateTimeString()
+            'created_at'            => Carbon::parse($user->created_at)->toDateTimeString(),
+            'posts'                 => $user->posts->count(),
+            'followers'             => $user->followers->count(),
+            'following'             => $user->following->count(),
         ];
     }
 }
