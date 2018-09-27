@@ -17,10 +17,8 @@ class CreateEventDatesTable extends Migration
             $table->increments('id');
             $table->integer('event_id')->unsigned();
             $table->foreign('event_id')->references('id')->on('events');
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->time('start_time');
-            $table->time('end_time');
+            $table->datetime('start');
+            $table->datetime('end');
             $table->timestamps();
         });
     }
