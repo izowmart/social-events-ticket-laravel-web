@@ -10,7 +10,7 @@
     <div class="col-md-8">
         <div class="details-content">            
             <h1 class="details-title">{{$event->name}}</h1>
-            <p class="details-dates"><i class="fa fa-calendar-check-o"></i> {{date("jS M Y", strtotime($event->start_date))}}, {{date("g:i a", strtotime($event->start_time))}} - {{date("jS M Y", strtotime($event->end_date))}}, {{date("g:i a", strtotime($event->end_time))}}</p>
+            <p class="details-dates"><i class="fa fa-calendar-check-o"></i> {{date("jS M Y, g:i a", strtotime($event->start))}} - {{date("jS M Y, g:i a", strtotime($event->end))}}</p>
             <p class="details-location"><i style="font-size: 18px;" class="fa fa-map-marker"></i> {{$event->location}}</p><br>
 
             <p class="details-description">
