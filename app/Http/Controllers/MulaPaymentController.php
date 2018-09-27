@@ -35,7 +35,8 @@ class MulaPaymentController extends Controller
         $validator = Validator::make($data_array,
             [
                 'event_id' => 'required|integer|exists:events,id',
-                'customer_id' => 'required|integer|exists:ticket_customers,id',
+                // 'customer_id' => 'required|integer|exists:ticket_customers,id',
+                'customer_id' => 'required',
             ],
             [
                 'event_id.required' => 'event id required',
@@ -53,12 +54,18 @@ class MulaPaymentController extends Controller
             ]);
         }
 
+        // $ticket_customer = TicketCustomer::create([
+        //     'first_name' => "JOhn",
+        //     'last_name' => 'Doe',
+        //     'email'=>'augustineowuor32@gmail.com',
+        //     'phone_number'=> '0720810670'
+        // ]);
 
         $event_id = $data_array['event_id'];
-        $ticket_customer_id = $data_array['customer_id'];
+        // $ticket_customer_id = $data_array['customer_id'];
 
         $event = Event::find($event_id);
-        $ticket_customer = TicketCustomer::find($ticket_customer_id);
+        // $ticket_customer = TicketCustomer::find($ticket_customer_id);
 
         $payload = [
             "merchantTransactionID" => now()->timestamp."". uniqid(),

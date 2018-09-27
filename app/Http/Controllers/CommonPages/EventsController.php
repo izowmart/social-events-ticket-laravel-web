@@ -103,7 +103,6 @@ class EventsController extends Controller
         $event->location = $request->location;
         $event->longitude = $request->longitude;
         $event->latitude = $request->latitude;
-        $event->no_of_tickets = $request->tickets;
         $event->description = $request->description;
         $event->type = $request->type;
         $event->save();
@@ -137,7 +136,7 @@ class EventsController extends Controller
                 $ticket_category_details->event_id = $event_id;
                 $ticket_category_details->category_id = $ticket_category->id;
                 $ticket_category_details->price = $request->$amount;
-                $ticket_category_details->tickets = $request->$tickets;
+                $ticket_category_details->no_of_tickets = $request->$tickets;
                 $ticket_category_details->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->$ticket_sale_end_date));
                 $ticket_category_details->save();
                 
