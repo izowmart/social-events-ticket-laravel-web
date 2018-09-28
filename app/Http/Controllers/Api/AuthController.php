@@ -73,12 +73,14 @@ class AuthController extends Controller
             $user = User::create($data);
 
             if ($user) {
+                $userTransformer = new UserTransformer();
+                $userTransformer->setUserId($user->id);
 
                 return response()->json(
                     [
                         'success' => true,
                         'message' => 'User Account Created Successfully. Welcome!',
-                        'data'    => fractal($user, UserTransformer::class),
+                        'data'    => fractal($user, $userTransformer),
                     ], 200
                 );
             } else {
@@ -121,12 +123,13 @@ class AuthController extends Controller
         } else {
             //attempt to authenticate user
             if (Auth::attempt($request->only(['email', 'password']))) {
-
+                $userTransformer = new UserTransformer();
+                $userTransformer->setUserId(Auth::user()->id);
                 return response()->json(
                     [
                         'success' => true,
                         'message' => 'User Successfully Logged In. Welcome!',
-                        'data'    => fractal(Auth::user(), UserTransformer::class),
+                        'data'    => fractal(Auth::user(), $userTransformer),
                     ], 200
                 );
             } else {
@@ -243,10 +246,13 @@ class AuthController extends Controller
         $user = User::findOrFail($user_id);
         $data = [];
         if ($user) {
+            $userTransformer = new UserTransformer();
+            $userTransformer->setUserId($user_id);
+
             $data =
                 [
-                    'followers' => $user->followers,
-                    'following' => $user->following
+                    'followers' => fractal($user->followers,$userTransformer),
+                    'following' => fractal($user->following, $userTransformer)
                 ];
         }
 

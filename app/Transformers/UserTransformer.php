@@ -8,8 +8,18 @@ use League\Fractal\TransformerAbstract;
 
 class UserTransformer extends TransformerAbstract
 {
+    private $user_id;
+    private $requesting_user;
+//
+//    public function __construct($user_id)
+//    {
+//        $this->user_id = $user_id;
+//    }
+
     /**
      * A Fractal transformer.
+     *
+     * @param \App\User $user
      *
      * @return array
      */
@@ -29,7 +39,18 @@ class UserTransformer extends TransformerAbstract
             'auto_follow_status'    => (bool) $user->auto_follow_status,
             'app_version_code'      => $user->app_version_code,
             'is_first_time_login'   => (bool) $user->first_time_login,
-            'created_at'            => Carbon::parse($user->created_at)->toDateTimeString()
+            'created_at'            => Carbon::parse($user->created_at)->toDateTimeString(),
+            'posts'                 => $user->posts->count(),
+            'followers'             => $user->followers->count(),
+            'following'             => $user->following->count(),
+            'follower'              => (bool) ($this->user_id == $user->id || $this->requesting_user == null ) ? false : in_array($user->id,$this->requesting_user->followers->pluck('id')->toArray()),
+            'followed'              => (bool) ($this->user_id == $user->id || $this->requesting_user == null ) ? false : in_array($user->id,$this->requesting_user->following->pluck('id')->toArray()),
         ];
+    }
+
+    public function setUserId($user_id)
+    {
+        $this->user_id = $user_id;
+        $this->requesting_user = User::find($this->user_id);
     }
 }
