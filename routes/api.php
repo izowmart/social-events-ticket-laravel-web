@@ -51,8 +51,8 @@ $api->version('v1', function ($api) {
         $api->post('delete_post', $base_url . 'Api\PostController@delete');
         $api->post('like_post', $base_url . 'Api\PostController@like');
         $api->post('report_abuse', $base_url . 'Api\PostController@report_abuse');
-        $api->get('user/{id}/relations', $base_url . 'Api\AuthController@user_relations');
-        $api->post('user/follow', $base_url . 'Api\AuthController@follow');
+        $api->get('{id}/relations', $base_url . 'Api\AuthController@user_relations');
+        $api->post('follow', $base_url . 'Api\AuthController@follow');
     });
 
     $api->group(['prefix'=> 'scanner'], function ($api) use ($base_url) {
