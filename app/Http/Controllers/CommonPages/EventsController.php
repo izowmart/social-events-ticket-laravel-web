@@ -6,13 +6,13 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Event;
-use App\PaidEventCategory;
 use App\EventSponsorMedia;
 use App\EventDate;
 use App\EventPrice;
 use App\Scanner;
 use App\EventScanner;
 use App\TicketCategory;
+use App\TicketCategoryDetail;
 
 class EventsController extends Controller
 {
@@ -64,26 +64,24 @@ class EventsController extends Controller
     }
 
     public function store(Request $request){
+                
+        //dd($request);
         $this->validate($request, [
             'name'=>'required',
             'description'=>'required',            
             'location'=>'required',
             'type'=>'required',
             'image'=>'image',
-            'start_date'=>'required',
-            'start_time'=>'required',
-            'stop_date'=>'required',
-            'stop_time'=>'required'
+            'start'=>'required',
+            'stop'=>'required'
         ]); 
 
-        //if its paid event, the amount and category is required
-        if($request->type==2){
-            $this->validate($request, [
-            'amount'=>'required',
-            'tickets'=>'required',
-            'category'=>'required'
-        ]); 
-        }
+        //check if its paid event and validate required fields
+        // if($request->type==2){
+        //     //get selected categories
+        //     $ticket_category = TicketCategory::find($single_category);
+        //     $ticket_slug = $ticket_category->slug;
+        // }
 
         // Handle image upload
 
@@ -105,7 +103,6 @@ class EventsController extends Controller
         $event->location = $request->location;
         $event->longitude = $request->longitude;
         $event->latitude = $request->latitude;
-        $event->no_of_tickets = $request->tickets;
         $event->description = $request->description;
         $event->type = $request->type;
         $event->save();
@@ -114,10 +111,8 @@ class EventsController extends Controller
 
         $event_date = new EventDate();
         $event_date->event_id = $event_id;
-        $event_date->start_date = $request->start_date;
-        $event_date->end_date = $request->stop_date;
-        $event_date->start_time = date('H:i:s',strtotime($request->start_time));
-        $event_date->end_time = date('H:i:s',strtotime($request->stop_time));
+        $event_date->start = date('Y-m-d H:i:s',strtotime($request->start));
+        $event_date->end = date('Y-m-d H:i:s',strtotime($request->stop));
         $event_date->save();
 
         $event_sponsor_media = new EventSponsorMedia();
@@ -127,15 +122,25 @@ class EventsController extends Controller
 
         //insert price and category if it's a paid event
         if($request->type==2){
-            $event_price = new EventPrice();
-            $event_price->event_id = $event_id;
-            $event_price->price = $request->amount;
-            $event_price->save();
 
-            $paid_event_category = new PaidEventCategory();
-            $paid_event_category->event_id = $event_id;
-            $paid_event_category->category = $request->category;
-            $paid_event_category->save();
+            foreach($request->category as $single_category){
+                //get the slug of category from db
+                $ticket_category = TicketCategory::find($single_category);
+                $ticket_slug = $ticket_category->slug;
+                //creat names for inputs
+                $amount = $ticket_slug.'_amount';
+                $tickets = $ticket_slug.'_tickets';
+                $ticket_sale_end_date = $ticket_slug.'_ticket_sale_end_date';
+
+                $ticket_category_details = new TicketCategoryDetail;
+                $ticket_category_details->event_id = $event_id;
+                $ticket_category_details->category_id = $ticket_category->id;
+                $ticket_category_details->price = $request->$amount;
+                $ticket_category_details->no_of_tickets = $request->$tickets;
+                $ticket_category_details->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->$ticket_sale_end_date));
+                $ticket_category_details->save();
+                
+            }
         }
 
         //Give message after successfull operation

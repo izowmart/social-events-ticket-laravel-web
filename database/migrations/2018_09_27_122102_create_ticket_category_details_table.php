@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePaidEventCategoriesTable extends Migration
+class CreateTicketCategoryDetailsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,15 @@ class CreatePaidEventCategoriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('paid_event_categories', function (Blueprint $table) {
+        Schema::create('ticket_category_details', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('event_id')->unsigned();
             $table->foreign('event_id')->references('id')->on('events');
-            $table->integer('category')->comment("1: Regular,2: VIP");            
+            $table->integer('category_id')->unsigned();
+            $table->foreign('category_id')->references('id')->on('ticket_categories');
+            $table->string('price');
+            $table->integer('no_of_tickets');
+            $table->datetime('ticket_sale_end_date');
             $table->timestamps();
         });
     }
@@ -29,6 +33,6 @@ class CreatePaidEventCategoriesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('paid_event_categories');
+        Schema::dropIfExists('ticket_category_details');
     }
 }
