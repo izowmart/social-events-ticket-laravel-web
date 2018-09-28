@@ -5,6 +5,7 @@ namespace App\Http\Controllers\CommonPages;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Event;
 use App\EventSponsorMedia;
 use App\EventDate;
@@ -32,32 +33,25 @@ class EventsController extends Controller
 
     }
 
-    public function showEditForm(Request $request){
-        $event = Event::find($request->id);
+    public function showEditForm($slug){
+        $ticket_categories = TicketCategory::all();
+        
+        $event = Event::select('events.id','events.name','events.slug','events.description','events.location','events.latitude','events.longitude','events.type','events.slug','event_dates.start','event_dates.end','event_sponsor_media.media_url')
+                    ->join('event_dates', 'event_dates.event_id', '=', 'events.id')
+                    ->join('event_sponsor_media', 'event_sponsor_media.event_id', '=', 'events.id')
+                    ->where('events.slug',$slug)
+                    ->orderBy('id','desc')
+                    ->first();
+        $ticket_category_details = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.ticket_sale_end_date','ticket_category_details.category_id','ticket_categories.slug','ticket_categories.name')
+                                    ->join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
+                                    ->where('event_id', $event->id)
+                                    ->get();
 
-        //fetch category and price if it's a paid event
-        if ($event->type==2) {
-            $paid_event_category = PaidEventCategory::where('event_id',$request->id)->first();
-            $event_price = EventPrice::where('event_id',$request->id)->first();
-        }
-        $event_sponsor_media = EventSponsorMedia::where('event_id',$request->id)->first();
-        $event_date = EventDate::where('event_id',$request->id)->first();
-
-        if ($event->type==2) {
-            $data = array(
-                'event'=>$event,
-                'paid_event_category'=>$paid_event_category,
-                'event_price'=>$event_price,
-                'event_sponsor_media'=>$event_sponsor_media,
-                'event_date'=>$event_date
-            );
-        }else{
-            $data = array(
-                'event'=>$event,
-                'event_sponsor_media'=>$event_sponsor_media,
-                'event_date'=>$event_date
-            );
-        }
+        $data = array(
+            'event'=>$event,
+            'ticket_categories'=>$ticket_categories,
+            'ticket_category_details'=>$ticket_category_details
+        );   
 
         return view('event_organizer.pages.edit_event')->with($data);
 
@@ -155,20 +149,16 @@ class EventsController extends Controller
             'description'=>'required',            
             'location'=>'required',
             'type'=>'required',
-            'start_date'=>'required',
-            'start_time'=>'required',
-            'stop_date'=>'required',
-            'stop_time'=>'required'
+            'start'=>'required',
+            'stop'=>'required'
         ]); 
 
-        //if its paid event, the amount and category is required
-        if($request->type==2){
-            $this->validate($request, [
-            'amount'=>'required',
-            'tickets'=>'required',
-            'category'=>'required'
-        ]); 
-        }
+        //check if its paid event and validate required fields
+        // if($request->type==2){
+        //     //get selected categories
+        //     $ticket_category = TicketCategory::find($single_category);
+        //     $ticket_slug = $ticket_category->slug;
+        // }
 
         // check if image was updated
         if ($request->hasFile('image')) {
@@ -199,7 +189,6 @@ class EventsController extends Controller
         $event->location = $request->location;
         $event->longitude = $request->longitude;
         $event->latitude = $request->latitude;
-        $event->no_of_tickets = $request->tickets;
         $event->description = $request->description;
         $event->type = $request->type;
 
@@ -208,10 +197,8 @@ class EventsController extends Controller
         $event_id = $event->id;
 
         $event_date = EventDate::where('event_id',$event_id)->first();
-        $event_date->start_date = $request->start_date;
-        $event_date->end_date = $request->stop_date;
-        $event_date->start_time = date('H:i:s',strtotime($request->start_time));
-        $event_date->end_time = date('H:i:s',strtotime($request->stop_time));
+        $event_date->start = date('Y-m-d H:i:s',strtotime($request->start));
+        $event_date->end = date('Y-m-d H:i:s',strtotime($request->stop));
         $event_date->save();
 
         if ($request->hasFile('image')) {
@@ -220,42 +207,37 @@ class EventsController extends Controller
             $event_sponsor_media->save();
         }
 
-        //check if it was a paid event and changed to free. If so we will drop tables that belong to paid event
+        //check if it was a paid event and changed to free. If so we will delete its record from ticket_category_details table
         if($request->type==1 && $prev_event_type==2){
-            //delete paid_event_categories table
-            $paid_event_category = PaidEventCategory::where('event_id',$request->id);
-            $paid_event_category->delete();
+            $ticket_category_details = TicketCategoryDetail::where('event_id',$request->id);
+            $ticket_category_details->delete();
             
-            //delete event_prices table
-            $event_price = EventPrice::where('event_id',$request->id);
-            $event_price->delete();
-
         }
 
         //update price and category if it's a paid event
         if($request->type==2){
-            //check if the event was previously free so you'll insert new data, hence update
-            if($prev_event_type==1){
-                $event_price = new EventPrice();
-                $event_price->event_id = $event_id;
-                $event_price->price = $request->amount;
-                $event_price->save();
+            //delete all its records from ticket_category_details table and insert the new ones
+            $ticket_category_details = TicketCategoryDetail::where('event_id',$request->id);
+            $ticket_category_details->delete();
+            
+            foreach($request->category as $single_category){
+                //get the slug of category from db
+                $ticket_category = TicketCategory::find($single_category);
+                $ticket_slug = $ticket_category->slug;
+                //creat names for inputs
+                $amount = $ticket_slug.'_amount';
+                $tickets = $ticket_slug.'_tickets';
+                $ticket_sale_end_date = $ticket_slug.'_ticket_sale_end_date';
 
-                $paid_event_category = new PaidEventCategory();
-                $paid_event_category->event_id = $event_id;
-                $paid_event_category->category = $request->category;
-                $paid_event_category->save();
-
-            }else{
-                $event_price = EventPrice::where('event_id',$event_id)->first();
-                $event_price->price = $request->amount;
-                $event_price->save();
-
-                $paid_event_category = PaidEventCategory::where('event_id',$event_id)->first();
-                $paid_event_category->category = $request->category;
-                $paid_event_category->save();
-
-            }            
+                $ticket_category_details = new TicketCategoryDetail;
+                $ticket_category_details->event_id = $event_id;
+                $ticket_category_details->category_id = $ticket_category->id;
+                $ticket_category_details->price = $request->$amount;
+                $ticket_category_details->no_of_tickets = $request->$tickets;
+                $ticket_category_details->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->$ticket_sale_end_date));
+                $ticket_category_details->save();
+                
+            }           
         }
 
         //Give message after successfull operation
@@ -289,7 +271,7 @@ class EventsController extends Controller
         }else{
             //we will search for events that belong to current event organizer only
             $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
                     ->where('events.status',0)
                     ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
                     ->where('events.event_organizer_id',$event_organizer_id)                    
@@ -315,7 +297,7 @@ class EventsController extends Controller
         }else{
             //we will search for events that belong to current evenet organizer only
             $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
                 ->where('events.type',2)
                 ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
                 ->whereIn('events.status',[1,2])
@@ -342,7 +324,7 @@ class EventsController extends Controller
         }else{
             //we will search for events that belong to current evenet organizer only
             $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
                     ->where('events.type',1)
                     ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
                     ->whereIn('events.status',[1,2])
@@ -442,13 +424,9 @@ class EventsController extends Controller
 
         //check if its paid event
         if($event->type==2){
-            //delete paid_event_categories table
-            $paid_event_category = PaidEventCategory::where('event_id',$request->id);
-            $paid_event_category->delete();
-            
-            //delete event_prices table
-            $event_price = EventPrice::where('event_id',$request->id);
-            $event_price->delete();
+            //delete ticket_category_details table
+            $ticket_category_details = TicketCategoryDetail::where('event_id',$request->id);
+            $ticket_category_details->delete();
         }
 
         //delete event_sponsor_media table
@@ -460,7 +438,7 @@ class EventsController extends Controller
         $event_dates->delete();
 
         //delete image
-        unlink(public_path('storage/images/events/'.$event->image_url));
+        Storage::delete('images/events/'.$event->image_url);
 
         //finally delete events table
         $event->delete();

@@ -122,11 +122,8 @@
                         @endauth
 
                         @auth('web_event_organizer')
-                            <button onClick="document.getElementById('edit_form_{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">Edit</button>
-                            <form id="edit_form_{{$event->id}}" action="{{ route('edit_event') }}" method="POST" style="display: none;">
-                                {{ csrf_field() }}
-                                <input type="hidden" name="id" value="{{$event->id}}">
-                            </form>
+                            <a href="{{ route('edit_event', ['slug'=>$event->slug]) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            
                             <button onClick="deleteBtn({{$event->id}})" class="btn btn-sm btn-outline-danger">Delete</button>
                             <form id="delete_form_{{$event->id}}" action="{{ route('delete_event') }}" method="POST" style="display: none;">
                                 {{ csrf_field() }}

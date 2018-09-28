@@ -1,7 +1,8 @@
 @extends('common_pages.layouts')
 
 @section('styles')
-<link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-timepicker.min.css') }}" />   
+<link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-datetimepicker-standalone.min.css') }}" /> 
+<link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-select.min.css') }}" />  
 <link rel="stylesheet" type="text/css" href="{{ asset('css/summernote-bs4.css') }}" /> 
 @endsection
 
@@ -19,7 +20,7 @@
           <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
           <li class="breadcrumb-item"><a href="{{ route('event_organizer_home') }}">Home</a></li>
           <li class="breadcrumb-item"><a href="{{ route('event_organizer_verified_free_events') }}">Events</a></li>
-          <li class="breadcrumb-item"><a href="{{ route('edit_event') }}">Edit</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('edit_event', ['slug'=>$event->slug]) }}">Edit</a></li>
         </ul>
       </div>
       <div class="row">
@@ -59,44 +60,79 @@
                       <div class="row">
                         <div class="col-md-4">
                             <label class="control-label">Event Start</label>
-                            <div class="form-group{{ $errors->has('start_date') ? ' has-error' : '' }}">
-                                <input class="form-control" type="text" id="start_date" name="start_date" value="{{ $event_date->start_date}}" placeholder="Select start date"  required>
-                                @if ($errors->has('start_date'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('start_date') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                            <div class="form-group{{ $errors->has('start_time') ? ' has-error' : '' }}">
-                                <input class="form-control" type="text" id="start_time" name="start_time" value="{{ $event_date->end_date}}" placeholder="Select start time"  required>
-                                @if ($errors->has('start_time'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('start_time') }}</strong>
-                                    </span>
-                                @endif
+                            <div class="form-group{{ $errors->has('start') ? ' has-error' : '' }}">
+                                <div class='input-group date' id='datetimepicker1'>
+                                    <input class="form-control datetimepicker" type="text" id="start" name="start" value="{{date('m/d/Y H:i A',strtotime($event->start))}}" placeholder="Select start date"  required>
+                                   
+                                    @if ($errors->has('start'))
+                                        <span class="help-block">
+                                            <strong>{{ $errors->first('start') }}</strong>
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-4"></div>
                         <div class="col-md-4">
-                            <div class="form-group{{ $errors->has('stop_date') ? ' has-error' : '' }}">
+                            <div class="form-group{{ $errors->has('stop') ? ' has-error' : '' }}">
                                 <label class="control-label">Event Stop</label>
-                                <input class="form-control" type="text" id="stop_date" name="stop_date" value="{{ $event_date->end_date}}" placeholder="Select stop date"  required>
+                                <input class="form-control datetimepicker" type="text" id="stop" name="stop" value="{{date('m/d/Y H:i A',strtotime($event->end))}}" placeholder="Select stop date"  required>
                                 @if ($errors->has('stop'))
                                     <span class="help-block">
-                                        <strong>{{ $errors->first('stop_date') }}</strong>
+                                        <strong>{{ $errors->first('stop') }}</strong>
                                     </span>
                                 @endif
-                            </div> 
-                            <div class="form-group{{ $errors->has('stop_time') ? ' has-error' : '' }}">
-                                <input class="form-control" type="text" id="stop_time" name="stop_time" value="{{ $event_date->end_time}}" placeholder="Select stop time"  required autofocus>
-                                @if ($errors->has('stop_time'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('stop_time') }}</strong>
-                                    </span>
-                                @endif
-                            </div>                           
+                            </div>                          
                         </div>
                       </div>
+                    </div>
+                  </div>
+                   <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group{{ $errors->has('type') ? ' has-error' : '' }}">
+                          <label class="control-label">Event type</label>
+                          <div class="form-group{{ $errors->has('type') ? ' has-error' : '' }}">
+                            <div class="animated-radio-button form-check-inline">
+                              <label>
+                                <input type="radio" value="1" @if($event->type==1) checked @endif name="type" required><span class="label-text">Free</span>
+                              </label>
+                            </div>
+                            <div class="animated-radio-button form-check-inline">
+                              <label>
+                                <input type="radio" value="2" @if($event->type==2) checked @endif name="type" id="paid" required><span class="label-text">Paid</span>
+                              </label>
+                            </div>
+                            @if ($errors->has('type'))
+                                <span class="help-block">
+                                    <strong>{{ $errors->first('type') }}</strong>
+                                </span>
+                            @endif
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="paid-row">
+                    <div class="row" id="category-row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label">Category</label>
+                            <div class="form-group{{ $errors->has('category') ? ' has-error' : '' }}">    
+                                <select class="selectpicker" id="category" name="category[]" multiple>
+                                    @foreach ($ticket_categories as $ticket_category)
+                                        <option value="{{$ticket_category->id}}" id="category-{{$ticket_category->id}}">{{$ticket_category->name}}</option>                                        
+                                    @endforeach
+                                </select>
+                                @if ($errors->has('type'))
+                                    <span class="help-block">
+                                        <strong>{{ $errors->first('category') }}</strong>
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div id="append-row">
+                    
                     </div>
                   </div>
                   <div class="row">
@@ -128,7 +164,7 @@
                           <label for="image">Image</label>                                    
                           <div id="hidden">
                               <br>
-                          <img id="blah" src="{{ asset('storage/images/events') }} {{'/'.$event_sponsor_media->media_url}}" width="565"><br><br>
+                          <img id="blah" src="{{ asset('storage/images/events') }} {{'/'.$event->media_url}}" height="400"><br><br>
                           <div class="input-group">
                               <div class="custom-file">
                                   <input type="file" aria-describedby="ImageHelp" name="image" onchange="readURL(this);" class="custom-file-input" id="image">
@@ -147,85 +183,9 @@
                       </div>
                     </div>
                   </div>
-                  <div class="row">
-                    <div class="col-md-4">
-                      <div class="form-group{{ $errors->has('type') ? ' has-error' : '' }}">
-                          <label class="control-label">Event type</label>
-                          <div class="form-group{{ $errors->has('type') ? ' has-error' : '' }}">
-                            <div class="animated-radio-button form-check-inline">
-                              <label>
-                                <input type="radio" value="1" @if($event->type==1) checked @endif name="type" required><span class="label-text">Free</span>
-                              </label>
-                            </div>
-                            <div class="animated-radio-button form-check-inline">
-                              <label>
-                                <input type="radio" value="2" @if($event->type==2) checked @endif name="type" required><span class="label-text">Paid</span>
-                              </label>
-                            </div>
-                            @if ($errors->has('type'))
-                                <span class="help-block">
-                                    <strong>{{ $errors->first('type') }}</strong>
-                                </span>
-                            @endif
-                          </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row" id="amount-row">                    
-                    <div class="col-md-4">
-                      <div class="form-group">
-                        <label class="control-label">Amount</label>
-                        <div class="form-group{{ $errors->has('amount') ? ' has-error' : '' }}">
-                          <label class="sr-only" for="exampleInputAmount">Amount (in shillings)</label>
-                          <div class="input-group">
-                            <div class="input-group-prepend"><span class="input-group-text">Ksh</span></div>
-                            <input class="form-control" id="amount" value="@if($event->type==2){{$event_price->price}}@endif" name="amount" type="number" min="1" placeholder="Amount to be paid">
-                            <div class="input-group-append"><span class="input-group-text">.00</span></div>
-                          </div>
-                          @if ($errors->has('type'))
-                                <span class="help-block">
-                                    <strong>{{ $errors->first('amount') }}</strong>
-                                </span>
-                            @endif
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-3">
-                      <div class="form-group{{ $errors->has('tickets') ? ' has-error' : '' }}">
-                          <label class="control-label">No. of tickets</label>
-                          <input class="form-control" type="number" id="tickets" name="tickets" value="@if($event->type==2){{$event->no_of_tickets}}@endif" placeholder="Maximum number of tickets">
-                          @if ($errors->has('tickets'))
-                              <span class="help-block">
-                                  <strong>{{ $errors->first('tickets') }}</strong>
-                              </span>
-                          @endif
-                      </div>    
-                    </div>
-                    <div class="col-md-4">
-                      <div class="form-group">
-                          <label class="control-label">Category</label>
-                          <div class="form-group{{ $errors->has('category') ? ' has-error' : '' }}">
-                            <div class="animated-radio-button form-check-inline">
-                              <label>
-                                <input type="radio" value="1" @if($event->type==2 && $paid_event_category->category==1) checked @endif name="category" id="regular"><span class="label-text">Regular</span>
-                              </label>
-                            </div>
-                            <div class="animated-radio-button form-check-inline">
-                              <label>
-                                <input type="radio" value="2" @if($event->type==2 && $paid_event_category->category==2) checked @endif name="category" id="vip"><span class="label-text">VIP</span>
-                              </label>
-                            </div>
-                            @if ($errors->has('type'))
-                                <span class="help-block">
-                                    <strong>{{ $errors->first('category') }}</strong>
-                                </span>
-                            @endif
-                          </div>
-                      </div>
-                    </div>
-                  </div>
+                  
                   <input type="hidden" name="id" value="{{$event->id}}">  
-                  <input type="hidden" name="previous_image_url" value="{{$event_sponsor_media->media_url}}">                  
+                  <input type="hidden" name="previous_image_url" value="{{$event->media_url}}">                  
                   <div class="tile-footer">
                     <button class="btn btn-primary" type="submit">Submit</button>
                   </div>
@@ -241,9 +201,10 @@
 @section('other-scripts')
 <script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=true&libraries=places&key=AIzaSyBO5Else2rW4UNyXiCMp3y20JV7BseTMys"></script>
 <script src="{{ asset('js/plugins/jquery.placepicker.js') }}"></script>
-<script src="{{ asset('js/plugins/bootstrap-datepicker.min.js') }}"></script>
-<script src="{{ asset('js/plugins/bootstrap-timepicker.min.js') }}"></script>
+<script src="{{ asset('js/plugins/moment.min.js') }}"></script>
+<script src="{{ asset('js/plugins/bootstrap-datetimepicker.min.js') }}"></script>
 <script src="{{ asset('js/plugins/summernote-bs4.min.js') }}"></script>
+<script src="{{ asset('js/plugins/bootstrap-select.min.js') }}"></script>
 <script>
     $('.summernote').summernote({
         height: 350, // set editor height
@@ -265,15 +226,54 @@
         ['help', ['help']]
         ]          
     });
+    $('#category').selectpicker();
+    var selectedItems = [];
 </script>
-@if ($event->type==1)
-  <script>
-    $(document).ready(function() {
-      //only hide if its free event
-      $("#amount-row").hide();
-    });
-  </script>    
-@endif
+
+@if($event->type==2)
+    <script>
+        //show the category and append row div
+        $(document).ready(function() {
+            $("#category-row").slideDown("slow");
+            $("#append-row").slideDown("slow");
+        });
+
+    </script>
+
+    @foreach ($ticket_category_details as $ticket_category_detail)
+        <script>
+            $(document).ready(function() {
+                //fetch the ids for selected categories  
+                var category_id = '{{$ticket_category_detail->category_id}}';    
+                //add selected attribute to options that were selected     
+                $('#'+'category-'+category_id).attr('selected', 'selected');
+                //refresh the select to display added attributes
+                $('#category').selectpicker('refresh');
+                //get the text for selected attribute and passit to appendRows method so that it adds its rows to the interface
+                var text = $('#category option[value='+category_id+']').text();
+                appendRows(text);
+                //get and set the input values to the inputs created by the appendRows
+                var price = '{{$ticket_category_detail->price}}';
+                var no_of_tickets = {{$ticket_category_detail->no_of_tickets}};
+                var ticket_sale_end_date = "{{date('m/d/Y H:i A',strtotime($ticket_category_detail->ticket_sale_end_date))}}";
+                var slug = '{{$ticket_category_detail->slug}}';
+
+                $('#'+slug+'_category_amount').val(price);
+                $('#'+slug+'_category_tickets').val(no_of_tickets);
+                $('#'+slug+'_category_ticket_sale_end_date').val(ticket_sale_end_date);
+            });
+        </script>         
+            
+    @endforeach
+    
+    @else
+        <script>   
+        $(document).ready(function() {  
+            $("#category-row").hide();
+            $("#append-row").hide();
+        });
+        </script>
+    @endif 
 
 <script>
   function readURL(input) {
@@ -283,7 +283,7 @@
         reader.onload = function (e) {
             $('#blah')
                 .attr('src', e.target.result)
-                .width(400);            
+                .height(400);            
             $("#hidden").slideDown("slow");
         };
 
@@ -291,8 +291,40 @@
     }
   }
 
-  $(document).ready(function() {
-           
+  $(document).ready(function() {    
+    $("#hidden").hide();
+    $('#category').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+        
+        if (isSelected==true) {
+             $('#category option:selected').each(function () {
+                  var text = $(this).text();
+                 if (!selectedItems.includes(text)) {
+                    selectedItems.push(text);
+                    var value = $(this).val();
+                    appendRows(text);
+                 }
+             }); 
+            
+        }else{ 
+            // previousValue.forEach(Individual);
+            // function Individual(value) {
+                var deselected_text = $('#category option').eq(clickedIndex).text();
+                var name = deselected_text.toLowerCase().split(' ').join('_');
+                var div = name+'_div';        
+
+                for(var i = selectedItems.length - 1; i >= 0; i--) {
+                    if(selectedItems[i] === deselected_text) {
+                        selectedItems.splice(i, 1);
+                        $('#'+div).slideUp("slow").remove();
+                    }
+                }         
+                
+            //}
+
+        }
+        
+    });
+        
     $("#location-address").each(function() {
       var target = this;
       var $map = $('#location');
@@ -310,36 +342,63 @@
       }).data('placepicker');
     });
 
-    $('#start_date,#stop_date').datepicker({
-      	format: "dd/mm/yyyy",
-      	autoclose: true,
-      	todayHighlight: true
-      });
-    $('#start_time,#stop_time').timepicker({
-      defaultTime : false,
-      icons: {
-                up: 'fa fa-angle-up',
-                down: 'fa fa-angle-down'
-            }
+    $('.datetimepicker').datetimepicker({
+        icons: {
+            time: "fa fa-clock-o",
+            date: "fa fa-calendar",
+            up: "fa fa-arrow-up",
+            down: "fa fa-arrow-down",
+            previous: "	fa fa-angle-left",
+            next: "	fa fa-angle-right"
+        }
     });
 
-    $(document).ready(function(){
-        $('input[type=radio][name=type]').change(function() {
-            if (this.value == '2') {
-                $("#amount-row").slideDown("slow");
-                $('#amount').attr('required','required');
-                $('#regular').attr('required','required');                
-                $('#vip').attr('required','required');
-            }else {                
-                $("#amount-row").slideUp("slow");
-                $('#amount').removeAttr('required');
-                $('#regular').removeAttr('required');
-                $('#vip').removeAttr('required');
-            }
-        });
-     });
+    $('input[type=radio][name=type]').change(function() {
+        if (this.value == '2') {
+            $("#category-row").slideDown("slow");
+        }else {            
+            $("#append-row").empty().slideUp("slow");  
+            $('#category').selectpicker('deselectAll');
+            $("#category-row").slideUp("slow");
+        }
+    });
 
   }); 
 
+  function appendRows(category_name) {
+      name = category_name.toLowerCase().split(' ').join('_');
+      id = name+"_category";
+      label = category_name;
+      var content = "<div class='row' id='"+name+"_div'><div class='col-md-4'><div class='form-group'><label class='control-label'>"+label+" Amount</label><div class='form-group'><label class='sr-only' for='exampleInputAmount'>Amount (in shillings)</label><div class='input-group'><div class='input-group-prepend'><span class='input-group-text'>Ksh</span></div><input class='form-control' id='"+id+"_amount' value='' name='"+name+"_amount' type='number' min='1' placeholder='Amount to be paid' required><div class='input-group-append'><span class='input-group-text'>.00</span></div></div></div></div></div><div class='col-md-3'><div class='form-group'><label class='control-label'>"+label+" No. of tickets</label><input class='form-control' type='number' id='"+id+"_tickets' name='"+name+"_tickets' value='' placeholder='Maximum number of tickets' required></div></div><div class='col-md-3'><label class='control-label'>"+label+" Ticket sale end date</label><div class='form-group'><div class='input-group date' id='datetimepicker1'><input class='form-control datetimepicker' type='text' id='"+id+"_ticket_sale_end_date' name='"+name+"_ticket_sale_end_date' value='' placeholder='Select date'  required></div></div></div></div>";     
+      $("#append-row").append(content).slideDown("slow");
+      $("#"+name+"_div").hide();
+      $("#"+name+"_div").slideDown("slow");
+
+      $('.datetimepicker').datetimepicker({
+        icons: {
+            time: "fa fa-clock-o",
+            date: "fa fa-calendar",
+            up: "fa fa-arrow-up",
+            down: "fa fa-arrow-down",
+            previous: "	fa fa-angle-left",
+            next: "	fa fa-angle-right"
+        }
+    });
+  }
+
 </script>
+@if($event->type==2)
+    @foreach ($ticket_category_details as $ticket_category_detail)
+        <script>
+            $(document).ready(function() {
+                //fetch the names for selected categories  
+                var name= '{{$ticket_category_detail->name}}';    
+                //push them into selecteditems array  
+                selectedItems.push(name);  
+            });
+        </script>         
+            
+    @endforeach
+@endif 
+
 @endsection

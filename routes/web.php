@@ -187,8 +187,8 @@ Route::group(['middleware' => 'event_organizer_auth','prefix'=>'event_organizer'
         Route::post('activate', 'CommonPages\EventsController@activate')->name('event_organizer_activate_event_post');    
         Route::get('add', 'CommonPages\EventsController@showAddForm')->name('add_event');   
         Route::post('add', 'CommonPages\EventsController@store')->name('add_event_post');    
-        Route::post('edit', 'CommonPages\EventsController@showEditForm')->name('edit_event');   
-        Route::post('edit/update', 'CommonPages\EventsController@update')->name('edit_event_post');   
+        Route::get('edit/{slug}', 'CommonPages\EventsController@showEditForm')->name('edit_event');   
+        Route::post('edit', 'CommonPages\EventsController@update')->name('edit_event_post');   
         Route::post('delete', 'CommonPages\EventsController@destroy')->name('delete_event');
 
         Route::group(['prefix'=>'scanners'], function () {

@@ -179,7 +179,7 @@
                           <small class="form-text text-muted" id="ImageHelp">Preview of the image will be shown below.</small>                                        
                           <div id="hidden">
                               <br>
-                              <img id="blah" src="" width="565"><br><br>
+                              <img id="blah" src="" height="400""><br><br>
                           </div>
                       </div>
                     </div>
@@ -233,7 +233,7 @@
         reader.onload = function (e) {
             $('#blah')
                 .attr('src', e.target.result)
-                .width(400);            
+                .height(400);            
             $("#hidden").slideDown("slow");
         };
 
@@ -243,6 +243,7 @@
 
   $(document).ready(function() {
     var selectedItems = [];
+    $("#hidden").hide();
     $("#category-row").hide();
     $("#append-row").hide();
     $('#category').selectpicker();
@@ -259,37 +260,21 @@
                  }
              }); 
             
-        }else{
-                       
+        }else{                       
             previousValue.forEach(Individual);
             function Individual(value) {
-                // $('#category option:not(:selected)').each(function () { 
-                var previous_text = $('#category option[value='+value+']').text();
-                var array_legth = previousValue.length;
-                //console.log("Previously selected value: "+value+"\tPreviously selected text: "+previous_text+"\tArray length: "+array_legth+"\n");
-                var name = previous_text.toLowerCase().split(' ').join('_')+"_div";
-               // });
-                //var value = previousValue;
-                $("#"+name).remove();    
+                var deselected_text = $('#category option').eq(clickedIndex).text();
+                var name = deselected_text.toLowerCase().split(' ').join('_');
+                var div = name+'_div';        
 
                 for(var i = selectedItems.length - 1; i >= 0; i--) {
-                    if(selectedItems[i] === previous_text) {
-                        //console.log(selectedItems[i]+" removed!\n");
+                    if(selectedItems[i] === deselected_text) {
                         selectedItems.splice(i, 1);
+                        $('#'+div).slideUp("slow").remove();
                     }
-                }          
+                }         
                 
             }
-
-             $('#category option:selected').each(function () {
-                  var text = $(this).text();
-                 if (!selectedItems.includes(text)) {
-                    selectedItems.push(text);
-                    var value = $(this).val();
-                    //console.log("Clicked index: "+clickedIndex+"\tSelected value:"+value+"\tSelected text: "+text+"\t"+"\n");
-                    appendRows(text);
-                 }
-             }); 
 
         }
         
