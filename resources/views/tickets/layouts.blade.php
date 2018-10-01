@@ -7,7 +7,8 @@
     @yield('title')
     <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="{{ asset('css/tickets-style.css') }}">    
+    <link rel="stylesheet" href="{{ asset('css/tickets-style.css') }}">  
+    @yield('styles')  
 </head>
 <body>
 <nav class="navbar navbar-expand-sm nav-color navbar-dark">
