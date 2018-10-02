@@ -3,13 +3,7 @@
 @section('styles')
     <link rel="stylesheet" type="text/css" href="{{ asset('css/smart_wizard_theme_arrows.min.css') }}">
     <style>
-    input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button { 
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        margin: 0; 
-    }
+    
     </style>
 @endsection
 
@@ -75,20 +69,19 @@
                                 </div>
                                 <div class="modal-body">
 
-                                <form action="" id="myForm" role="form" data-toggle="validator" method="post" accept-charset="utf-8">
+                                <form action="{{ route('encryption_url') }}" id="myForm" role="form" data-toggle="validator" method="post" accept-charset="utf-8">
+                                    @csrf
+                                    <!-- SmartWizard html -->
+                                    <div id="smartwizard">
+                                        <ul>
+                                            <li><a href="#ticket_details">Step 1<br /><small>Ticket Details</small></a></li>
+                                            <li><a href="#personal_details">Step 2<br /><small>Personal Details</small></a></li>
+                                        </ul>
 
-                                <!-- SmartWizard html -->
-                                <div id="smartwizard">
-                                    <ul>
-                                        <li><a href="#ticket_details">Step 1<br /><small>Ticket Details</small></a></li>
-                                        <li><a href="#personal_details">Step 2<br /><small>Personal Details</small></a></li>
-                                    </ul>
-
-                                    <div>
-                                        <div id="ticket_details">
-                                            <h2>{{$event->name}} details</h2>
-                                            <div id="form-step-0" role="form" data-toggle="validator">
-                                                <div class="form-group">
+                                        <div>
+                                            <div id="ticket_details">
+                                                <h2>{{$event->name}} details</h2>
+                                                <div id="form-step-0" role="form" data-toggle="validator">                                
                                                     <table class="table table-borderless">
                                                         <thead>
                                                         <tr>
@@ -104,49 +97,52 @@
                                                             <td>{{$ticket_category->name}}</td>
                                                             <td id="{{$ticket_category->slug}}_price">{{$ticket_category->price}}</td>
                                                             <td>
-                                                                <input type="number" class="form-control" style="width: 60px" min="0" max="100" name="{{$ticket_category->slug}}_quantity" value="0" id="{{$ticket_category->slug}}_quantity">
-                                                                
+                                                                <div class="form-group">
+                                                                <input type="number" class="form-control" style="width: 60px" min="0" name="{{$ticket_category->slug}}_quantity" value="0" id="{{$ticket_category->slug}}_quantity">
+                                                                </div>
                                                             </td>
                                                             <td class="total" id="{{$ticket_category->slug}}_total">0</td>
                                                         </tr>    
                                                         @endforeach                                                        
                                                         </tbody>
                                                     </table>
-                                                    <h5>Subtotal: Ksh <input type="number" style="border:none" value="0" data-error="Choose atleast one quantity to proceed" name="subtotal" id="subtotal" readonly required></h5>
+                                                    <div class="form-group">
+                                                        <h5>Subtotal: Ksh <input type="number" style="border:none" value="0" data-error="Choose atleast one quantity to proceed" min="1" name="subtotal" id="subtotal" readonly required></h5>
                                                     <div class="help-block with-errors"></div>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                        </div>
-                                        <div id="personal_details">
-                                            <h2>Personal Details</h2>
-                                            <div id="form-personal_details" role="form" data-toggle="validator">
-                                                <div class="form-group">
-                                                    <label for="name">First Name</label>
-                                                    <input type="text" class="form-control" name="first_name" id="first_name" data-error="Your first name is required" placeholder="Input your first name" required>
-                                                    <div class="help-block with-errors"></div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="name">Last Name</label>
-                                                    <input type="text" class="form-control" name="last_name" id="last_name" data-error="Your last name is required" placeholder="Input your last name" required>
-                                                    <div class="help-block with-errors"></div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="name">Email</label>
-                                                    <input type="email" class="form-control" aria-describedby="emailHelp" data-error="Please input a valid email address" name="email address" id="email" placeholder="input your email" required>
-                                                    <div class="help-block with-errors"></div>
-                                                    <small class="form-text text-muted" id="ImageHelp">We'll send the ticket to your email.</small> 
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="name">Phone</label>
-                                                    <input type="tel" class="form-control" name="phone" id="email" max="13" data-error="A valid phone number is required" placeholder="Input your phone number" required>
-                                                    <div class="help-block with-errors"></div>
+                                            </div>
+                                            <div id="personal_details">
+                                                <h2>Personal Details</h2>
+                                                <div id="form-personal_details" role="form" data-toggle="validator">
+                                                    <div class="form-group">
+                                                        <label for="first_name">First Name</label>
+                                                        <input type="text" class="form-control" name="first_name" id="first_name" data-error="Your first name is required" placeholder="Input your first name" required>
+                                                        <div class="help-block with-errors"></div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="last_name">Last Name</label>
+                                                        <input type="text" class="form-control" name="last_name" id="last_name" data-error="Your last name is required" placeholder="Input your last name" required>
+                                                        <div class="help-block with-errors"></div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="email">Email</label>
+                                                        <input type="email" class="form-control" aria-describedby="emailHelp" data-error="Please input a valid email address" name="email" id="email" placeholder="input your email" required>
+                                                        <div class="help-block with-errors"></div>
+                                                        <small class="form-text text-muted" id="ImageHelp">We'll send the ticket to your email.</small> 
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="phone">Phone</label>
+                                                        <input type="tel" class="form-control" name="phone" id="phone" max="13" data-error="A valid phone number is required" placeholder="Input your phone number" required>
+                                                        <div class="help-block with-errors"></div>
+                                                    </div>
+                                                    <input type="hidden" name="event_id" value="{{$event->id}}">
+                                                    <input type="hidden" name="ticket_sale_end_date_time" value="{{$event->ticket_sale_end_date}}">
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-
                                 </form>
 
                                 </div>
@@ -175,6 +171,7 @@
 @section('scripts')
 <!-- Include jQuery Validator plugin -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
+ <script id="mula-checkout-library" type="text/javascript" src="https://beep2.cellulant.com:9212/checkout/v2/mula-checkout.js"></script>
 <script src="{{ asset('js/plugins/jquery.smartWizard.min.js') }}"></script>
 <script>
  var main_total = 0;
@@ -205,6 +202,9 @@
 
 <script type="text/javascript">
     $(document).ready(function(){
+       $("#subtotal").on('keydown paste', function(e){
+            e.preventDefault();
+        });
        $('.total').on("change",function() {
            console.log("On change triggered");
            $('.total').each(function(index) {
@@ -212,9 +212,10 @@
                console.log("Total: "+value);
            });
         });
+        var encryptionURL = "{{route('encryption_url')}}";
         // Toolbar extra buttons
-            var btnFinish = $('<button></button>').text('Finish')
-                                             .addClass('btn btn-info')
+            var btnFinish = $('<div></div>').text('')
+                                             .addClass('checkout-button')
                                              .on('click', function(){
                                                     if( !$(this).hasClass('disabled')){
                                                         var elmForm = $("#myForm");
@@ -225,13 +226,38 @@
                                                                 alert('Oops we still have error in the form');
                                                                 return false;
                                                             }else{
-                                                                alert('Great! we are ready to submit form');
-                                                                elmForm.submit();
-                                                                return false;
+                                                            // alert('Great! we are ready to submit form');
+                                                            // elmForm.submit();
+   
+                                                            var params = $('#myForm').serialize();
+                                                            console.log(params);
+
+                                                             function encrypt() {
+                                                                return fetch(encryptionURL, {
+                                                                    method: 'POST',
+                                                                    body: JSON.stringify(params),
+                                                                    mode: 'cors'
+                                                                }).then(response => response.json())}
+                                                                encrypt().then(response => {
+                                                                                 console.log("response: "+JSON.stringify(response));
+                                                                MulaCheckout.renderMulaCheckout({merchantProperties: response, checkoutType: 'modal'})
+
+            });
+                                                             return false;
+
+
+
                                                             }
+                                                           
                                                         }
+
                                                     }
                                                 });
+
+            
+
+       
+
             var btnCancel = $('<button></button>').text('Cancel')
                                              .addClass('btn btn-danger')
                                              .on('click', function(){
@@ -280,6 +306,7 @@
                 // Enable finish button only on last step
                 if($('button.sw-btn-next').hasClass('disabled')){
                     $('.sw-btn-group-extra').show(); // show the button extra only in the last page and hide next button
+ MulaCheckout.addPayWithMulaButton({className: 'checkout-button', checkoutType: 'modal'});
                     $('.sw-btn-next').hide();
                 }else{
                     $('.sw-btn-group-extra').hide();	

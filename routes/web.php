@@ -15,6 +15,7 @@
 Route::get('/', 'HomeController@index')->name('home');
 Route::get('/test_payment', 'MulaPaymentController@index')->name('payment_home');
 Route::group(['prefix' => 'payments'], function () {
+    // Route::get('https://beep2.cellulant.com:9212:/checkout/v2/modal')
     Route::post('encryption_url', 'MulaPaymentController@encryptData')->name('encryption_url');
     Route::post('success_url', 'MulaPaymentController@success')->name('success_url');
     Route::post('mobile_success_url', 'MulaPaymentController@mobile_success')->name('mobile_success_url');
@@ -208,6 +209,5 @@ Route::group(['middleware' => 'event_organizer_auth','prefix'=>'event_organizer'
 Route::group(['prefix' => 'tickets'], function () {
     Route::get('/', 'TicketsController@index')->name('tickets_home');
     Route::get('{slug}', 'TicketsController@show')->name('ticket_details');
-    Route::post('save', 'TicketsController@save')->name('save_customer_info');
     
 });

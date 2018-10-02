@@ -7,6 +7,7 @@ use App\Http\Traits\UniversalMethods;
 use App\PaymentRequest;
 use App\PaymentResponse;
 use App\TicketCustomer;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -28,40 +29,53 @@ class MulaPaymentController extends Controller
         return view('payments.button');
     }
 
+    /**
+     * we need to pass 
+     * event_id, event_ticket_cattegory_id & its no of ticke
+     */
+
     public function encryptData(Request $request)
     {
-       $data_array = (array)json_decode($request->getContent());
+        $data_array = [];
 
-        $validator = Validator::make($data_array,
-            [
-                'event_id' => 'required|integer|exists:events,id',
-                // 'customer_id' => 'required|integer|exists:ticket_customers,id',
-                'customer_id' => 'required',
-            ],
-            [
-                'event_id.required' => 'event id required',
-                'event_id.integer' => 'event id integer',
-                'event_id.exists' => 'event id must exists',
-                'customer_id.required' => 'customer id required',
-                'customer_id.integer' => 'customer id integer',
-                'customer_id.exists' => 'customer id exists',
+      
+       parse_str($request->getContent(),$data);
 
-            ]);
+       return response()->json(['data_array'=> $data_array]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'failed because of '.UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray())
-            ]);
+    //    dd($request->all());
+    //    $validator = Validator::make($data_array, [
+    //         'first_name'=>'required',
+    //         'last_name'=>'required',            
+    //         'email'=>'required',
+    //         'phone'=>'required',
+    //         'event_id'=>'required',
+    //         'subtotal'=>'required',
+    //         'ticket_sale_end_date_time'=>'required'
+    //     ]); 
+
+    //     if($validator->fails()){
+
+    //         return redirect()->back()->withInput();
+    //     }
+        //     return response()->json([
+        //         'message' => 'failed because of '.UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray())
+        //     ]);
+        // }
+
+
+        $ticket_customer = new TicketCustomer;
+        $ticket_customer->first_name = $data_array['first_name'];
+        $ticket_customer->last_name = $data_array['last_name'];        
+        $ticket_customer->email = $data_array['email'];
+        $ticket_customer->phone_number = $data_array['phone'];
+        if($user = User::where('email',$data_array['email'])->first()!==null){
+            $ticket_customer->user_id = $user->id;
         }
+        $ticket_customer->save();
 
-        // $ticket_customer = TicketCustomer::create([
-        //     'first_name' => "JOhn",
-        //     'last_name' => 'Doe',
-        //     'email'=>'augustineowuor32@gmail.com',
-        //     'phone_number'=> '0720810670'
-        // ]);
 
-        $event_id = $data_array['event_id'];
+        $event_id = $request->event_id;
         // $ticket_customer_id = $data_array['customer_id'];
 
         $event = Event::find($event_id);
@@ -73,11 +87,11 @@ class MulaPaymentController extends Controller
             "customerLastName"      => $ticket_customer->last_name,
             "MSISDN"                => UniversalMethods::formatPhoneNumber($ticket_customer->phone_number),
             "customerEmail"         => $ticket_customer->email,
-            "amount"                => "100", //TODO::get the amount for the type of ticket the customer has decided to purchase
+            "amount"                => $data_array['subtotal'], //TODO::get the amount for the type of ticket the customer has decided to purchase
             "currencyCode"          => "KES",
             "accountNumber"         => "123456",
             "serviceCode"           => "APISBX3857",
-            "dueDate"               => "2018-10-24 11:09:59", //TODO::this is to be replaced by the ticket_sale_end_date_time
+            "dueDate"               => $data_array['ticket_sale_end_date_time'], //TODO::this is to be replaced by the ticket_sale_end_date_time
             "serviceDescription"    => "Payment for ".$event->name,
             "accessKey"             => '$2a$08$Ga/jSxv1qturlAr8SkHhzOaprXnfOJUTqB6fLRrc/0nSYpRlAd96e',
             "countryCode"           => "KE",
@@ -145,6 +159,8 @@ class MulaPaymentController extends Controller
 
             if ($pending_payment_request != null) {
 
+                //TODO:: create an tickets record and capture
+                //TODO:: ticket_customer_id, event_ticket_category_id, number_of_tickets
 
                 //accept the payment
                 return response()->json([
