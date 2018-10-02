@@ -23,7 +23,7 @@ class Scanner extends Authenticatable
             ->join('event_dates','event_dates.event_id','=','events.id') //join with the dates
             ->where('status','=',1) //approved by admin
             ->where('type','=',2)  //paid event
-            ->whereDate('event_dates.start_date','>=',now()); //whose start date is today or after
+            ->whereDate('event_dates.start','>=',now()); //whose start date is today or after
 
 
     }

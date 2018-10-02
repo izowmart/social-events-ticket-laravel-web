@@ -25,11 +25,15 @@ class Event extends Model
     }
 
     protected $fillable = [
-        'event_organizer_id','name', 'description', 'location', 'type',
+        'event_organizer_id','name', 'description', 'location', 'type','image_url','start_date_time'
     ];
 
     public function scanners(){
         return $this->hasMany('App\EventScanner','event_id');
+    }
+    public function events_dates()
+    {
+        return $this->belongsTo('App\EventDate', 'event_id');
     }
 
     public function tickets()

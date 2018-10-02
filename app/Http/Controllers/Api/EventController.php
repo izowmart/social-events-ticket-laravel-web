@@ -12,12 +12,12 @@ use Illuminate\Support\Facades\Response;
 
 class EventController extends Controller
 {
-    public function events()
+    public function index()
     {
         try {
             $events = Event::join('event_dates','event_dates.event_id','=','events.id')
                 ->where('events.status', 1)//approved by admin
-                ->whereDate('event_dates.start_date','>=',now())
+                ->whereDate('event_dates.start','>=',now())
                 ->get();
 
 
