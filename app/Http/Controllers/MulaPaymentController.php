@@ -27,7 +27,6 @@ class MulaPaymentController extends Controller
     {
         return view('payments.button');
     }
-
     public function encryptData(Request $request)
     {
        $data_array = (array)json_decode($request->getContent());
