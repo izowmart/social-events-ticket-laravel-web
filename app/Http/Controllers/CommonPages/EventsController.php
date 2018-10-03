@@ -58,16 +58,13 @@ class EventsController extends Controller
     }
 
     public function store(Request $request){
-                
-        //dd($request);
+                        
         $this->validate($request, [
             'name'=>'required',
             'description'=>'required',            
             'location'=>'required',
             'type'=>'required',
             'image'=>'image',
-            'start'=>'required',
-            'stop'=>'required'
         ]); 
 
         //check if its paid event and validate required fields
@@ -103,11 +100,14 @@ class EventsController extends Controller
 
         $event_id = $event->id;
 
-        $event_date = new EventDate();
-        $event_date->event_id = $event_id;
-        $event_date->start = date('Y-m-d H:i:s',strtotime($request->start));
-        $event_date->end = date('Y-m-d H:i:s',strtotime($request->stop));
-        $event_date->save();
+        foreach ($request->dates as $date) {
+            //echo 'start: '.$date['start']. 'stop: '.$date['stop'].'<br>';
+            $event_date = new EventDate();
+            $event_date->event_id = $event_id;
+            $event_date->start = date('Y-m-d H:i:s',strtotime($date['start']));
+            $event_date->end = date('Y-m-d H:i:s',strtotime($date['stop']));
+            $event_date->save();
+        }
 
         $event_sponsor_media = new EventSponsorMedia();
         $event_sponsor_media->event_id = $event_id;
