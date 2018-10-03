@@ -36,12 +36,12 @@ class EventsController extends Controller
     public function showEditForm($slug){
         $ticket_categories = TicketCategory::all();
         
-        $event = Event::select('events.id','events.name','events.slug','events.description','events.location','events.latitude','events.longitude','events.type','events.slug','event_dates.start','event_dates.end','event_sponsor_media.media_url')
-                    ->join('event_dates', 'event_dates.event_id', '=', 'events.id')
+        $event = Event::select('events.id','events.name','events.slug','events.description','events.location','events.latitude','events.longitude','events.type','events.slug','event_sponsor_media.media_url')
                     ->join('event_sponsor_media', 'event_sponsor_media.event_id', '=', 'events.id')
                     ->where('events.slug',$slug)
                     ->orderBy('id','desc')
                     ->first();
+        $event_dates = EventDate::select('id','start','end')->where('event_id',$event->id)->get();
         $ticket_category_details = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.ticket_sale_end_date','ticket_category_details.category_id','ticket_categories.slug','ticket_categories.name')
                                     ->join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
                                     ->where('event_id', $event->id)
@@ -49,9 +49,11 @@ class EventsController extends Controller
 
         $data = array(
             'event'=>$event,
+            'event_dates'=>$event_dates,
             'ticket_categories'=>$ticket_categories,
             'ticket_category_details'=>$ticket_category_details
         );   
+        //dd($data);
 
         return view('event_organizer.pages.edit_event')->with($data);
 
@@ -144,13 +146,12 @@ class EventsController extends Controller
     }
 
     public function update(Request $request){
+        //dd($request->all());
         $this->validate($request, [
             'name'=>'required',
             'description'=>'required',            
             'location'=>'required',
             'type'=>'required',
-            'start'=>'required',
-            'stop'=>'required'
         ]); 
 
         //check if its paid event and validate required fields
@@ -196,10 +197,16 @@ class EventsController extends Controller
 
         $event_id = $event->id;
 
-        $event_date = EventDate::where('event_id',$event_id)->first();
-        $event_date->start = date('Y-m-d H:i:s',strtotime($request->start));
-        $event_date->end = date('Y-m-d H:i:s',strtotime($request->stop));
-        $event_date->save();
+        //delete previous dates and insert new ones
+        $event_date = EventDate::where('event_id',$event_id);
+        $event_date->delete();
+        foreach ($request->dates as $date) {
+            $event_date = new EventDate();
+            $event_date->event_id = $event_id;
+            $event_date->start = date('Y-m-d H:i:s',strtotime($date['start']));
+            $event_date->end = date('Y-m-d H:i:s',strtotime($date['stop']));
+            $event_date->save();
+        }
 
         if ($request->hasFile('image')) {
             $event_sponsor_media = EventSponsorMedia::where('event_id',$event_id)->first();
