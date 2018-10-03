@@ -23,7 +23,9 @@ class CreateEventsTable extends Migration
             $table->decimal('latitude',8,6);
             $table->decimal('longitude',8,6);
             $table->integer('type')->comment("1: Free,2: Paid");
+            $table->string('media_url');
             $table->integer('status')->default(0)->comment('0- unverified, 1 - verified, 2 - deactivated');
+            $table->integer('ticket_template')->default(1);
             $table->string('slug');
             $table->timestamps();
         });

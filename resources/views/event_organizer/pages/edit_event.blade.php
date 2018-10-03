@@ -55,14 +55,17 @@
                         </div>
                     </div>
                   </div>
-                  <div class="row">
+                  <div id="date_fields" class=" m-t-20"></div>
+                  @foreach ($event_dates as $event_date)
+                  <div class="row @if ($loop->last) @else {{'removeclass'.$event_date->id}} @endif
+                  ">
                     <div class="col-md-10">
                       <div class="row">
                         <div class="col-md-4">
                             <label class="control-label">Event Start</label>
                             <div class="form-group{{ $errors->has('start') ? ' has-error' : '' }}">
-                                <div class='input-group date' id='datetimepicker1'>
-                                    <input class="form-control datetimepicker" type="text" id="start" name="start" value="{{date('m/d/Y H:i A',strtotime($event->start))}}" placeholder="Select start date"  required>
+                                <div class='input-group date'>
+                                    <input class="form-control datetimepicker" type="text" name="dates[{{$event_date->id}}][start]" value="{{date('m/d/Y H:i A',strtotime($event_date->start))}}" placeholder="Select start date"  required>
                                    
                                     @if ($errors->has('start'))
                                         <span class="help-block">
@@ -72,11 +75,11 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4"></div>
+                        <div class="col-md-3"></div>
                         <div class="col-md-4">
                             <div class="form-group{{ $errors->has('stop') ? ' has-error' : '' }}">
                                 <label class="control-label">Event Stop</label>
-                                <input class="form-control datetimepicker" type="text" id="stop" name="stop" value="{{date('m/d/Y H:i A',strtotime($event->end))}}" placeholder="Select stop date"  required>
+                                <input class="form-control datetimepicker" type="text" name="dates[{{$event_date->id}}][stop]" value="{{date('m/d/Y H:i A',strtotime($event_date->end))}}" placeholder="Select stop date"  required>
                                 @if ($errors->has('stop'))
                                     <span class="help-block">
                                         <strong>{{ $errors->first('stop') }}</strong>
@@ -84,9 +87,19 @@
                                 @endif
                             </div>                          
                         </div>
-                      </div>
+                        <div class="col-sm-1 pt-4">
+                            <div class="form-group">
+                                @if ($loop->last)
+                                    <button class="btn btn-primary" style="text-align: center" type="button" onclick="date_fields();"><i class="fa fa-plus"></i></button>                 
+                                @else                                    
+                                    <button class="btn btn-success" type="button" onclick="remove_date_fields({{$event_date->id}});"><i class="fa fa-minus"></i></button>
+                                @endif
+                            </div>
+                        </div>
+                       </div>
                     </div>
-                  </div>
+                  </div>  
+                  @endforeach                  
                    <div class="row">
                     <div class="col-md-4">
                       <div class="form-group{{ $errors->has('type') ? ' has-error' : '' }}">
@@ -161,8 +174,7 @@
                   <div class="row">
                     <div class="col-md-10">
                       <div class="form-group{{ $errors->has('image') ? ' has-error' : '' }}">
-                          <label for="image">Image</label>                                    
-                          <div id="hidden">
+                          <label for="image">Image</label>   
                               <br>
                           <img id="blah" src="{{ asset('storage/images/events') }} {{'/'.$event->media_url}}" height="400"><br><br>
                           <div class="input-group">
@@ -178,8 +190,7 @@
                               <span class="help-block">
                                   <strong>{{ $errors->first('image') }}</strong>
                               </span>
-                          @endif                         
-                          </div>
+                          @endif   
                       </div>
                     </div>
                   </div>
@@ -206,6 +217,33 @@
 <script src="{{ asset('js/plugins/summernote-bs4.min.js') }}"></script>
 <script src="{{ asset('js/plugins/bootstrap-select.min.js') }}"></script>
 <script>
+    var room = {{$event_dates->last()->id}};
+
+    function date_fields() {
+
+        room++;
+        var objTo = document.getElementById('date_fields')
+        var divtest = document.createElement("div");
+        divtest.setAttribute("class", "form-group removeclass" + room);
+        var rdiv = 'removeclass' + room;
+        divtest.innerHTML = '<div class="row"> <div class="col-md-10"> <div class="row"> <div class="col-md-4"> <label class="control-label">Event Start</label> <div class="form-group"> <div class="input-group" date> <input class="form-control datetimepicker" type="text" name="dates['+room+'][start]" placeholder="Select start date" required> </div> </div> </div> <div class="col-md-3"></div> <div class="col-md-4"> <div class="form-group"> <label class="control-label">Event Stop</label> <input class="form-control datetimepicker" type="text" name="dates['+room+'][stop]" placeholder="Select stop date" required> </div> </div> <div class="col-sm-1 pt-4"> <div class="form-group"> <button class="btn btn-success" type="button" onclick="remove_date_fields(' + room + ');"><i class="fa fa-minus"></i></button> </div> </div> </div> </div> </div>';
+
+        objTo.appendChild(divtest)
+
+        $('.datetimepicker').datetimepicker({
+            icons: {
+                time: "fa fa-clock-o",
+                date: "fa fa-calendar",
+                up: "fa fa-arrow-up",
+                down: "fa fa-arrow-down",
+                previous: "	fa fa-angle-left",
+                next: "	fa fa-angle-right"
+            }
+        });
+    }
+    function remove_date_fields(rid) {
+        $('.removeclass' + rid).remove();
+    }
     $('.summernote').summernote({
         height: 350, // set editor height
         minHeight: null, // set minimum height of editor
