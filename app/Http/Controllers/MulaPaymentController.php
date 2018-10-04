@@ -61,10 +61,10 @@ class MulaPaymentController extends Controller
         // ]);
 
         $event_id = $data_array['event_id'];
-        // $ticket_customer_id = $data_array['customer_id'];
+         $ticket_customer_id = $data_array['customer_id'];
 
         $event = Event::find($event_id);
-        // $ticket_customer = TicketCustomer::find($ticket_customer_id);
+         $ticket_customer = TicketCustomer::find($ticket_customer_id);
 
         $payload = [
             "merchantTransactionID" => now()->timestamp."". uniqid(),
@@ -219,7 +219,6 @@ class MulaPaymentController extends Controller
     /*
      * Mobile METHODS
      */
-
     public function mobile_success(Request $request)
     {
         try {

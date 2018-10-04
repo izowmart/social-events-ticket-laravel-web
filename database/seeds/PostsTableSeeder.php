@@ -20,7 +20,7 @@ class PostsTableSeeder extends Seeder
             'comment' => "This is a test comment. No big deal!",
             'anonymous' => 1,
             'type' => 1,
-            'shared' => 1,
+            'shared' => 0,
             'status' => 1,
             'created_at'    =>now(),
             'updated_at' => now()
@@ -35,7 +35,7 @@ class PostsTableSeeder extends Seeder
             'anonymous' => 1,
             'type' => 1,
             'shared' => 1,
-            'status' => 1,
+            'status' => 0,
             'created_at'    =>now(),
             'updated_at' => now()
         ]);
@@ -58,11 +58,11 @@ class PostsTableSeeder extends Seeder
             'user_id' => 3,
             'venue_id' => 4,
             'media_type' => 1,
-            'media_url' => "image.jpg", //TODO:: add relevant filename
+            'media_url' => "5b903c5022bc21536179280.jpg", //TODO:: add relevant filename
             'comment' => "This is a test comment for a image. No big deal!",
             'anonymous' => 1,
             'type' => 1,
-            'shared' => 1,
+            'shared' => 0,
             'status' => 1,
             'created_at'    =>now(),
             'updated_at' => now()
@@ -72,11 +72,11 @@ class PostsTableSeeder extends Seeder
             'user_id' => 4,
             'venue_id' => 3,
             'media_type' => 1,
-            'media_url' => "image.jpg", //TODO:: add relevant filename
+            'media_url' => "1_5ba0f9bf5f78b.png", //TODO:: add relevant filename
             'comment' => "This is a test comment for a image. No big deal!",
             'anonymous' => 1,
             'type' => 1,
-            'shared' => 1,
+            'shared' => 0,
             'status' => 1,
             'created_at'    =>now(),
             'updated_at' => now()
@@ -86,7 +86,7 @@ class PostsTableSeeder extends Seeder
             'user_id' => 4,
             'venue_id' => 1,
             'media_type' => 2,
-            'media_url' => "image.jpg", //TODO:: add relevant filename
+            'media_url' => "5b903c5022bc21536179280.jpg", //TODO:: add relevant filename
             'comment' => "This is a test comment for a image. No big deal!",
             'anonymous' => 1,
             'type' => 1,
@@ -100,7 +100,7 @@ class PostsTableSeeder extends Seeder
             'user_id' => 1,
             'venue_id' => 2,
             'media_type' => 1,
-            'media_url' => "image.jpg", //TODO:: add relevant filename
+            'media_url' => "1_5ba0f9bf5f78b.png", //TODO:: add relevant filename
             'comment' => "This is a test comment for a image. No big deal!",
             'anonymous' => 1,
             'type' => 1,
@@ -114,7 +114,7 @@ class PostsTableSeeder extends Seeder
             'user_id' => 1,
             'venue_id' => 2,
             'media_type' => 1,
-            'media_url' => "image.jpg", //TODO:: add relevant filename
+            'media_url' => "5b903c5022bc21536179280.jpg", //TODO:: add relevant filename
             'comment' => "This is a test comment for a image. No big deal!",
             'anonymous' => 1,
             'type' => 1,
