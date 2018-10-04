@@ -43,4 +43,9 @@ class Venue extends Model
     {
         return $this->belongsToMany('App\User','user_venues','venue_id','user_id');
     }
+
+    public function posts()
+    {
+        return $this->hasMany('App\Post','venue_id');
+    }
 }

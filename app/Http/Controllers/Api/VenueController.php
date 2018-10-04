@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Resources\VenueResource;
 use App\Http\Traits\UniversalMethods;
 use App\Transformers\VenueTransformer;
 use App\UserVenue;
@@ -17,29 +16,26 @@ class VenueController extends Controller
 {
     public function index($user_id)
     {
-
-
-//        try {
-//        dd($user_id);
+        try {
             $venues = Venue::all();
             return Response::json([
                     "success" => true,
                     "message" => "found " . count($venues),
                     "data" => fractal()->collection($venues)
                         ->serializeWith(ArraySerializer::class)
-                        ->transformWith(new VenueTransformer($user_id))//(new VenueTransformer())->transform($venues,$user_id)
                         ->withResourceName('data')
+                        ->transformWith(new VenueTransformer($user_id))//(new VenueTransformer())->transform($venues,$user_id)
+
                 ]
 
             );
-//        } catch (\Exception $exception) {
-//            return Response::json(array(
-//                    "success" => false,
-//                    "message" => "error fetching venues!" . $exception,
-//                )
-//
-//            );
-//        }
+        } catch (\Exception $exception) {
+            return response()->json(array(
+                    "success" => false,
+                    "message" => "error fetching venues!" . $exception,
+                )
+            );
+        }
     }
 
     public function follow_venue(Request $request)
