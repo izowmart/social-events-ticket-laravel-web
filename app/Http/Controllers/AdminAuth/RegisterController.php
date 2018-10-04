@@ -35,12 +35,12 @@ class RegisterController extends Controller
         ]);
 
         $password = substr(md5(microtime()),rand(0,26),8);
-        // Admin::create([
-        //     'first_name' => $request['first_name'],
-        //     'last_name' => $request['last_name'],
-        //     'email' => $request['email'],
-        //     'password' => bcrypt($password),
-        // ]);
+        Admin::create([
+            'first_name' => $request['first_name'],
+            'last_name' => $request['last_name'],
+            'email' => $request['email'],
+            'password' => bcrypt($password),
+        ]);
         $admin_first_name = $request['first_name'];
         $admin_email = $request['email'];
         $admin_password = $password;

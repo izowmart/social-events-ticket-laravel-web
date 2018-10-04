@@ -51,7 +51,7 @@
               href="{{ route('admin_unverified_events') }}"
               data-toggle="tooltip" title="{{$pending_events->count()}} pending even organizer(s)"
           @else
-              href"{{ route('admin_verified_paid_events') }}"
+              href="{{ route('admin_verified_paid_events') }}"
           @endif>
           @if ($pending_events->count()>0)
             <span class="pending text-center">{{$pending_events->count()}}</span>              
