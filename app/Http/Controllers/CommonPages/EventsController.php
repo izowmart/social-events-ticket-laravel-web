@@ -97,6 +97,7 @@ class EventsController extends Controller
         $event->longitude = $request->longitude;
         $event->latitude = $request->latitude;
         $event->description = $request->description;
+        $event->media_url = $fileNameToStore;
         $event->type = $request->type;
         $event->save();
 
@@ -111,10 +112,10 @@ class EventsController extends Controller
             $event_date->save();
         }
 
-        $event_sponsor_media = new EventSponsorMedia();
-        $event_sponsor_media->event_id = $event_id;
-        $event_sponsor_media->media_url = $fileNameToStore;
-        $event_sponsor_media->save();
+        // $event_sponsor_media = new EventSponsorMedia();
+        // $event_sponsor_media->event_id = $event_id;
+        // $event_sponsor_media->media_url = $fileNameToStore;
+        // $event_sponsor_media->save();
 
         //insert price and category if it's a paid event
         if($request->type==2){
@@ -191,6 +192,7 @@ class EventsController extends Controller
         $event->longitude = $request->longitude;
         $event->latitude = $request->latitude;
         $event->description = $request->description;
+        $event->media_url = $fileNameToStore;
         $event->type = $request->type;
 
         $event->save();
