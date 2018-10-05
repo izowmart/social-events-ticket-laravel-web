@@ -1,12 +1,5 @@
 @extends('common_pages.layouts')
 
-@section('testing-styles')
-<style>
-
-</style>
-    
-@endsection
-
 @section('content')
     @include('includes.header')
     @include('includes.side-menu')
@@ -65,7 +58,7 @@
 <script type="text/javascript" src="{{ asset('js/plugins/jquery.dataTables.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/plugins/dataTables.bootstrap.min.js') }}"></script>
 <script type="text/javascript">$('#adminsTable').DataTable();</script>
-<script type="text/javascript" src="js/plugins/bootstrap-notify.min.js"></script>
+<script type="text/javascript" src="{{ asset('js/plugins/bootstrap-notify.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/plugins/sweetalert.min.js') }}"></script>
 <script>
   function deleteBtn(id) {    

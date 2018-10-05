@@ -57,7 +57,13 @@
                                 {{'inactive'}}
                             @endif
                         </td>
-                        <td><a href="{{ route('single_admin', ['id'=>Crypt::encrypt($advert->admin_id)]) }}">{{$advert->first_name}} {{$advert->last_name}}</a></td>
+                        <td><a @if ($advert->admin_deleted==NULL)
+                            href="{{ route('single_admin', ['id'=>Crypt::encrypt($advert->admin_id)]) }}"
+                        @else
+                            href="" onclick="event.preventDefault(); deletedAdmin()"
+                        @endif>{{$advert->first_name}} {{$advert->last_name}} @if (Auth::guard('web_admin')->user()->id==$advert->admin_id)
+                            (You)
+                        @endif</a></td>
                         <td>
                           <a href="{{ route('edit_advert', ['slug'=>$advert->slug]) }}" class="btn btn-sm btn-outline-primary">Edit</a>
                           
@@ -103,6 +109,17 @@
       		}
           
       		
+      	});
+  }
+
+  function deletedAdmin() {    
+    swal({
+      		title: "Deleted",
+      		text: "This admin was deleted from the system",
+      		type: "info",
+      		showCancelButton: false,
+      		confirmButtonText: "Ok",
+      		closeOnCancel: true
       	});
   }
   
