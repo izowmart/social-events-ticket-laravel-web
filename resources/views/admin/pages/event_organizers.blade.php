@@ -14,13 +14,21 @@
     <main class="app-content">
       <div class="app-title">
         <div>
-          <h1><i class="fa fa-th-list"></i> Event Organizers</h1>
-          <p>List of all {{$type}} event organizers</p>
+            @if ($type=="single")                
+                <h1><i class="fa fa-th-list"></i> Event Organizer</h1>
+            @else 
+                <h1><i class="fa fa-th-list"></i> Event Organizers</h1>               
+                <p>List of all {{$type}} event organizers</p>
+            @endif
         </div>
         <ul class="app-breadcrumb breadcrumb">
           <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
           <li class="breadcrumb-item"><a href="{{ route('admin_home') }}">Home</a></li>
-          <li class="breadcrumb-item"><a href="{{ route($type.'_event_organizers') }}">{{ucfirst(trans($type))}} Event Organizers</a></li>
+          @if ($type=="single")
+            <li class="breadcrumb-item"><a href="{{ route('verified_event_organizers') }}"> Event Organizer</a></li>               
+          @else
+            <li class="breadcrumb-item"><a href="{{ route($type.'_event_organizers') }}">{{ucfirst(trans($type))}} Event Organizers</a></li>              
+          @endif
         </ul>
       </div>
       <div class="row">

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\CommonPages;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Event;
@@ -273,7 +274,7 @@ class EventsController extends Controller
     public function Unverifiedindex(){
         $user = $this->CheckUserType();
         if($user=="Admin"){
-            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.id as event_organizer_id','event_organizers.first_name','event_organizers.last_name')
                     ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
                     ->where('events.status',0)
                     ->get();

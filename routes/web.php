@@ -159,6 +159,7 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
     });
 
     Route::group(['prefix'=>'event_organizers'], function () {
+        Route::get('show/{id}', 'AdminPages\EventOrganizersController@show')->name('single_event_organizer');
         Route::get('unverified', 'AdminPages\EventOrganizersController@Unverifiedindex')->name('unverified_event_organizers');
         Route::get('verified', 'AdminPages\EventOrganizersController@Verifiedindex')->name('verified_event_organizers');
         Route::post('deactivate', 'AdminPages\EventOrganizersController@deactivate')->name('deactivate_event_organizer_post');
