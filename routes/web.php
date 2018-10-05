@@ -98,7 +98,10 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
     Route::get('add', 'AdminAuth\RegisterController@showRegistrationForm')->name('add_admin');
     Route::post('add', 'AdminAuth\RegisterController@register')->name('add_admin_post');
 
-    Route::get('admins', 'AdminPages\AdminsController@index')->name('admins');
+    Route::group(['prefix' => 'admins'], function () {
+        Route::get('/', 'AdminPages\AdminsController@index')->name('admins');
+        Route::get('show/{id}', 'AdminPages\AdminsController@show')->name('single_admin');
+    });
 
     Route::group(['prefix'=>'countries'], function () {
         Route::get('/', 'AdminPages\CountriesController@index')->name('countries');
@@ -112,6 +115,7 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
 
     Route::group(['prefix'=>'towns'], function () {
         Route::get('/', 'AdminPages\TownsController@index')->name('towns');
+        Route::get('show/{id}', 'AdminPages\TownsController@show')->name('single_town');
         Route::get('add', 'AdminPages\TownsController@showAddForm')->name('add_town');
         Route::post('add', 'AdminPages\TownsController@store')->name('add_town_post');
         Route::get('edit/{coutry}/{town}', 'AdminPages\TownsController@showEditForm')->name('edit_town');
@@ -131,6 +135,7 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
 
     Route::group(['prefix'=>'venues'], function () {
         Route::get('/', 'AdminPages\VenuesController@index')->name('venues');
+        Route::get('show/{id}', 'AdminPages\VenuesController@show')->name('single_venue');
         Route::get('add', 'AdminPages\VenuesController@showAddForm')->name('add_venue');
         Route::post('add', 'AdminPages\VenuesController@store')->name('add_venue_post');
         Route::get('edit/{slug}', 'AdminPages\VenuesController@showEditForm')->name('edit_venue');
@@ -141,6 +146,7 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
 
     Route::group(['prefix'=>'users'], function () {
         Route::get('/', 'AdminPages\UsersController@index')->name('users');
+        Route::get('show/{id}', 'AdminPages\UsersController@show')->name('single_user');
         Route::get('new_users_chart', 'AdminPages\HomeController@new_users_chart')->name('new_users_chart');
         Route::get('active_users_chart', 'AdminPages\HomeController@active_users_chart')->name('active_users_chart');
 
@@ -153,6 +159,7 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
     });
 
     Route::group(['prefix'=>'event_organizers'], function () {
+        Route::get('show/{id}', 'AdminPages\EventOrganizersController@show')->name('single_event_organizer');
         Route::get('unverified', 'AdminPages\EventOrganizersController@Unverifiedindex')->name('unverified_event_organizers');
         Route::get('verified', 'AdminPages\EventOrganizersController@Verifiedindex')->name('verified_event_organizers');
         Route::post('deactivate', 'AdminPages\EventOrganizersController@deactivate')->name('deactivate_event_organizer_post');

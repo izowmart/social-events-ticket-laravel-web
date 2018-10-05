@@ -44,7 +44,7 @@
                     @foreach ($venues as $venue)
                     <tr class="item">
                         <td>{{str_limit($venue->venue_name, $limit = 30, $end = '...')}}</td>
-                        <td>{{ $venue->town_name}}</td>                        
+                        <td><a href="{{ route('single_town', ['id'=>Crypt::encrypt($venue->town_id)]) }}">{{ $venue->town_name}}</a></td>                        
                         <td>{{$venue->contact_person_name}}</td>
                         <td>{{$venue->contact_person_phone}}</td>
                         <td>{{$venue->contact_person_email}}</td>

@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\AdminPages;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Venue;
 use App\Town;
 
@@ -24,7 +25,16 @@ class VenuesController extends Controller
      */
     public function index()
     {
-        $venues = Venue::select('venues.id','venues.slug','venues.name as venue_name','venues.contact_person_name','venues.contact_person_phone','venues.contact_person_email','venues.latitude','venues.longitude','towns.name as town_name')
+        $venues = Venue::select('venues.id','venues.slug','venues.name as venue_name','venues.contact_person_name','venues.contact_person_phone','venues.contact_person_email','venues.latitude','venues.longitude','towns.id as town_id','towns.name as town_name')
+                ->join('towns', 'towns.id', '=', 'venues.town_id')
+                ->get();
+        return view('admin.pages.venues')->with('venues',$venues); 
+    }
+
+    public function show($id)
+    {
+        $venues = Venue::where('venues.id',Crypt::decrypt($id))
+                ->select('venues.id','venues.slug','venues.name as venue_name','venues.contact_person_name','venues.contact_person_phone','venues.contact_person_email','venues.latitude','venues.longitude','towns.id as town_id','towns.name as town_name')
                 ->join('towns', 'towns.id', '=', 'venues.town_id')
                 ->get();
         return view('admin.pages.venues')->with('venues',$venues); 

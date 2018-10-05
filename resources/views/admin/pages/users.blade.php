@@ -54,7 +54,7 @@
                             @endif
                         </td>                        
                         <td>{{$user->name}}</td>
-                        <td>{{$user->first_name}} {{$user->app_version_code}}</td>                        
+                        <td>{{$user->app_version_code}}</td>                        
                         <td>
                             @if ($user->status==1)
                                 {{'active'}}

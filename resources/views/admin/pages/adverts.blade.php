@@ -15,7 +15,6 @@
       <div class="app-title">
         <div>
           <h1><i class="fa fa-bullhorn"></i> Adverts</h1>
-          <p>List of all adverts</p>
         </div>
         <ul class="app-breadcrumb breadcrumb">
           <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
@@ -58,7 +57,7 @@
                                 {{'inactive'}}
                             @endif
                         </td>
-                        <td>{{$advert->first_name}} {{$advert->last_name}}</td>
+                        <td><a href="{{ route('single_admin', ['id'=>Crypt::encrypt($advert->admin_id)]) }}">{{$advert->first_name}} {{$advert->last_name}}</a></td>
                         <td>
                           <a href="{{ route('edit_advert', ['slug'=>$advert->slug]) }}" class="btn btn-sm btn-outline-primary">Edit</a>
                           

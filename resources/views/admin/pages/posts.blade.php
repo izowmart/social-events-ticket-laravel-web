@@ -42,8 +42,8 @@
                 <tbody>
                     @foreach ($posts as $post)
                     <tr class="item">
-                        <td>{{$post->first_name}} {{$post->last_name}}</td>
-                        <td>{{ $post->venue_name}}</td>                        
+                        <td><a href="{{ route('single_user', ['id'=>Crypt::encrypt($post->user_id)]) }}">{{$post->first_name}} {{$post->last_name}}</a></td>
+                        <td><a href="{{ route('single_venue', ['id'=>Crypt::encrypt($post->venue_id)]) }}">{{ $post->venue_name}}</a></td>                        
                         <td>{{$post->comment}}</td>
                         <td><a href="{{$post->media_url}}" target="_blank" class="btn btn-sm btn-outline-primary">View</a></td>
                         <td>
@@ -57,7 +57,7 @@
                         </td>
                         <td>{{ $post->abuses->count() }}
                             @if ($post->abuses->count()>0)
-                                <a href="{{ route('abuses',['id'=>$post->id]) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                <a href="{{ route('abuses',['id'=>Crypt::encrypt($post->id)]) }}" class="btn btn-sm btn-outline-primary">View</a>
                                 
                             @endif
                         </td>

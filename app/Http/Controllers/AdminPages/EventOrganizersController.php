@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AdminPages;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use App\Http\Controllers\Controller;
 use App\EventOrganizer;
 
@@ -28,6 +29,17 @@ class EventOrganizersController extends Controller
         $event_organizers = EventOrganizer::where('status',1)->orWhere('status',2)->get();
         $data=array(
            'type'=>'verified',
+           'event_organizers'=>$event_organizers
+        );
+        return view('admin.pages.event_organizers')->with($data);
+        
+    }
+
+    public function show($id)
+    {
+        $event_organizers = EventOrganizer::where('id',Crypt::decrypt($id))->get();
+        $data=array(
+           'type'=>'single',
            'event_organizers'=>$event_organizers
         );
         return view('admin.pages.event_organizers')->with($data);
