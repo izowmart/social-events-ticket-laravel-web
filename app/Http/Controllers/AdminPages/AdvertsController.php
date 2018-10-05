@@ -5,6 +5,7 @@ namespace App\Http\Controllers\AdminPages;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Advert;
+use App\Admin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 
@@ -25,9 +26,10 @@ class AdvertsController extends Controller
      */
     public function index()
     {
-        $adverts = Advert::select('adverts.id','adverts.slug','adverts.title','adverts.description','adverts.image_url','adverts.start_date','adverts.end_date','adverts.status','admins.id as admin_id','admins.first_name','admins.last_name')
+        $adverts = Advert::select('adverts.id','adverts.slug','adverts.title','adverts.description','adverts.image_url','adverts.start_date','adverts.end_date','adverts.status','admins.id as admin_id','admins.first_name','admins.last_name','admins.deleted_at as admin_deleted')
                 ->join('admins', 'admins.id', '=', 'adverts.admin_id')
                 ->get();
+        
         return view('admin.pages.adverts')->with('adverts',$adverts); 
     }
 

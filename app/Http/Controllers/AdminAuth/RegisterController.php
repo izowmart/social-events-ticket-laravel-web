@@ -53,7 +53,7 @@ class RegisterController extends Controller
         });
 
         //Give message to admin after successfull registration
-        $request->session()->flash('status', 'Admin registered successfully');
+        $request->session()->flash('status', 'login credential has been sent to registered admin email');
         return redirect($this->redirectPath);
         
     }
