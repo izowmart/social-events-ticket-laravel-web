@@ -34,10 +34,9 @@ class TownsController extends Controller
 
     public function show($id)
     {
-        $towns = Town::find(Crypt::decrypt($id))
+        $towns = Town::where('towns.id',Crypt::decrypt($id))
                 ->select('countries.name as country_name','towns.name as town_name','towns.created_at','towns.id')
                 ->join('countries', 'countries.id', '=', 'towns.country_id')
-                ->take(1)
                 ->get();
        return view('admin.pages.towns')->with('towns',$towns); 
     }
