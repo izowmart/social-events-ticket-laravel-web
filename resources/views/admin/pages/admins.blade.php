@@ -15,7 +15,6 @@
       <div class="app-title">
         <div>
           <h1><i class="fa fa-user-circle"></i> Admins</h1>
-          <p>List of all registered admins</p>
         </div>
         <ul class="app-breadcrumb breadcrumb">
           <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>

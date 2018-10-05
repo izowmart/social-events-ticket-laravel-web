@@ -98,7 +98,10 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
     Route::get('add', 'AdminAuth\RegisterController@showRegistrationForm')->name('add_admin');
     Route::post('add', 'AdminAuth\RegisterController@register')->name('add_admin_post');
 
-    Route::get('admins', 'AdminPages\AdminsController@index')->name('admins');
+    Route::group(['prefix' => 'admins'], function () {
+        Route::get('/', 'AdminPages\AdminsController@index')->name('admins');
+        Route::get('show/{id}', 'AdminPages\AdminsController@show')->name('single_admin');
+    });
 
     Route::group(['prefix'=>'countries'], function () {
         Route::get('/', 'AdminPages\CountriesController@index')->name('countries');
