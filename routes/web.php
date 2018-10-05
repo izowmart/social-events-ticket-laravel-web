@@ -100,7 +100,8 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
 
     Route::group(['prefix' => 'admins'], function () {
         Route::get('/', 'AdminPages\AdminsController@index')->name('admins');
-        Route::get('show/{id}', 'AdminPages\AdminsController@show')->name('single_admin');
+        Route::get('show/{id}', 'AdminPages\AdminsController@show')->name('single_admin');   
+        Route::post('delete', 'AdminPages\AdminsController@destroy')->name('delete_admin');
     });
 
     Route::group(['prefix'=>'countries'], function () {
