@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\AdminPages;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Abuse;
 
 class AbusesController extends Controller
@@ -27,7 +28,7 @@ class AbusesController extends Controller
         $abuses = Abuse::select('abuses.type','abuses.created_at','abuses.id','users.first_name','users.last_name','users.email','posts.status')
                 ->join('users', 'users.id', '=', 'abuses.user_id')
                 ->join('posts', 'posts.id', '=', 'abuses.post_id')
-                ->where('abuses.post_id',$id)
+                ->where('abuses.post_id',Crypt::decrypt($id))
                 ->get();
         return view('admin.pages.abuses')->with('abuses',$abuses);
         

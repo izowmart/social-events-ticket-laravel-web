@@ -57,7 +57,7 @@
                         </td>
                         <td>{{ $post->abuses->count() }}
                             @if ($post->abuses->count()>0)
-                                <a href="{{ route('abuses',['id'=>$post->id]) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                <a href="{{ route('abuses',['id'=>Crypt::encrypt($post->id)]) }}" class="btn btn-sm btn-outline-primary">View</a>
                                 
                             @endif
                         </td>
