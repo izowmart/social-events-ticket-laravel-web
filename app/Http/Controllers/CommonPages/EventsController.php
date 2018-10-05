@@ -296,6 +296,60 @@ class EventsController extends Controller
 
     }
 
+    public function UnverifiedPaidindex(){
+        $user = $this->CheckUserType();
+        if($user=="Admin"){
+            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.id as event_organizer_id','event_organizers.first_name','event_organizers.last_name')
+                    ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
+                    ->where('events.type',2)
+                    ->where('events.status',0)
+                    ->get();
+        }else{
+            //we will search for events that belong to current event organizer only
+            $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
+            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+                    ->where('events.type',2)
+                    ->where('events.status',0)
+                    ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
+                    ->where('events.event_organizer_id',$event_organizer_id)                    
+                    ->get();
+
+        }
+        $data=array(
+           'type'=>'unverified paid',
+           'events'=>$events
+        );
+        return view('common_pages.events')->with($data);
+
+    }
+
+    public function UnverifiedFreeindex(){
+        $user = $this->CheckUserType();
+        if($user=="Admin"){
+            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.id as event_organizer_id','event_organizers.first_name','event_organizers.last_name')
+                    ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
+                    ->where('events.type',1)
+                    ->where('events.status',0)
+                    ->get();
+        }else{
+            //we will search for events that belong to current event organizer only
+            $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
+            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+                    ->where('events.type',1)
+                    ->where('events.status',0)
+                    ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
+                    ->where('events.event_organizer_id',$event_organizer_id)                    
+                    ->get();
+
+        }
+        $data=array(
+           'type'=>'unverified free',
+           'events'=>$events
+        );
+        return view('common_pages.events')->with($data);
+
+    }
+
     public function VerifiedPaidindex(){
         $user = $this->CheckUserType();
         if($user=="Admin"){

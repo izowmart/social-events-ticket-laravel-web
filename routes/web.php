@@ -170,6 +170,8 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
 
     Route::group(['prefix'=>'events'], function () {
         Route::get('unverified', 'CommonPages\EventsController@Unverifiedindex')->name('admin_unverified_events');
+        Route::get('unverified/paid', 'CommonPages\EventsController@UnverifiedPaidindex')->name('admin_unverified_paid_events');
+        Route::get('unverified/free', 'CommonPages\EventsController@UnverifiedFreeindex')->name('admin_unverified_free_events');
         Route::get('verified/paid', 'CommonPages\EventsController@VerifiedPaidindex')->name('admin_verified_paid_events');
         Route::get('verified/free', 'CommonPages\EventsController@VerifiedFreeindex')->name('admin_verified_free_events');
         Route::post('deactivate', 'CommonPages\EventsController@deactivate')->name('admin_deactivate_event_post');
@@ -188,6 +190,8 @@ Route::group(['middleware' => 'event_organizer_auth','prefix'=>'event_organizer'
 
     Route::group(['prefix'=>'events'], function () {
         Route::get('unverified', 'CommonPages\EventsController@Unverifiedindex')->name('event_organizer_unverified_events');
+        Route::get('unverified/paid', 'CommonPages\EventsController@UnverifiedPaidindex')->name('event_organizer_unverified_paid_events');
+        Route::get('unverified/free', 'CommonPages\EventsController@UnverifiedFreeindex')->name('event_organizer_unverified_free_events');
         Route::get('verified/paid', 'CommonPages\EventsController@VerifiedPaidindex')->name('event_organizer_verified_paid_events');
         Route::get('verified/free', 'CommonPages\EventsController@VerifiedFreeindex')->name('event_organizer_verified_free_events');
         Route::post('deactivate', 'CommonPages\EventsController@deactivate')->name('event_organizer_deactivate_event_post');

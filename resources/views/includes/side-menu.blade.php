@@ -23,23 +23,31 @@
           <li><a class="treeview-item {{ Route::currentRouteNamed('verified_event_organizers') ? 'active' : '' }}" href="{{ route('verified_event_organizers') }}"><i class="icon fa fa-circle-o"></i> Verified</a></li>
         </ul>
       </li>
-      <li class="treeview {{ Route::currentRouteNamed('admin_verified_free_events') || Route::currentRouteNamed('admin_unverified_events') || Route::currentRouteNamed('admin_verified_paid_events') ? 'is-expanded' : '' }}"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="app-menu__icon fa fa-calendar-check-o"></i><span class="app-menu__label">Events</span><i class="treeview-indicator fa fa-angle-right"></i></a>
+      <li class="treeview {{ Route::currentRouteNamed('admin_verified_free_events') || Route::currentRouteNamed('admin_unverified_free_events') || Route::currentRouteNamed('admin_verified_free_events') ? 'is-expanded' : '' }}"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="app-menu__icon 	fa fa-calendar-o"></i><span class="app-menu__label">Free Events</span><i class="treeview-indicator fa fa-angle-right"></i></a>
         <ul class="treeview-menu">
-          <li><a class="treeview-item {{ Route::currentRouteNamed('admin_unverified_events') ? 'active' : '' }}" href="{{ route('admin_unverified_events') }}"><i class="icon fa fa-circle-o"></i> Unverified</a></li>
-          <li><a class="treeview-item" href="#"><i class="icon fa fa-circle-o"></i> Verified</a></li>
-          <li><a class="treeview-item {{ Route::currentRouteNamed('admin_verified_free_events') ? 'active' : '' }}" href="{{ route('admin_verified_free_events') }}"><i class="icon fa fa-circle-o"></i> Free</a></li>
-          <li><a class="treeview-item {{ Route::currentRouteNamed('admin_verified_paid_events') ? 'active' : '' }}" href="{{ route('admin_verified_paid_events') }}"><i class="icon fa fa-circle-o"></i> Paid</a></li>
+          <li><a class="treeview-item {{ Route::currentRouteNamed('admin_unverified_free_events') ? 'active' : '' }}" href="{{ route('admin_unverified_free_events') }}"><i class="icon fa fa-circle-o"></i> Unverified</a></li>
+          <li><a class="treeview-item {{ Route::currentRouteNamed('admin_verified_free_events') ? 'active' : '' }}" href="{{ route('admin_verified_free_events') }}"><i class="icon fa fa-circle-o"></i> Verified</a></li>
+        </ul>
+      </li>
+      <li class="treeview {{ Route::currentRouteNamed('admin_verified_paid_events') || Route::currentRouteNamed('admin_unverified_paid_events') || Route::currentRouteNamed('admin_verified_paid_events') ? 'is-expanded' : '' }}"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="app-menu__icon fa fa-calendar-check-o"></i><span class="app-menu__label">Paid Events</span><i class="treeview-indicator fa fa-angle-right"></i></a>
+        <ul class="treeview-menu">
+          <li><a class="treeview-item {{ Route::currentRouteNamed('admin_unverified_paid_events') ? 'active' : '' }}" href="{{ route('admin_unverified_paid_events') }}"><i class="icon fa fa-circle-o"></i> Unverified</a></li>
+          <li><a class="treeview-item {{ Route::currentRouteNamed('admin_verified_paid_events') ? 'active' : '' }}" href="{{ route('admin_verified_paid_events') }}"><i class="icon fa fa-circle-o"></i> Verified</a></li>
         </ul>
       </li>
       @endauth
       @auth('web_event_organizer')
       <li><a class="app-menu__item {{ Route::currentRouteNamed('event_organizer_home') ? 'active' : '' }}" href="{{ route('event_organizer_home') }}"><i class="app-menu__icon fa fa-home"></i><span class="app-menu__label">Home</span></a></li> 
-      <li class="treeview {{ Route::currentRouteNamed('event_organizer_verified_free_events') || Route::currentRouteNamed('event_organizer_unverified_events') || Route::currentRouteNamed('event_organizer_verified_paid_events') ? 'is-expanded' : '' }}"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="app-menu__icon fa fa-calendar-check-o"></i><span class="app-menu__label">Events</span><i class="treeview-indicator fa fa-angle-right"></i></a>
+      <li class="treeview {{ Route::currentRouteNamed('event_organizer_verified_free_events') || Route::currentRouteNamed('event_organizer_unverified_free_events') || Route::currentRouteNamed('admin_verified_free_events') ? 'is-expanded' : '' }}"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="app-menu__icon 	fa fa-calendar-o"></i><span class="app-menu__label">Free Events</span><i class="treeview-indicator fa fa-angle-right"></i></a>
         <ul class="treeview-menu">
-          <li><a class="treeview-item {{ Route::currentRouteNamed('event_organizer_unverified_events') ? 'active' : '' }}" href="{{ route('event_organizer_unverified_events') }}"><i class="icon fa fa-circle-o"></i> Unverified</a></li>
-          <li><a class="treeview-item" href="#"><i class="icon fa fa-circle-o"></i> Verified</a></li>
-          <li><a class="treeview-item {{ Route::currentRouteNamed('event_organizer_verified_free_events') ? 'active' : '' }}" href="{{ route('event_organizer_verified_free_events') }}"><i class="icon fa fa-circle-o"></i> Free</a></li>
-          <li><a class="treeview-item {{ Route::currentRouteNamed('event_organizer_verified_paid_events') ? 'active' : '' }}" href="{{ route('event_organizer_verified_paid_events') }}"><i class="icon fa fa-circle-o"></i> Paid</a></li>
+          <li><a class="treeview-item {{ Route::currentRouteNamed('event_organizer_unverified_free_events') ? 'active' : '' }}" href="{{ route('event_organizer_unverified_free_events') }}"><i class="icon fa fa-circle-o"></i> Unverified</a></li>
+          <li><a class="treeview-item {{ Route::currentRouteNamed('event_organizer_verified_free_events') ? 'active' : '' }}" href="{{ route('event_organizer_verified_free_events') }}"><i class="icon fa fa-circle-o"></i> Verified</a></li>
+        </ul>
+      </li>
+      <li class="treeview {{ Route::currentRouteNamed('event_organizer_verified_paid_events') || Route::currentRouteNamed('event_organizer_unverified_paid_events') || Route::currentRouteNamed('event_organizer_verified_paid_events') ? 'is-expanded' : '' }}"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="app-menu__icon fa fa-calendar-check-o"></i><span class="app-menu__label">Paid Events</span><i class="treeview-indicator fa fa-angle-right"></i></a>
+        <ul class="treeview-menu">
+          <li><a class="treeview-item {{ Route::currentRouteNamed('event_organizer_unverified_paid_events') ? 'active' : '' }}" href="{{ route('event_organizer_unverified_paid_events') }}"><i class="icon fa fa-circle-o"></i> Unverified</a></li>
+          <li><a class="treeview-item {{ Route::currentRouteNamed('event_organizer_verified_paid_events') ? 'active' : '' }}" href="{{ route('event_organizer_verified_paid_events') }}"><i class="icon fa fa-circle-o"></i> Verified</a></li>
         </ul>
       </li>   
       @endauth
