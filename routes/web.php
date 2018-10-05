@@ -115,6 +115,7 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
 
     Route::group(['prefix'=>'towns'], function () {
         Route::get('/', 'AdminPages\TownsController@index')->name('towns');
+        Route::get('show/{id}', 'AdminPages\TownsController@show')->name('single_town');
         Route::get('add', 'AdminPages\TownsController@showAddForm')->name('add_town');
         Route::post('add', 'AdminPages\TownsController@store')->name('add_town_post');
         Route::get('edit/{coutry}/{town}', 'AdminPages\TownsController@showEditForm')->name('edit_town');

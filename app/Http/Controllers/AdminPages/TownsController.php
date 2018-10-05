@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\AdminPages;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use App\Http\Controllers\Controller;
-use App\Town;
+use Illuminate\Http\Request;
 use App\Country;
+use App\Town;
 use DB;
 
 class TownsController extends Controller
@@ -27,6 +28,16 @@ class TownsController extends Controller
     {
         $towns = Town::select('countries.name as country_name','towns.name as town_name','towns.created_at','towns.id')
                 ->join('countries', 'countries.id', '=', 'towns.country_id')
+                ->get();
+       return view('admin.pages.towns')->with('towns',$towns); 
+    }
+
+    public function show($id)
+    {
+        $towns = Town::find(Crypt::decrypt($id))
+                ->select('countries.name as country_name','towns.name as town_name','towns.created_at','towns.id')
+                ->join('countries', 'countries.id', '=', 'towns.country_id')
+                ->take(1)
                 ->get();
        return view('admin.pages.towns')->with('towns',$towns); 
     }
