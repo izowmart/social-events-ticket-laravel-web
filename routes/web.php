@@ -145,6 +145,7 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
 
     Route::group(['prefix'=>'users'], function () {
         Route::get('/', 'AdminPages\UsersController@index')->name('users');
+        Route::get('show/{id}', 'AdminPages\UsersController@show')->name('single_user');
         Route::get('new_users_chart', 'AdminPages\HomeController@new_users_chart')->name('new_users_chart');
         Route::get('active_users_chart', 'AdminPages\HomeController@active_users_chart')->name('active_users_chart');
 

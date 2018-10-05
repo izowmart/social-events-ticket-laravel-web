@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\AdminPages;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use App\Http\Controllers\Controller;
-use App\Post;
+use Illuminate\Http\Request;
 use App\Abuse;
+use App\Post;
 use DB;
 
 class PostsController extends Controller
@@ -25,7 +26,7 @@ class PostsController extends Controller
      */
     public function index()
     {
-        $posts = Post::select('posts.media_url','posts.comment','posts.id','posts.status','venues.name as venue_name','users.first_name','users.last_name')
+        $posts = Post::select('posts.media_url','posts.comment','posts.id','posts.status','venues.name as venue_name','users.id as user_id','users.first_name','users.last_name')
                 ->join('venues', 'venues.id', '=', 'posts.venue_id')
                 ->join('users', 'users.id', '=', 'posts.user_id')
                 ->get();

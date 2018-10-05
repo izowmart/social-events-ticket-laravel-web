@@ -42,7 +42,7 @@
                 <tbody>
                     @foreach ($posts as $post)
                     <tr class="item">
-                        <td>{{$post->first_name}} {{$post->last_name}}</td>
+                        <td><a href="{{ route('single_user', ['id'=>Crypt::encrypt($post->user_id)]) }}">{{$post->first_name}} {{$post->last_name}}</a></td>
                         <td>{{ $post->venue_name}}</td>                        
                         <td>{{$post->comment}}</td>
                         <td><a href="{{$post->media_url}}" target="_blank" class="btn btn-sm btn-outline-primary">View</a></td>
