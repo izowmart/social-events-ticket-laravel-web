@@ -135,6 +135,7 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
 
     Route::group(['prefix'=>'venues'], function () {
         Route::get('/', 'AdminPages\VenuesController@index')->name('venues');
+        Route::get('show/{id}', 'AdminPages\VenuesController@show')->name('single_venue');
         Route::get('add', 'AdminPages\VenuesController@showAddForm')->name('add_venue');
         Route::post('add', 'AdminPages\VenuesController@store')->name('add_venue_post');
         Route::get('edit/{slug}', 'AdminPages\VenuesController@showEditForm')->name('edit_venue');
