@@ -11,6 +11,8 @@
 |
 */
 
+use App\Http\Traits\SendFCMNotification;
+
 $base_url = "";
 Route::group(['prefix' => 'auth'], function () use ($base_url) {
 
