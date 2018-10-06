@@ -18,7 +18,7 @@ class UsersTableSeeder extends Seeder
             'first_name' => 'John',
             'last_name'  => 'Doe',
             'username'   => 'johndoe',
-            'email'      => 'johnnjoroge40@gmail.com',
+            'email'      => 'johnnjoroge@gmail.com',
             'phone_number' => '+254798541235',
             'year_of_birth' => '1990',
             'gender'     => 1,

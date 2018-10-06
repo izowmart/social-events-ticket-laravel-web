@@ -19,6 +19,7 @@ Route::group(['prefix' => 'auth'], function () use ($base_url) {
         //unauthenticated routes
         Route::post('register', $base_url . 'Api\AuthController@register_user');
         Route::post('login', $base_url . 'Api\AuthController@login_user');
+        Route::post('fcbk_login', 'Api\AuthController@facebook_login');
         Route::post('reset_password_email', $base_url . 'Api\AuthController@reset_password_user');
 
         //authenticated
