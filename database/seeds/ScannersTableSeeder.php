@@ -19,7 +19,7 @@ class ScannersTableSeeder extends Seeder
             'first_name' => 'John',
             'last_name' => 'Scanner',
             'email' =>'johnscanner@gmail.com',
-            'password'=>bcrypt('password'),
+            'password'=>bcrypt('Passw0rd'),
             'event_organizer_id'=> $event_organizer->id,
             'created_at'    =>now(),
             'updated_at' => now(),

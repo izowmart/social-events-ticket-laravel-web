@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\UserAuth;
 
+use App\Helpers\ValidUserScannerPassword;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -24,4 +25,17 @@ class ResetPasswordController extends Controller
         );
     }
 
+    /**
+     * Get the password reset validation rules.
+     *
+     * @return array
+     */
+    protected function rules()
+    {
+        return [
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => ['required', new ValidUserScannerPassword()],
+        ];
+    }
 }

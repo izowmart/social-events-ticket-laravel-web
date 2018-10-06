@@ -5,10 +5,11 @@ namespace App;
 use App\Notifications\ScannerResetPasswordNotification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
 
 class Scanner extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, HasApiTokens;
 
     protected $fillable = [
         'event_organizer_id','first_name', 'last_name', 'email', 'password',

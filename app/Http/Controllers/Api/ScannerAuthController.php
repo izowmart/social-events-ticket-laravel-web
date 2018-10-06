@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ValidUserScannerPassword;
 use App\Http\Resources\ScannerResource;
 use App\Http\Traits\UniversalMethods;
 use App\Scanner;
 use App\Transformers\ScannerTransformer;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
@@ -36,14 +38,13 @@ class ScannerAuthController extends Controller
         $validator = Validator::make($request->all(),
             [
                 'email'    => 'required|email|exists:scanners,email',
-                'password' => 'required|min:8'
+                'password' => ['required', new ValidUserScannerPassword()],
             ],
             [
                 'email.required'    => 'Please provide an email address',
                 'email.email'       => 'Email address is invalid',
                 'email.exists'      => 'You do not have an account. Kindly sign up!',
                 'password.required' => 'Please provide a password',
-                'password.min'      => 'Password must be at least 8 characters',
             ]
         );
 
@@ -59,12 +60,25 @@ class ScannerAuthController extends Controller
             //attempt to authenticate user
             if ($this->guard()->attempt($request->only(['email', 'password']))) {
 
+                $scanner = $this->guard()->user();
+
+                //generate token for the scanner
+                //create token for the user
+                $tokenResult = $scanner->createToken('Personal Access Token');
+                $token = $tokenResult->token;
+                $token->expires_at = Carbon::now()->addWeeks(1);
+                $token->save();
+
                 return response()->json(
                     [
                         'success' => true,
                         'message' => 'Scanner Successfully Logged In. Welcome!',
-                        'data'    => fractal($this->guard()->user(),ScannerTransformer::class),
-                    ], 200
+                        'data'    => fractal($scanner,ScannerTransformer::class),
+                        'access_token' => $tokenResult->accessToken,
+                        'expires_at'   => Carbon::parse(
+                            $tokenResult->token->expires_at
+                        )->toDateTimeString()
+                    ], 201
                 );
             } else {
                 return response()->json(
@@ -72,7 +86,7 @@ class ScannerAuthController extends Controller
                         'success' => true,
                         'message' => 'Email or Password is Incorrect!',
                         'data'    => [],
-                    ], 200
+                    ], 401
                 );
             }
         }
