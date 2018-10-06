@@ -151,7 +151,11 @@ class AuthController extends Controller
                         'success' => true,
                         'message' => 'User Successfully Logged In. Welcome!',
                         'data'    => fractal($user, $userTransformer),
-                    ], 200
+                        'access_token' => $tokenResult->accessToken,
+                        'expires_at'   => Carbon::parse(
+                            $tokenResult->token->expires_at
+                        )->toDateTimeString()
+                    ], 201
                 );
             } else {
                 return response()->json(
@@ -159,7 +163,7 @@ class AuthController extends Controller
                         'success' => true,
                         'message' => 'Email or Password is Incorrect!',
                         'data'    => [],
-                    ], 200
+                    ], 401
                 );
             }
         }
