@@ -26,7 +26,7 @@ class CreateUsersTable extends Migration
             $table->integer('country_id')->unsigned()->nullable();
             $table->foreign('country_id')->references('id')->on('countries');
             $table->string("facebook_id")->nullable()->unique();
-            $table->string('fcm_token')->default("0");
+            $table->string('fcm_token')->nullable();
             $table->boolean('auto_follow_status')->default(true)->comment('true: follow is automatic; false: send me a follow request');
             $table->string('app_version_code')->default("1.0.0");
             $table->string('password');
