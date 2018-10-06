@@ -9,6 +9,7 @@ use App\Http\Traits\UniversalMethods;
 use App\Notification;
 use App\Transformers\UserTransformer;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,11 +38,11 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(),
             [
-                'username'   => 'required',
-                'first_name' => 'required',
-                'last_name'  => 'required',
-                'email'      => 'required|email|unique:users,email',
-                'password'   => 'required|min:8'
+                'username'   => 'required|alpha_dash',
+                'first_name' => 'required|string',
+                'last_name'  => 'required|string',
+                'email'      => 'bail|required|email|unique:users,email',
+                'password'   => ['required', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/m'],
             ],
             [
                 'username.required'   => 'Please provide a username',
@@ -51,7 +52,7 @@ class AuthController extends Controller
                 'email.email'         => 'Email address is invalid',
                 'email.unique'        => 'The email address is already in use',
                 'password.required'   => 'Please provide a password',
-                'password.min'        => 'Password must be at least 8 characters',
+                'password.regex'      => 'Password must be at least 6 characters with lowercase and uppercase letters and a number',
             ]
         );
 
@@ -73,15 +74,26 @@ class AuthController extends Controller
             $user = User::create($data);
 
             if ($user) {
+
+                //create token for the user
+                $tokenResult = $user->createToken('Personal Access Token');
+                $token = $tokenResult->token;
+                $token->expires_at = Carbon::now()->addWeeks(1);
+                $token->save();
+
                 $userTransformer = new UserTransformer();
                 $userTransformer->setUserId($user->id);
 
                 return response()->json(
                     [
-                        'success' => true,
-                        'message' => 'User Account Created Successfully. Welcome!',
-                        'data'    => fractal($user, $userTransformer),
-                    ], 200
+                        'success'      => true,
+                        'message'      => 'User Account Created Successfully. Welcome!',
+                        'data'         => fractal($user, $userTransformer),
+                        'access_token' => $tokenResult->accessToken,
+                        'expires_at'   => Carbon::parse(
+                            $tokenResult->token->expires_at
+                        )->toDateTimeString()
+                    ], 201
                 );
             } else {
                 return response()->json(
@@ -100,15 +112,15 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(),
             [
-                'email'    => 'required|email|exists:users,email',
-                'password' => 'required|min:8'
+                'email'    => 'bail|required|email|exists:users,email',
+                'password' => ['required', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/m'],
             ],
             [
                 'email.required'    => 'Please provide an email address',
                 'email.email'       => 'Email address is invalid',
                 'email.exists'      => 'You do not have an account. Kindly sign up!',
                 'password.required' => 'Please provide a password',
-                'password.min'      => 'Password must be at least 8 characters',
+                'password.regex'    => 'Password must be at least 6 characters with lowercase and uppercase letters and a number',
             ]
         );
 
@@ -123,13 +135,22 @@ class AuthController extends Controller
         } else {
             //attempt to authenticate user
             if (Auth::attempt($request->only(['email', 'password']))) {
+
+                $user = Auth::user();
+                //create token for the user
+                $tokenResult = $user->createToken('Personal Access Token');
+                $token = $tokenResult->token;
+                $token->expires_at = Carbon::now()->addWeeks(1);
+                $token->save();
+
                 $userTransformer = new UserTransformer();
-                $userTransformer->setUserId(Auth::user()->id);
+                $userTransformer->setUserId($user->id);
+
                 return response()->json(
                     [
                         'success' => true,
                         'message' => 'User Successfully Logged In. Welcome!',
-                        'data'    => fractal(Auth::user(), $userTransformer),
+                        'data'    => fractal($user, $userTransformer),
                     ], 200
                 );
             } else {
@@ -251,7 +272,7 @@ class AuthController extends Controller
 
             $data =
                 [
-                    'followers' => fractal($user->followers,$userTransformer),
+                    'followers' => fractal($user->followers, $userTransformer),
                     'following' => fractal($user->following, $userTransformer)
                 ];
         }
