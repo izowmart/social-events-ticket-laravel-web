@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ValidUserScannerPassword;
 use App\Http\Resources\ScannerResource;
 use App\Http\Traits\UniversalMethods;
 use App\Scanner;
@@ -37,14 +38,13 @@ class ScannerAuthController extends Controller
         $validator = Validator::make($request->all(),
             [
                 'email'    => 'required|email|exists:scanners,email',
-                'password' => ['required', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/m'],
+                'password' => ['required', new ValidUserScannerPassword()],
             ],
             [
                 'email.required'    => 'Please provide an email address',
                 'email.email'       => 'Email address is invalid',
                 'email.exists'      => 'You do not have an account. Kindly sign up!',
                 'password.required' => 'Please provide a password',
-                'password.min'      => 'Password must be at least 8 characters',
             ]
         );
 

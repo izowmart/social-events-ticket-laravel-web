@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Follower;
+use App\Helpers\ValidUserScannerPassword;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Http\Traits\UniversalMethods;
@@ -42,7 +43,7 @@ class AuthController extends Controller
                 'first_name' => 'required|string',
                 'last_name'  => 'required|string',
                 'email'      => 'bail|required|email|unique:users,email',
-                'password'   => ['required', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/m'],
+                'password'   => ['required', new ValidUserScannerPassword()],
             ],
             [
                 'username.required'   => 'Please provide a username',
@@ -52,7 +53,7 @@ class AuthController extends Controller
                 'email.email'         => 'Email address is invalid',
                 'email.unique'        => 'The email address is already in use',
                 'password.required'   => 'Please provide a password',
-                'password.regex'      => 'Password must be at least 6 characters with lowercase and uppercase letters and a number',
+//                'password.regex'      => 'Password must be at least 6 characters with lowercase and uppercase letters and a number',
             ]
         );
 
@@ -113,7 +114,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(),
             [
                 'email'    => 'bail|required|email|exists:users,email',
-                'password' => ['required', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/m'],
+                'password' => ['required',new ValidUserScannerPassword()],
             ],
             [
                 'email.required'    => 'Please provide an email address',
