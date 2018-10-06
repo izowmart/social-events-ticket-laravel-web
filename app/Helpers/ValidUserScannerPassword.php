@@ -11,6 +11,12 @@ namespace App\Helpers;
 
 use Illuminate\Contracts\Validation\Rule;
 
+/*
+ * Validate passwords for mobile phone users: User & Scanner
+ * At least 6 characters with one upper and lowercase letter and a number
+ *
+ */
+
 class ValidUserScannerPassword implements Rule
 {
 
@@ -27,7 +33,7 @@ class ValidUserScannerPassword implements Rule
         //check that the password contains at least 86characters, one uppercase and lowercase letter and a number
         if (preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/m", $value)) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
