@@ -605,6 +605,7 @@ class AuthController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'status changed',
+
                 ], 200);
             } else {
                 return response()->json([
@@ -617,6 +618,68 @@ class AuthController extends Controller
                 'success' => false,
                 'message' => 'status change failed: ' . $exception->getMessage(),
             ], 500);
+        }
+    }
+
+    public function update_app_version_code_and_fcm_token(Request $request)
+    {
+        try {
+            $regex = "/^(?:(\d+)\.)?(?:(\d+)\.)?(\d+)$/m";
+            $validator = Validator::make($request->all(),
+                [
+                    'user_id'          => 'required|integer',
+                    'app_version_code' => ['nullable', 'regex:' . $regex],
+                    'fcm_token'         =>'nullable|string',
+                ]);
+
+            if ($validator->fails()) {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
+                        'data'    => []
+                    ], 500
+                );
+            }
+
+            $user = User::where('id', $request->user_id)->first();
+
+            if ($user != null) {
+                if ($request->has('app_version_code') && $request->app_version_code != null) {
+                    $user->app_version_code = $request->app_version_code;
+                }
+                if ($request->has('fcm_token') && $request->fcm_token != null){
+                    $user->fcm_token = $request->fcm_token;
+                }
+
+                $user->save();
+
+                $userTransformer = new UserTransformer();
+                $userTransformer->setUserId($user->id);
+
+                return response()->json(
+                    [
+                        'success' => true,
+                        'message' => 'Updated successfully',
+                        'datum'   => fractal($user, $userTransformer)
+                    ], 200
+                );
+            } else {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => 'Kindly sign Up',
+                    ], 500
+                );
+            }
+
+        } catch ( \Exception $exception ) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'error: '.$exception->getMessage(),
+                ], 500
+            );
         }
     }
 
