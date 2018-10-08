@@ -109,6 +109,87 @@ class AuthController extends Controller
         }
     }
 
+    public function update_user_profile(Request $request){
+        $validator = Validator::make($request->all(),
+            [
+                'username'          => 'required|alpha_dash',
+                'first_name'        => 'required|string',
+                'year_of_birth'     => 'nullable|string|before:-18 years',
+                'profile_url'       => 'nullable|string',
+                'gender'            => 'nullable|int',
+                'country_id'        => 'nullable|int',
+                'phone_number'      => 'nullable|string|null|unique:user,phone_number'
+            ],
+            [   'username.required'         =>  'Please provide a username',
+                'first_name.required'       =>  'Please provide a first name',
+                'year_of_birth.before'      =>  'You must be over 18 years old',
+                'phone_number.unique'       =>  'That phone number is already in use'
+            ]
+            );
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
+                    'data'    => []
+                ], 200
+            );
+        }else{
+            $user_id = $request->user_id;
+
+            $username = $request-> username;
+            $first_name = $request-> first_name;
+            $year_of_birth = $request-> year_of_birth;
+            $gender = $request-> gender;
+            $country_id = $request-> country_id;
+            $phone_number = $request-> phone_number;
+            $profile_url = $request->has('profile_url') ? $request->profile_url : null;
+
+
+             $result = User::where('id', $user_id)->update([
+                 'username' => $username,
+                 'profile_url' => $profile_url,
+                 'first_name' => $first_name,
+                 'year_of_birth' => $year_of_birth,
+                 'gender' => $gender,
+                 'country_id' => $country_id,
+                 'phone_number' => $phone_number
+             ]);
+
+            if ($profile_url != null) {
+                $file_name = $result->id . "_" . uniqid().".png";
+                $file_path = public_path("uploads/users/");
+
+                if (!file_exists($file_path)) {
+                    mkdir($file_path, 0755, true);
+                }
+
+                Image::make($profile_url)
+                    ->save($file_path.$file_name);
+
+                $result->profile_url = $file_name;
+                if ($result->save()) {
+                    DB::commit();
+                }
+            }
+
+
+            if ($result) {
+                 return response()->json([
+                     'success' => true,
+                     'message' => 'Profile updated successfully',
+                 ], 200);
+             } else {
+                 return response()->json([
+                     'success' => false,
+                     'message' => 'Profile update failed',
+                 ], 500);
+             }
+
+
+        }
+    }
+
 
     public function login_user(Request $request)
     {

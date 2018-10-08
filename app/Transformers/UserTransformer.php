@@ -30,6 +30,7 @@ class UserTransformer extends TransformerAbstract
             'firstname'             => $user->first_name,
             'lastname'              => $user->last_name,
             'username'              => $user->username,
+            'phone_number'          => $user->phone_number,
             'email'                 => $user->email,
             'year_of_birth'         => $user->year_of_birth,
             'gender'                => $user->gender,

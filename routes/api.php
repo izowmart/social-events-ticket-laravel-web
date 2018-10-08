@@ -27,6 +27,7 @@ Route::group(['prefix' => 'auth'], function () use ($base_url) {
             Route::get('users', $base_url . 'Api\AuthController@index');
             Route::post('update_auto_follow_status', $base_url . 'Api\AuthController@update_auto_follow_status');
             Route::post('update_fcm_token', $base_url . 'Api\AuthController@update_fcm_token');
+            Route::post('update_user_profile',$base_url. 'Api\AuthController@update_user_profile');
         });
     });
 
