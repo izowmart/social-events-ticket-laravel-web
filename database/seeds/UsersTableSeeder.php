@@ -13,6 +13,8 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
+
+        //all passwords must have a number and a capsital letter.we have P and 0->Zero in Passw0rd
     
         User::create([
             'first_name' => 'John',

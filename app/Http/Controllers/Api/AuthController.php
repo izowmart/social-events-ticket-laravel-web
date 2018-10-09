@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Intervention\Image\Facades\Image;
 
 
@@ -115,6 +116,7 @@ class AuthController extends Controller
         try {
             $validator = Validator::make($request->all(),
                 [
+                    'user_id'  => 'required|integer|exists:users,id',
                     'username' => 'required|alpha_dash',
                     'first_name' => 'required|string',
                     'last_name' => 'required|string',
@@ -122,7 +124,7 @@ class AuthController extends Controller
                     'profile_url' => 'nullable|string',
                     'gender' => 'nullable|int',
                     'country_id' => 'nullable|int',
-                    'phone_number' => 'nullable|string|unique:users,phone_number'
+                    'phone_number' => ['nullable','string',Rule::unique('users')->ignore($request->user_id, 'id')]
                 ],
                 [   'username.required' => 'Please provide a username',
                     'first_name.required' => 'Please provide a first name',
@@ -152,13 +154,13 @@ class AuthController extends Controller
                 $profile_url = $request->has('profile_url') ? $request->profile_url : null;
 
 
-                $result = User::where('id', $user_id)->first();
+                $user = User::where('id', $user_id)->first();
 
-                if ($result != null) {
+                if ($user != null) {
 
 
                     if ($profile_url != null) {
-                        $file_name = $result->id . "_" . uniqid() . ".png";
+                        $file_name = $user->id . "_" . uniqid() . ".png";
                         $file_path = public_path("uploads/users/");
 
                         if (!file_exists($file_path)) {
@@ -168,33 +170,34 @@ class AuthController extends Controller
                         Image::make($profile_url)
                             ->save($file_path . $file_name);
 
-                        $result->profile_url = $file_name;
-                        if ($result->save()) {
+                        $user->profile_url = $file_name;
+                        if ($user->save()) {
                             DB::commit();
                         }
                     }
 
-                    $result = $result->update([
-                        'username' => $username,
-                        'last_name' => $last_name,
-                        'profile_url' => $profile_url,
-                        'first_name' => $first_name,
-                        'year_of_birth' => $year_of_birth,
-                        'gender' => $gender,
-                        'country_id' => $country_id,
-                        'phone_number' => $phone_number
-                    ]);
+
+                    $user->username = $username;
+                    $user->last_name = $last_name;
+                    $user->profile_url = $profile_url;
+                    $user->first_name = $first_name;
+                    $user->year_of_birth = $year_of_birth;
+                    $user->gender = $gender;
+                    $user->country_id = $country_id;
+                    $user->phone_number = $phone_number;
+
+                    $user->save();
                 }
 
 
-                if ($result != null ) {
+                if ($user != null ) {
                     $userTransformer = new UserTransformer();
-                    $userTransformer->setUserId($result->id);
+                    $userTransformer->setUserId($user->id);
 
                     return response()->json([
                         'success' => true,
                         'message' => 'Profile updated successfully',
-                        'datum' => fractal($result, $userTransformer)
+                        'datum' => fractal($user, $userTransformer)
                     ], 200);
                 } else {
                     return response()->json([
@@ -207,7 +210,7 @@ class AuthController extends Controller
         } catch (\Exception $exception) {
             return response()->json([
                 'success' => false,
-                'message' => 'Profile update failed: '.$exception->getMessage(),
+                'message' => 'Profile update failed: '.$exception->getTraceAsString(),
                 'datum' => []
             ], 500);
 
