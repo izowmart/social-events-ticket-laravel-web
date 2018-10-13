@@ -22,7 +22,7 @@ class EventController extends Controller
 
 
             return Response::json([
-                    "success" => "true",
+                    "success" => true,
                     "message" => "found " . count($events),
                     "data"    => fractal($events, EventTransformer::class),
                 ]

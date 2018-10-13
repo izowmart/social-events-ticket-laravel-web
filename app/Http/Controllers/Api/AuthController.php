@@ -367,7 +367,7 @@ class AuthController extends Controller
                 [
                     'success' => true,
                     'message' => 'Successfully fetched your people!',
-                    'data'    => $data,
+                    'data'    => [$data],
                 ]
             );
         } catch ( \Exception $exception ) {
@@ -653,6 +653,7 @@ class AuthController extends Controller
                     $user->fcm_token = $request->fcm_token;
                 }
 
+                $user->first_time_login = false;
                 $user->save();
 
                 $userTransformer = new UserTransformer();
