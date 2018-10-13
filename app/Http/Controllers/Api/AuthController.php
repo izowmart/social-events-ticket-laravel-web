@@ -64,7 +64,7 @@ class AuthController extends Controller
                 [
                     'success' => false,
                     'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
-                    'data'    => []
+                    'data'    => null
                 ], 200
             );
         } else {
@@ -102,7 +102,7 @@ class AuthController extends Controller
                     [
                         'success' => false,
                         'message' => 'User Account Creation Failed!',
-                        'data'    => [],
+                        'data'    => null,
                     ], 500
                 );
             }
@@ -131,7 +131,7 @@ class AuthController extends Controller
                 [
                     'success' => false,
                     'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
-                    'data'    => []
+                    'data'    => null
                 ], 200
             );
         } else {
@@ -164,7 +164,7 @@ class AuthController extends Controller
                     [
                         'success' => true,
                         'message' => 'Email or Password is Incorrect!',
-                        'data'    => [],
+                        'data'    => null,
                     ], 401
                 );
             }
@@ -637,7 +637,7 @@ class AuthController extends Controller
                     [
                         'success' => false,
                         'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
-                        'data'    => []
+                        'data'    => null
                     ], 500
                 );
             }
@@ -661,7 +661,7 @@ class AuthController extends Controller
                     [
                         'success' => true,
                         'message' => 'Updated successfully',
-                        'datum'   => fractal($user, $userTransformer)
+                        'data'   => fractal($user, $userTransformer)
                     ], 200
                 );
             } else {
