@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Follower;
 use App\Helpers\ValidUserScannerPassword;
 use App\Http\Controllers\Controller;
+use App\Http\Traits\SendFCMNotification;
 use App\Http\Traits\UniversalMethods;
 use App\Notification;
 use App\Transformers\UserTransformer;
@@ -683,4 +684,15 @@ class AuthController extends Controller
         }
     }
 
+    public function testNotification()
+    {
+        $data=['message'=> 'This is a test notification'];
+        $fcm_token = User::find(25)->fcm_token;
+
+        $result = SendFCMNotification::sendNotification([$fcm_token], $data);
+
+        return response()->json([
+            'result' => $result
+        ]);
+    }
 }
