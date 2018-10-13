@@ -13,6 +13,8 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
+
+        //all passwords must have a number and a capsital letter.we have P and 0->Zero in Passw0rd
     
         User::create([
             'first_name' => 'John',
@@ -27,7 +29,7 @@ class UsersTableSeeder extends Seeder
             'fcm_token' => 0,
             'auto_follow_status' => 1,
             'app_version_code' => '1.0.0',
-            'password'   => bcrypt('password'),
+            'password'   => bcrypt('Passw0rd'),
             'created_at' =>now(),
             'updated_at' =>now(),
         ]);
@@ -45,7 +47,7 @@ class UsersTableSeeder extends Seeder
             'fcm_token' => 0,
             'auto_follow_status' => 1,
             'app_version_code' => '1.0.0',
-            'password'   => bcrypt('password'),
+            'password'   => bcrypt('Passw0rd'),
             'created_at' =>now(),
             'updated_at' =>now(),
         ]);
@@ -63,7 +65,7 @@ class UsersTableSeeder extends Seeder
             'fcm_token' => 0,
             'auto_follow_status' => 1,
             'app_version_code' => '1.0.0',
-            'password'   => bcrypt('password'),
+            'password'   => bcrypt('Passw0rd'),
             'created_at' =>'2018-09-23 11:27:35',
             'updated_at' =>'2018-09-23 10:27:35',
         ]);
@@ -81,7 +83,7 @@ class UsersTableSeeder extends Seeder
             'fcm_token' => 0,
             'auto_follow_status' => 1,
             'app_version_code' => '1.0.0',
-            'password'   => bcrypt('password'),
+            'password'   => bcrypt('Passw0rd'),
             'created_at' =>'2018-09-23 11:27:35',
             'updated_at' =>'2018-09-23 10:27:35',
         ]);
@@ -99,7 +101,7 @@ class UsersTableSeeder extends Seeder
             'fcm_token' => 0,
             'auto_follow_status' => 1,
             'app_version_code' => '1.0.0',
-            'password'   => bcrypt('password'),
+            'password'   => bcrypt('Passw0rd'),
             'created_at' =>'2018-09-24 10:27:35',
             'updated_at' =>'2018-09-21 10:27:35',
         ]);
@@ -117,7 +119,7 @@ class UsersTableSeeder extends Seeder
             'fcm_token' => 0,
             'auto_follow_status' => 1,
             'app_version_code' => '1.0.0',
-            'password'   => bcrypt('password'),
+            'password'   => bcrypt('Passw0rd'),
             'created_at' =>'2018-09-21 10:27:35',
             'updated_at' =>'2018-09-21 10:27:35',
         ]);
@@ -135,7 +137,7 @@ class UsersTableSeeder extends Seeder
             'fcm_token' => 0,
             'auto_follow_status' => 1,
             'app_version_code' => '1.0.0',
-            'password'   => bcrypt('password'),
+            'password'   => bcrypt('Passw0rd'),
             'created_at' =>'2018-09-26 10:27:35',
             'updated_at' =>'2018-09-26 10:27:35',
         ]);

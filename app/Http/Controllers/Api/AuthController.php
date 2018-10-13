@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Intervention\Image\Facades\Image;
 
 
@@ -39,27 +40,27 @@ class AuthController extends Controller
      */
     public function register_user(Request $request)
     {
-        $validator = Validator::make($request->all(),
-            [
-                'username'   => 'required|alpha_dash',
-                'first_name' => 'required|string',
-                'last_name'  => 'required|string',
-                'email'      => 'bail|required|email|unique:users,email',
-                'password'   => ['required', new ValidUserScannerPassword()],
-            ],
-            [
-                'username.required'   => 'Please provide a username',
-                'first_name.required' => 'Please provide your first name',
-                'last_name.required'  => 'Please provide your last name',
-                'email.required'      => 'Please provide your email',
-                'email.email'         => 'Email address is invalid',
-                'email.unique'        => 'The email address is already in use',
-                'password.required'   => 'Please provide a password',
-                //                'password.regex'      => 'Password must be at least 6 characters with lowercase and uppercase letters and a number',
-            ]
-        );
+            $validator = Validator::make($request->all(),
+                [
+                    'username' => 'required|alpha_dash',
+                    'first_name' => 'required|string',
+                    'last_name' => 'required|string',
+                    'email' => 'bail|required|email|unique:users,email',
+                    'password' => ['required', new ValidUserScannerPassword()],
+                ],
+                [
+                    'username.required' => 'Please provide a username',
+                    'first_name.required' => 'Please provide your first name',
+                    'last_name.required' => 'Please provide your last name',
+                    'email.required' => 'Please provide your email',
+                    'email.email' => 'Email address is invalid',
+                    'email.unique' => 'The email address is already in use',
+                    'password.required' => 'Please provide a password',
+                    //                'password.regex'      => 'Password must be at least 6 characters with lowercase and uppercase letters and a number',
+                ]
+            );
 
-        if ($validator->fails()) {
+            if ($validator->fails()) {
 
             return response()->json(
                 [
@@ -72,41 +73,150 @@ class AuthController extends Controller
             $password = bcrypt($request->password);
             $data = $request->except('password');
 
-            $data['password'] = $password;
+                $data['password'] = $password;
 
-            $user = User::create($data);
+                $user = User::create($data);
 
-            if ($user) {
+                if ($user) {
 
-                //create token for the user
-                $tokenResult = $user->createToken('Personal Access Token');
-                $token = $tokenResult->token;
-                $token->expires_at = Carbon::now()->addWeeks(1);
-                $token->save();
+                    //create token for the user
+                    $tokenResult = $user->createToken('Personal Access Token');
+                    $token = $tokenResult->token;
+                    $token->expires_at = Carbon::now()->addWeeks(1);
+                    $token->save();
 
-                $userTransformer = new UserTransformer();
-                $userTransformer->setUserId($user->id);
+                    $userTransformer = new UserTransformer();
+                    $userTransformer->setUserId($user->id);
 
-                return response()->json(
-                    [
-                        'success'      => true,
-                        'message'      => 'User Account Created Successfully. Welcome!',
-                        'data'         => fractal($user, $userTransformer),
-                        'access_token' => $tokenResult->accessToken,
-                        'expires_at'   => Carbon::parse(
-                            $tokenResult->token->expires_at
-                        )->toDateTimeString()
-                    ], 201
-                );
-            } else {
+                    return response()->json(
+                        [
+                            'success' => true,
+                            'message' => 'User Account Created Successfully. Welcome!',
+                            'data' => fractal($user, $userTransformer),
+                            'access_token' => $tokenResult->accessToken,
+                            'expires_at' => Carbon::parse(
+                                $tokenResult->token->expires_at
+                            )->toDateTimeString()
+                        ], 201
+                    );
+                } else {
+                    return response()->json(
+                        [
+                            'success' => false,
+                            'message' => 'User Account Creation Failed!',
+                            'data' => [],
+                        ], 500
+                    );
+                }
+            }
+        }
+
+    public function update_user_profile(Request $request)
+    {
+
+        try {
+            $validator = Validator::make($request->all(),
+                [
+                    'user_id'       => 'required|integer|exists:users,id',
+                    'username'      => 'required|alpha_dash',
+                    'first_name'    => 'required|string',
+                    'last_name'     => 'required|string',
+                    'year_of_birth' => 'nullable|string|before:-18 years',
+                    'profile_url'   => 'nullable|string',
+                    'gender'        => 'nullable|int',
+                    'country_id'    => 'nullable|int',
+                    'phone_number'  => ['nullable', 'string', Rule::unique('users')->ignore($request->user_id, 'id')]
+                ],
+                [
+                    'username.required'    => 'Please provide a username',
+                    'first_name.required'  => 'Please provide a first name',
+                    'last_name.required'   => 'Please provide a last name',
+                    'year_of_birth.before' => 'You must be over 18 years old',
+                    'phone_number.unique'  => 'That phone number is already in use'
+                ]
+            );
+            if ($validator->fails()) {
                 return response()->json(
                     [
                         'success' => false,
-                        'message' => 'User Account Creation Failed!',
+                        'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
+                        'data'    => []
+                    ], 200
+                );
+            } else {
+                $user_id = $request->user_id;
+
+                $username = $request->username;
+                $last_name = $request->last_name;
+                $first_name = $request->first_name;
+                $year_of_birth = $request->year_of_birth;
+                $gender = $request->gender;
+                $country_id = $request->country_id;
+                $phone_number = $request->phone_number;
+                $profile_url = $request->has('profile_url') ? $request->profile_url : null;
+
+
+                $user = User::where('id', $user_id)->first();
+
+                if ($user != null) {
+
+
+                    if ($profile_url != null) {
+                        $file_name = $user->id . "_" . uniqid() . ".png";
+                        $file_path = public_path("uploads/users/");
+
+                        if (!file_exists($file_path)) {
+                            mkdir($file_path, 0755, true);
+                        }
+
+                        Image::make($profile_url)
+                            ->save($file_path . $file_name);
+
+                        $user->profile_url = $file_name;
+                        if ($user->save()) {
+                            DB::commit();
+                        }
+                    }
+
+
+                    $user->username = $username;
+                    $user->last_name = $last_name;
+                    $user->profile_url = $profile_url;
+                    $user->first_name = $first_name;
+                    $user->year_of_birth = $year_of_birth;
+                    $user->gender = $gender;
+                    $user->country_id = $country_id;
+                    $user->phone_number = $phone_number;
+
+                    $user->save();
+                }
+
+
+                if ($user != null) {
+                    $userTransformer = new UserTransformer();
+                    $userTransformer->setUserId($user->id);
+
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Profile updated successfully',
+                        'datum'   => fractal($user, $userTransformer)
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Profile update failed...',
                         'data'    => null,
                     ], 500
-                );
+                    );
+                }
             }
+        } catch (\Exception $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Profile update failed: '.$exception->getTraceAsString(),
+                'datum' => []
+            ], 500);
+
         }
     }
 
