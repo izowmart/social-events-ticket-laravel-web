@@ -45,7 +45,8 @@ class PostController extends Controller
                 'user_id'       => 'required|exists:users,id',
                 'venue_id'      => 'required|exists:venues,id',
                 'media_type'    => 'required',
-                'type'          => 'required',
+                'media_file'    => 'required|file',
+                'feed_viewers'  => 'required',
                 'comment'       => 'sometimes|min:2',
             ],
             [
@@ -55,7 +56,8 @@ class PostController extends Controller
                 'venue_id.exists'       => 'Kindly log in to continue',
                 'media_type.required'   => 'Something is wrong with the uploaded media file!',
                 'comment.min'           => 'You comment should be at least 2 characters!',
-                'type.required'                  => "Confirm who you'd like to see your post"
+                'feed_viewers.required'                  => "Confirm who you'd like to see your post",
+
             ]
             );
 
@@ -72,7 +74,7 @@ class PostController extends Controller
         $user_id = $request->input('user_id');
         $venue_id = $request->input('venue_id');
         $media_type = $request->input('media_type');
-        $type = $request->input('type');
+        $type = $request->input('feed_viewers');
 
         $shared = $request->has('shared') ? $request->input('shared') : false ;
         $comment = $request->has('comment') ? $request->input('comment') : null;
@@ -80,13 +82,13 @@ class PostController extends Controller
 
         try {
             if ($media_type == 1) {
-                $file_name = $user_id . "_" . uniqid() . '.'.$request->file('image')->getClientOriginalExtension();;
+                $file_name = $user_id . "_" . uniqid() . '.'.$request->file('media_file')->getClientOriginalExtension();;
                 $file_path = "uploads/posts/images";
-                $success = $request->file('image')->storeAs($file_path, $file_name);
+                $success = $request->file('media_file')->storeAs($file_path, $file_name);
             } else {
-                $file_name = $user_id . "_" . uniqid() . '.'.$request->file('video')->getClientOriginalExtension();
+                $file_name = $user_id . "_" . uniqid() . '.'.$request->file('media_file')->getClientOriginalExtension();
                 $file_path = "uploads/posts/videos";
-                $success = $request->file('video')->storeAs($file_path, $file_name);
+                $success = $request->file('media_file')->storeAs($file_path, $file_name);
             }
 
 
