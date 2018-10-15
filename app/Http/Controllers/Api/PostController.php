@@ -21,10 +21,13 @@ class PostController extends Controller
     {
         try {
             $posts = Post::all();
+            $postTransformer = new PostTransformer();
+            $user_id = \request()->user()->id;
+            $postTransformer->setUserId($user_id);
             return Response::json(array(
                     "success" => true,
                     "message" => "found " . count($posts),
-                    "data" => fractal($posts, PostTransformer::class),
+                    "data" => fractal($posts, $postTransformer),
                 )
 
             );
@@ -47,7 +50,7 @@ class PostController extends Controller
                 'media_type'    => 'required',
                 'media_file'    => 'required|file',
                 'feed_viewers'  => 'required',
-                'comment'       => 'sometimes|min:2',
+                'comment'       => 'nullable|min:2',
             ],
             [
                 'user_id.required'      => 'Kindly log in to continue!',
@@ -66,7 +69,7 @@ class PostController extends Controller
                 [
                     'success' => false,
                     'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
-                    'data'    => []
+                    'datum'    => []
                 ], 200
             );
         }
@@ -104,17 +107,21 @@ class PostController extends Controller
                 $post->type = $type;
                 $post->shared = $shared;
                 $post->save();
+
+                $postTransformer = new PostTransformer();
+                $postTransformer->setUserId($user_id);
+
                 return Response::json(array(
                     "success" => true,
                     "message" => "post successfully saved",
-                    "data" => fractal($post,PostTransformer::class),
-                ));
+                    "datum" => fractal($post,$postTransformer),
+                ),200);
             } else {
                 return Response::json(array(
                     "success" => false,
                     "message" => "post not saved",
-                    "data" => [],
-                ));
+                    "datum" => [],
+                ),200);
             }
 
 
@@ -124,7 +131,7 @@ class PostController extends Controller
                 "message" => "error saving post" . $exception,
                 "data" => [],
 
-            ));
+            ),500);
         }
 
     }

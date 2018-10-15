@@ -3,11 +3,15 @@
 namespace App\Transformers;
 
 use App\Post;
+use App\User;
 use Carbon\Carbon;
 use League\Fractal\TransformerAbstract;
 
 class PostTransformer extends TransformerAbstract
 {
+    private $user_id;
+    private $user;
+
     /**
      * A Fractal transformer.
      *
@@ -24,10 +28,17 @@ class PostTransformer extends TransformerAbstract
             'created_at'        => Carbon::parse($post->created_at)->toDateTimeString(),
             'media_type'        => $post->media_type,
             'media_url'         => $post->media_url,
-            'like'              => (bool) count($post->like) == 0 ? false : true,
+            'liked'             => $this->user->likesPost($post->id),
             'shared'            => (bool) $post->shared,
             'comment'           => $post->comment,
-            'status'            => $post->status,
+            'status'            => $post->status == null ? 1 : $post->status,
         ];
     }
+
+    public function setUserId($user_id)
+    {
+        $this->user_id = $user_id;
+        $this->user = User::find($this->user_id);
+    }
+
 }
