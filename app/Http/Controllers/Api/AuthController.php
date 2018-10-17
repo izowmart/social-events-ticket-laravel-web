@@ -273,10 +273,10 @@ class AuthController extends Controller
             } else {
                 return response()->json(
                     [
-                        'success' => true,
+                        'success' => false,
                         'message' => 'Email or Password is Incorrect!',
                         'data'    => null,
-                    ], 401
+                    ], 200
                 );
             }
         }
