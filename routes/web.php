@@ -84,7 +84,7 @@ Route::group(['middleware' => 'guest'], function () {
 });
 //where the android app user is redirected to after password reset
 Route::group(['middleware' => 'web'], function () {
-    Route::get('user_home', 'HomeController@home_user');
+    Route::get('user/home', 'HomeController@home_user');
 });
 
 Route::group(['middleware' => 'scanner', 'prefix'=>'scanner'], function () {
