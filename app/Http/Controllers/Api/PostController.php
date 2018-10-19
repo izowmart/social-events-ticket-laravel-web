@@ -4,15 +4,19 @@ namespace App\Http\Controllers\Api;
 
 use App\Abuse;
 use App\Http\Resources\PostResource;
+use App\Http\Traits\SendFCMNotification;
 use App\Http\Traits\UniversalMethods;
 use App\Like;
 use App\Notification;
 use App\Post;
 use App\Transformers\PostTransformer;
+use App\Transformers\UserTransformer;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
@@ -38,6 +42,50 @@ class PostController extends Controller
                 )
 
             );
+        }
+    }
+
+    public function friends_posts(Request $request)
+    {
+        try {
+            $user = request()->user();
+
+            if ($user != null) {
+                $userTransformer = new UserTransformer();
+                $userTransformer->setUserId($user->id);
+
+                $postTransformer = new PostTransformer();
+                $postTransformer->setUserId($user->id);
+
+                //get the user followers
+                $user_following = $user->following->toArray();
+
+                //get friends shared posts
+                $posts = Post::where('shared', true)
+                    ->whereIn('id', $user_following)
+                    ->get();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Found ' . count($posts) . ' posts',
+                    'friends' => fractal($user_following, $userTransformer),
+                    'posts'   => fractal($posts, $postTransformer),
+                ],200);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Found 0 posts',
+                    'friends' => [],
+                    'posts'   => [],
+                ],200);
+            }
+        } catch ( \Exception $exception ) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed '.$exception->getMessage(),
+                'friends' => [],
+                'posts'   => [],
+            ],500);
         }
     }
 
@@ -86,12 +134,21 @@ class PostController extends Controller
         try {
             if ($media_type == 1) {
                 $file_name = $user_id . "_" . uniqid() . '.'.$request->file('media_file')->getClientOriginalExtension();;
-                $file_path = "uploads/posts/images";
-                $success = $request->file('media_file')->storeAs($file_path, $file_name);
+
+                $file_path = "posts/images/";
+
+                $image = $request->file("media_file");
+
+                $success = Storage::disk('uploads')->put($file_path.$file_name, File::get($image));
+
             } else {
                 $file_name = $user_id . "_" . uniqid() . '.'.$request->file('media_file')->getClientOriginalExtension();
-                $file_path = "uploads/posts/videos";
-                $success = $request->file('media_file')->storeAs($file_path, $file_name);
+
+                $file_path = "posts/videos/";
+
+                $video = $request->file("media_file");
+
+                $success = Storage::disk('uploads')->put($file_path.$file_name, File::get($video));
             }
 
 
@@ -174,7 +231,7 @@ class PostController extends Controller
                 [
                     'success' => false,
                     'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
-                    'data'    => []
+                    'datum'    => null
                 ], 200
             );
         }
@@ -185,6 +242,7 @@ class PostController extends Controller
         if ($report_abuse == null) {
             $post = Post::find($post_id);
             $user = User::find($user_id);
+
             $like = new Like();
             $like->user_id = $user_id;
             $like->post_id = $post_id;
@@ -198,16 +256,35 @@ class PostController extends Controller
             $notification->model_id = $post->id;
             $notification->save();
 
-            //TODO:: FCM notification for the like
+            $postTransformer = new PostTransformer();
+            $postTransformer->setUserId($user_id);
+
+            //FCM notification for the like to post owner,
+            //if the post owner is not the one who has done the liking
+            if ($user->id != $post->user_id) {
+                $recipient = User::find($post->user_id);
+
+                $token = [$recipient->fcm_token];
+
+                $data = [
+                    'message' => '' . $recipient->username . ' liked your post'
+                ];
+
+                if (count($token) > 0) {
+                    SendFCMNotification::sendNotification($token, $data);
+                }
+            }
 
             return Response::json(array(
                 "success" => true,
                 "message" => "You have liked a post",
+                'datum'  => fractal($post, $postTransformer)
             ));
         } else {
             return Response::json(array(
                 "success" => false,
                 "message" => "You had already liked this post",
+                'datum'   => null,
             ));
         }
 

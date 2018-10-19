@@ -54,6 +54,7 @@ Route::group(['prefix' => 'user', 'middleware' => 'auth:api'], function () use (
     Route::get('venues/{user_id}', $base_url . 'Api\VenueController@index');
     Route::post('follow_venue', $base_url . 'Api\VenueController@follow_venue');
     Route::get('posts/{user_id}', $base_url . 'Api\PostController@index');
+    Route::get('friends/posts', $base_url . 'Api\PostController@friends_posts');
     Route::post('posts', $base_url . 'Api\PostController@store');
     Route::post('delete_post', $base_url . 'Api\PostController@delete');
     Route::post('like_post', $base_url . 'Api\PostController@like');

@@ -25,12 +25,5 @@ class TicketCategoriesSeeder extends Seeder
             'updated_at' => now()
         ]
         );
-
-        TicketCategory::create([
-            'name'  => 'Season',
-            'created_at'    =>now(),
-            'updated_at' => now()
-        ]
-        );
     }
 }

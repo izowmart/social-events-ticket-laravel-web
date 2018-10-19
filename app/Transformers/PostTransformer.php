@@ -30,6 +30,7 @@ class PostTransformer extends TransformerAbstract
             'media_url'         => $post->media_url,
             'liked'             => $this->user->likesPost($post->id),
             'shared'            => (bool) $post->shared,
+            'friend_post'       => (bool) in_array($post->user_id,$this->user->following->toArray()),
             'comment'           => $post->comment,
             'status'            => $post->status == null ? 1 : $post->status,
         ];

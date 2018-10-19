@@ -8,6 +8,8 @@ use App\Advert;
 use App\Admin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class AdvertsController extends Controller
 {
@@ -63,11 +65,19 @@ class AdvertsController extends Controller
         //get just file name
         $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
         //get just ext
-        $extension = $request->file('image')->getClientOriginalExtension();
+
+        $image = $request->file('image');
+
+        $extension = $image->getClientOriginalExtension();
         //file name to store
         $fileNameToStore = 'advert'.'_'.time().'.'.$extension;
         //upload image
-        $path = $request->file('image')->storeAs('public/images/adverts',$fileNameToStore);
+
+        $file_path = "uploads/adverts/";
+
+        $success = Storage::disk('uploads')->put($file_path.$fileNameToStore, File::get($image));
+
+//        $path = $request->file('image')->storeAs('public/images/adverts',$fileNameToStore);
 
         //get id of curren admin
         $admin_id = Auth::guard('web_admin')->user()->id;
@@ -80,7 +90,7 @@ class AdvertsController extends Controller
         $advert->title = $request->title;
         $advert->start_date = $request->start;
         $advert->end_date = $request->stop;
-        $advert->image_url = $image_url;
+        $advert->image_url = $fileNameToStore;
         $advert->description = $request->description;
         
         $advert->save();

@@ -14,16 +14,16 @@ class DatabaseSeeder extends Seeder
     {
          $this->call(AdminsTableSeeder::class);
         $this->call(CountriesTableSeeder::class);
-         $this->call(UsersTableSeeder::class);
+//         $this->call(UsersTableSeeder::class);
          $this->call(EventOrganizerSeeder::class);
          $this->call(ScannersTableSeeder::class);
         $this->call(TownsTableSeeder::class);
         $this->call(VenuesTableSeeder::class);
-         $this->call(PostsTableSeeder::class);
-        $this->call(AbusesTableSeeder::class);
+//         $this->call(PostsTableSeeder::class);
+//        $this->call(AbusesTableSeeder::class);
         $this->call(EventsTableSeeder::class);
         $this->call(TicketCategoriesSeeder::class);
-        $this->call(NotificationTableSeeder::class);
+//        $this->call(NotificationTableSeeder::class);
 
     }
 }

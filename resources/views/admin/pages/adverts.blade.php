@@ -45,7 +45,7 @@
                     <tr class="item">
                         <td>{{str_limit($advert->title, $limit = 35, $end = '...')}}</td>
                         <td>{{ str_limit($advert->description, $limit = 60, $end = '...') }}</td>                        
-                        <td><a href="{{$advert->image_url}}" target="_blank" class="btn btn-sm btn-outline-primary">View</a></td>
+                        <td><a href="{{url("uploads/adverts/".$advert->image_url)}}" target="_blank" class="btn btn-sm btn-outline-primary">View</a></td>
                         <td>{{date("jS M Y", strtotime($advert->start_date))}}</td>
                         <td>{{date("jS M Y", strtotime($advert->end_date))}}</td>
                         <td>
