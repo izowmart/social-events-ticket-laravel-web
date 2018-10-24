@@ -238,8 +238,8 @@ class PostController extends Controller
 
         $user_id = $request->input('user_id');
         $post_id = $request->input('post_id');
-        $report_abuse = Like::where("user_id", $user_id)->where("post_id", $post_id)->first();
-        if ($report_abuse == null) {
+        $liked = Like::where("user_id", $user_id)->where("post_id", $post_id)->first();
+        if ($liked == null) {
             $post = Post::find($post_id);
             $user = User::find($user_id);
 
@@ -281,10 +281,18 @@ class PostController extends Controller
                 'datum'  => fractal($post, $postTransformer)
             ));
         } else {
+            //unlike the post
+            $liked->delete();
+
+            $post = Post::find($post_id);
+            $postTransformer = new PostTransformer();
+            $postTransformer->setUserId($user_id);
+
+
             return Response::json(array(
-                "success" => false,
-                "message" => "You had already liked this post",
-                'datum'   => null,
+                "success" => true,
+                "message" => "You had un-liked this post",
+                'datum'   => fractal($post, $postTransformer),
             ));
         }
 
