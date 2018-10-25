@@ -62,6 +62,8 @@ Route::group(['prefix' => 'user', 'middleware' => 'auth:api'], function () use (
     Route::post('report_abuse', $base_url . 'Api\PostController@report_abuse');
     Route::get('{id}/relations', $base_url . 'Api\AuthController@user_relations');
     Route::post('follow', $base_url . 'Api\AuthController@follow');
+
+    Route::post('search','Api\SearchController@index');
 });
 
 Route::group(['prefix' => 'scanner', 'middleware' => 'api'], function () use ($base_url) {
