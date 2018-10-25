@@ -58,6 +58,7 @@ Route::group(['prefix' => 'user', 'middleware' => 'auth:api'], function () use (
     Route::post('posts', $base_url . 'Api\PostController@store');
     Route::post('delete_post', $base_url . 'Api\PostController@delete');
     Route::post('like_post', $base_url . 'Api\PostController@like');
+    Route::post('posts/share', 'Api\PostController@share');
     Route::post('report_abuse', $base_url . 'Api\PostController@report_abuse');
     Route::get('{id}/relations', $base_url . 'Api\AuthController@user_relations');
     Route::post('follow', $base_url . 'Api\AuthController@follow');

@@ -3,6 +3,7 @@
 namespace App\Transformers;
 
 use App\Post;
+use App\Share;
 use App\User;
 use Carbon\Carbon;
 use League\Fractal\TransformerAbstract;
@@ -29,8 +30,8 @@ class PostTransformer extends TransformerAbstract
             'media_type'        => $post->media_type,
             'media_url'         => $post->media_url,
             'liked'             => $this->user->likesPost($post->id),
-            'shared'            => (bool) $post->shared,
-            'friend_post'       => (bool) in_array($post->user_id,$this->user->following->toArray()),
+            'shared'            => $post->shared($this->user_id),
+            'friend_post'       => $post->friends_post($this->user_id),
             'comment'           => $post->comment,
             'status'            => $post->status == null ? 1 : $post->status,
         ];

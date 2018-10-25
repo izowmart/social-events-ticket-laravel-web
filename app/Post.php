@@ -27,4 +27,17 @@ class Post extends Model
     {
         return $this->hasMany('App\Like','post_id');
     }
+
+    public function shared($user_id)
+    {
+        return Share::where('user_id', $user_id)->where('shared_id', $this->id)->exists();
+    }
+
+    //does this post belong to one that I follow
+    public function friends_post($user_id)
+    {
+        $user = User::find($user_id);
+
+        return in_array($this->id, $user->following->pluck('id')->toArray());
+    }
 }

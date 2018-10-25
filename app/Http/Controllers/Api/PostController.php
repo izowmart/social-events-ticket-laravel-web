@@ -9,11 +9,13 @@ use App\Http\Traits\UniversalMethods;
 use App\Like;
 use App\Notification;
 use App\Post;
+use App\Share;
 use App\Transformers\PostTransformer;
 use App\Transformers\UserTransformer;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
@@ -58,11 +60,10 @@ class PostController extends Controller
                 $postTransformer->setUserId($user->id);
 
                 //get the user followers
-                $user_following = $user->following->toArray();
+                $user_following = $user->following;
 
                 //get friends shared posts
-                $posts = Post::where('shared', true)
-                    ->whereIn('id', $user_following)
+                $posts = Post::whereIn('user_id', $user_following)
                     ->get();
 
                 return response()->json([
@@ -127,7 +128,7 @@ class PostController extends Controller
         $media_type = $request->input('media_type');
         $type = $request->input('feed_viewers');
 
-        $shared = $request->has('shared') ? $request->input('shared') : false ;
+//        $shared = $request->has('shared') ? $request->input('shared') : false ;
         $comment = $request->has('comment') ? $request->input('comment') : null;
         $anonymous = $request->has('anonymous') ? $request->input('anonymous') : false ;
 
@@ -162,8 +163,10 @@ class PostController extends Controller
                 $post->comment = $comment;
                 $post->anonymous = $anonymous;
                 $post->type = $type;
-                $post->shared = $shared;
+//                $post->shared = $shared;
                 $post->save();
+
+                //todo:: notify the users followers that they have new content???
 
                 $postTransformer = new PostTransformer();
                 $postTransformer->setUserId($user_id);
@@ -349,5 +352,96 @@ class PostController extends Controller
         }
     }
 
+    public function share(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(),
+                [
+                    'post_id' => 'required|integer|exists:posts,id'
+                ], [
+                    'post_id.required' => 'Kindly login in!',
+                    'post_id.integer'  => 'Kindly login in!',
+                    'post_id.exists'   => 'Kindly sign up!'
+                ]);
 
+            if ($validator->fails()) {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
+                        'datum'   => null
+                    ], 200
+                );
+            }
+
+            $post_id = $request->post_id;
+
+            //authenticated user
+            $user = request()->user();
+
+            //create new post item
+            $post = Post::find($post_id);
+
+            DB::beginTransaction();
+            $new_post = new Post();
+            $new_post->user_id = $post->user_id;
+            $new_post->venue_id = $post->venue_id;
+            $new_post->media_type = $post->media_type;
+            $new_post->media_url = $post->media_url;
+            $new_post->comment = $post->comment;
+            $new_post->anonymous = $post->anonymous;
+            $new_post->type = $post->type;
+//            $new_post->shared = true;
+            $new_post->save();
+
+            //shared record
+            $share = Share::updateOrCreate(
+                [
+                    'user_id'   => $user->id,
+                    'shared_id' => $post->id
+                ],
+                [
+                'user_id'   => $user->id,
+                'post_id'   => $new_post->id,
+                'shared_id' => $post->id
+            ]);
+
+//            $post->shared = true;
+            $post->save();
+
+            //create a notification record
+            $notification = new Notification();
+            $notification->initializer_id = $user->id;
+            $notification->recipient_id = $post->user_id;
+            $notification->type = 4;
+            $notification->model_id = $post->id;
+            $notification->save();
+
+            DB::commit();
+            //raise an FMC notification for the post owner
+            $recipient = User::find($post->user_id);
+            $data = [
+                'message' => $user->name . ' has shared your post'
+            ];
+            SendFCMNotification::sendNotification([$recipient->fcm_token], $data);
+
+
+            $postTransformer = new PostTransformer();
+            $postTransformer->setUserId($user->id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'post shared successfully!',
+                'datum' => fractal($new_post, $postTransformer),
+            ]);
+
+        } catch ( \Exception $exception ) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'post share failed '.$exception->getMessage(),
+                'datum'  => null
+            ]);
+        }
+    }
 }
