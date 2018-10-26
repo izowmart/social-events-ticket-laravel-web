@@ -48,8 +48,8 @@ class SearchController extends Controller
                 ->where(function ($query) use ($search_term) {
                     $query->where('first_name', 'like', '%' . $search_term . '%')
                         ->orWhere('last_name', 'like', '%' . $search_term . '%')
-                        ->orWhere('username', 'like', '%' . $search_term . '%')
-                        ->orwhere('email', 'like', '%' . $search_term . '%');
+                        ->orWhere('username', 'like', '%' . $search_term . '%');
+//                        ->orwhere('email', 'like', '%' . $search_term . '%');
                 })
                 ->get();
 
