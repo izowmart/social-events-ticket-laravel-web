@@ -48,7 +48,7 @@ class UserTransformer extends TransformerAbstract
 //            'follower'              => (bool) ($this->user_id == $user->id || $this->requesting_user == null ) ? false : in_array($user->id,$this->requesting_user->followers->where('status','=',1)->pluck('id')->toArray()),
 //            'pending_follow_request' => (bool) ($this->user_id == $user->id || $this->requesting_user == null ) ? false : in_array($user->id,$this->requesting_user->followers->where('status','=',2)->pluck('id')->toArray()),
 //            'followed'              => (bool) ($this->user_id == $user->id || $this->requesting_user == null ) ? false : in_array($user->id,$this->requesting_user->following->where('status','=',1)->pluck('id')->toArray()),
-            'user_relationship'     => (int) $user->getUserRelationship($this->user_id)
+            'user_relationship'     => (int) $user->getUserRelationship($this->user_id) //-1: self, 0: no relationship, 1: follows but not followed back, 2: mutual, 3: doesn't follow but followed, 4: pending request and not followed, 5: pending request and followed
         ];
     }
 

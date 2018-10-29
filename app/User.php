@@ -11,6 +11,13 @@ class User extends Authenticatable
 {
     use Notifiable, HasApiTokens;
 
+    const SELF = -1;
+    const NO_RELATIONSHIP = 0;
+    const REQUESTER_FOLLOWS_BUT_NOT_FOLLOWED_BACK= 1;
+    const REQUESTER_FOLLOWS_AND_FOLLOWED_BACK= 2;
+    const REQUESTER_DOESNT_FOLLOW_BUT_FOLLOWED= 3;
+    const REQUESTER_PENDING_FOLLOW_BUT_NOT_FOLLOWED_BACK= 4;
+    const REQUESTER_PENDING_FOLLOW_AND_FOLLOWED_BACK = 5;
     /**
      * The attributes that are mass assignable.
      *
@@ -99,30 +106,30 @@ class User extends Authenticatable
 
         if ($user_id == $this->id) {
             //this is the owner
-            return -1;
+            return $this::SELF;
         } elseif (!$my_pending_follow_requests) {
             //no pending follow requests
             if ($my_following && !$my_follower) {
                 //i follow them but they don't follow me back
-                return 1;
+                return $this::REQUESTER_FOLLOWS_BUT_NOT_FOLLOWED_BACK;
             } elseif ($my_following && $my_follower) {
                 // we both follow each other
-                return 2;
+                return $this::REQUESTER_FOLLOWS_AND_FOLLOWED_BACK;
             } elseif (!$my_following && $my_follower) {
                 //i don't follow them but they follow me
-                return 3;
+                return $this::REQUESTER_DOESNT_FOLLOW_BUT_FOLLOWED;
             }
         } elseif ($my_pending_follow_requests) {
             if (!$my_follower) {
                 //pending follow request but they don't follow me
-                return 4;
+                return $this::REQUESTER_PENDING_FOLLOW_BUT_NOT_FOLLOWED_BACK;
             } else {
                 //pending follow request and they follow me
-                return 5;
+                return $this::REQUESTER_PENDING_FOLLOW_AND_FOLLOWED_BACK;
             }
         } elseif (!$my_following && !$my_follower) {
             //no relationship
-            return 0;
+            return $this::NO_RELATIONSHIP;
         }
 
 //        return 0;
