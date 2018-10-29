@@ -668,13 +668,33 @@ class AuthController extends Controller
 
     public function index()
     {
+        $user_id = request()->user()->id;
         $users = User::all();
+
+//        $user = $users->get(3);
+//
+//        dd(
+//            [
+//                "requesting_user_id" => $user_id,
+//                "user_id" => $user->id,
+//                "following"=>$user->following->toArray(),
+//                "in following"=>$user->following->pluck('id')->toArray(),
+//                "followers"=>$user->followers->toArray(),
+//                "in followers"=>in_array($user_id,$user->followers->pluck('id')->toArray()),
+//                "pending_follow_requests" => $user->pending_follow_requests->toArray(),
+//                "in pending"=>in_array($user_id,$user->pending_follow_requests->pluck('id')->toArray()),
+//                "relationship"=>$user->getUserRelationship($user_id)
+//            ]
+//        );
+
+        $userTransformer = new UserTransformer();
+        $userTransformer->setUserId($user_id);
 
         return response()->json(
             [
                 'success' => true,
                 'message' => 'Found ' . count($users) . ' users',
-                'data'    => fractal($users, UserTransformer::class),
+                'data'    => fractal($users, $userTransformer),
             ], 200
         );
 

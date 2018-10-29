@@ -45,8 +45,10 @@ class UserTransformer extends TransformerAbstract
             'posts'                 => $user->posts->count(),
             'followers'             => $user->followers->count(),
             'following'             => $user->following->count(),
-            'follower'              => (bool) ($this->user_id == $user->id || $this->requesting_user == null ) ? false : in_array($user->id,$this->requesting_user->followers->pluck('id')->toArray()),
-            'followed'              => (bool) ($this->user_id == $user->id || $this->requesting_user == null ) ? false : in_array($user->id,$this->requesting_user->following->pluck('id')->toArray()),
+//            'follower'              => (bool) ($this->user_id == $user->id || $this->requesting_user == null ) ? false : in_array($user->id,$this->requesting_user->followers->where('status','=',1)->pluck('id')->toArray()),
+//            'pending_follow_request' => (bool) ($this->user_id == $user->id || $this->requesting_user == null ) ? false : in_array($user->id,$this->requesting_user->followers->where('status','=',2)->pluck('id')->toArray()),
+//            'followed'              => (bool) ($this->user_id == $user->id || $this->requesting_user == null ) ? false : in_array($user->id,$this->requesting_user->following->where('status','=',1)->pluck('id')->toArray()),
+            'user_relationship'     => (int) $user->getUserRelationship($this->user_id)
         ];
     }
 
