@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Abuse;
-use App\Http\Resources\PostResource;
 use App\Http\Traits\SendFCMNotification;
 use App\Http\Traits\UniversalMethods;
 use App\Like;
@@ -47,6 +46,14 @@ class PostController extends Controller
         }
     }
 
+    /**
+     * Get posts created by my following or
+     * posts shared by my following or
+     * posts that I have shared
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function friends_posts(Request $request)
     {
         try {
@@ -63,7 +70,7 @@ class PostController extends Controller
                 $user_following = $user->following;
 
                 //get friends shared posts
-                $posts = Post::whereIn('user_id', $user_following)
+                $posts = Post::whereIn('user_id', $user_following->toArray())
                     ->get();
 
                 return response()->json([
@@ -379,9 +386,10 @@ class PostController extends Controller
             //authenticated user
             $user = request()->user();
 
-            //create new post item
+            //find original post
             $post = Post::find($post_id);
 
+            //create new shared post
             DB::beginTransaction();
             $new_post = new Post();
             $new_post->user_id = $post->user_id;
@@ -391,23 +399,19 @@ class PostController extends Controller
             $new_post->comment = $post->comment;
             $new_post->anonymous = $post->anonymous;
             $new_post->type = $post->type;
-//            $new_post->shared = true;
             $new_post->save();
 
             //shared record
             $share = Share::updateOrCreate(
                 [
                     'user_id'   => $user->id,
-                    'shared_id' => $post->id
+                    'original_post_id' => $post->id
                 ],
                 [
-                'user_id'   => $user->id,
-                'post_id'   => $new_post->id,
-                'shared_id' => $post->id
-            ]);
+                'new_post_id'   => $new_post->id,
+                ]
+            );
 
-//            $post->shared = true;
-            $post->save();
 
             //create a notification record
             $notification = new Notification();
@@ -423,16 +427,19 @@ class PostController extends Controller
             $data = [
                 'message' => $user->name . ' has shared your post'
             ];
-            SendFCMNotification::sendNotification([$recipient->fcm_token], $data);
 
+            if (!empty($recipient->fcm_token)) {
+                SendFCMNotification::sendNotification([$recipient->fcm_token], $data);
+            }
 
             $postTransformer = new PostTransformer();
             $postTransformer->setUserId($user->id);
+            $data= [0=> $post, 1 => $new_post];
 
             return response()->json([
                 'success' => true,
                 'message' => 'post shared successfully!',
-                'datum' => fractal($new_post, $postTransformer),
+                'datum' => fractal($data, $postTransformer),
             ]);
 
         } catch ( \Exception $exception ) {

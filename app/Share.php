@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Share extends Model
 {
-    protected $fillable=['user_id','post_id','shared_id'];
+    protected $fillable=['user_id','original_post_id','new_post_id'];
 }

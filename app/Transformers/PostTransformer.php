@@ -26,14 +26,17 @@ class PostTransformer extends TransformerAbstract
             'id'                => $post->id,
             'username'          => $post->user->username,
             'venue'             => $post->venue->name,
-            'created_at'        => Carbon::parse($post->created_at)->toDateTimeString(),
             'media_type'        => $post->media_type,
             'media_url'         => $post->media_url,
             'liked'             => $this->user->likesPost($post->id),
             'shared'            => $post->shared($this->user_id),
+            'my_shared_post'    => $post->my_shared_post($this->user_id),
             'friend_post'       => $post->friends_post($this->user_id),
+            'original_post'     => $post->original_post(),
             'comment'           => $post->comment,
             'status'            => $post->status == null ? 1 : $post->status,
+            'created_at'        => Carbon::parse($post->created_at)->toDateTimeString(),
+            'updated_at'        => Carbon::parse($post->updated_at)->toDateTimeString(),
         ];
     }
 
