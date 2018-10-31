@@ -10,11 +10,6 @@ class VenueTransformer extends TransformerAbstract
 {
     protected  $user_id;
 
-    public function __construct($user_id)
-    {
-        $this->user_id = $user_id;
-    }
-
     /**
      * A Fractal transformer.
      *
@@ -35,8 +30,15 @@ class VenueTransformer extends TransformerAbstract
             'contact_person_phone'          => $venue->contact_person_phone,
             'status'                        => $venue->status ,
             'following'                     => $venue->followed($this->user_id) != null ? true : false,
+            'distance'                      => $venue->distance == null ? 0.00 : $venue->distance ,
             'created_at'                    => Carbon::parse($venue->created_at)->toDateTimeString(),
             'updated_at'                    => Carbon::parse($venue->updated_at)->toDateTimeString(),
         ];
     }
+
+    public function setUserId($user_id)
+    {
+        $this->user_id = $user_id;
+    }
+
 }

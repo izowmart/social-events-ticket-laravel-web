@@ -51,7 +51,7 @@ Route::group(['prefix' => 'user', 'middleware' => 'auth:api'], function () use (
     Route::get('events/{user_id}', $base_url . 'Api\EventController@index');
     Route::get('notifications/{user_id}', $base_url . 'Api\NotificationController@index');
     Route::post('notifications', $base_url . 'Api\NotificationController@markSeen');
-    Route::get('venues/{user_id}', $base_url . 'Api\VenueController@index');
+    Route::get('venues', $base_url . 'Api\VenueController@index');
     Route::post('follow_venue', $base_url . 'Api\VenueController@follow_venue');
     Route::get('posts/{user_id}', $base_url . 'Api\PostController@index');
     Route::get('friends/posts', $base_url . 'Api\PostController@friends_posts');
@@ -64,6 +64,7 @@ Route::group(['prefix' => 'user', 'middleware' => 'auth:api'], function () use (
     Route::post('follow', $base_url . 'Api\AuthController@follow');
 
     Route::post('search','Api\SearchController@index');
+    Route::post('venues/near', 'Api\VenueController@venues_near_me');
 });
 
 Route::group(['prefix' => 'scanner', 'middleware' => 'api'], function () use ($base_url) {
