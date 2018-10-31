@@ -13,10 +13,10 @@ class User extends Authenticatable
 
     const SELF = -1;
     const NO_RELATIONSHIP = 0;
-    const REQUESTER_FOLLOWS_BUT_NOT_FOLLOWED_BACK= 1;
-    const REQUESTER_FOLLOWS_AND_FOLLOWED_BACK= 2;
-    const REQUESTER_DOESNT_FOLLOW_BUT_FOLLOWED= 3;
-    const REQUESTER_PENDING_FOLLOW_BUT_NOT_FOLLOWED_BACK= 4;
+    const REQUESTER_FOLLOWS_BUT_NOT_FOLLOWED_BACK = 1;
+    const REQUESTER_FOLLOWS_AND_FOLLOWED_BACK = 2;
+    const REQUESTER_DOESNT_FOLLOW_BUT_FOLLOWED = 3;
+    const REQUESTER_PENDING_FOLLOW_BUT_NOT_FOLLOWED_BACK = 4;
     const REQUESTER_PENDING_FOLLOW_AND_FOLLOWED_BACK = 5;
     /**
      * The attributes that are mass assignable.
@@ -98,41 +98,38 @@ class User extends Authenticatable
 
     public function getUserRelationship($user_id)
     {
+        $user = User::find($user_id);
         $my_following = in_array($user_id, $this->following->pluck('id')->toArray());
         $my_follower = in_array($user_id, $this->followers->pluck('id')->toArray());
-        $my_pending_follow_requests = in_array($user_id, $this->pending_follow_requests->pluck('id')->toArray());
+        $my_sent_requests = in_array($this->id, $user->pending_follow_requests->pluck('id')->toArray());
 
-//        dd($my_following, $my_follower, $my_pending_follow_requests,$user_id == $this->id);
 
         if ($user_id == $this->id) {
-            //this is the owner
             return $this::SELF;
-        } elseif (!$my_pending_follow_requests) {
-            //no pending follow requests
-            if ($my_following && !$my_follower) {
-                //i follow them but they don't follow me back
-                return $this::REQUESTER_FOLLOWS_BUT_NOT_FOLLOWED_BACK;
-            } elseif ($my_following && $my_follower) {
-                // we both follow each other
-                return $this::REQUESTER_FOLLOWS_AND_FOLLOWED_BACK;
-            } elseif (!$my_following && $my_follower) {
-                //i don't follow them but they follow me
+        } elseif (!$my_follower && !$my_following) {
+            //not following or follower
+            if ($my_sent_requests) {
+                if (!$my_follower) {
+                    //pending follow request but they don't follow me
+                    return $this::REQUESTER_PENDING_FOLLOW_BUT_NOT_FOLLOWED_BACK;
+                } else {
+                    //pending follow request and they follow me
+                    return $this::REQUESTER_PENDING_FOLLOW_AND_FOLLOWED_BACK;
+                }
+            }else{
+                return $this::NO_RELATIONSHIP;
+            }
+        }elseif ($my_following && $my_follower){
+            return $this::REQUESTER_FOLLOWS_AND_FOLLOWED_BACK;
+        }elseif (!$my_following && $my_follower) {
+            //i follow them but they don't follow me back
+            return $this::REQUESTER_FOLLOWS_BUT_NOT_FOLLOWED_BACK;
+        }elseif ($my_following && !$my_follower){
+            //i don't follow them but they follow me
                 return $this::REQUESTER_DOESNT_FOLLOW_BUT_FOLLOWED;
-            }
-        } elseif ($my_pending_follow_requests) {
-            if (!$my_follower) {
-                //pending follow request but they don't follow me
-                return $this::REQUESTER_PENDING_FOLLOW_BUT_NOT_FOLLOWED_BACK;
-            } else {
-                //pending follow request and they follow me
-                return $this::REQUESTER_PENDING_FOLLOW_AND_FOLLOWED_BACK;
-            }
-        } elseif (!$my_following && !$my_follower) {
-            //no relationship
+        }else{
             return $this::NO_RELATIONSHIP;
         }
-
-//        return 0;
     }
 
     public function posts()

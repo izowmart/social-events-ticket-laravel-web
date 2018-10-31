@@ -668,10 +668,11 @@ class AuthController extends Controller
 
     public function index()
     {
-        $user_id = request()->user()->id;
+        $requesting_user = request()->user();
+        $user_id = $requesting_user->id;
         $users = User::all();
-
-//        $user = $users->get(3);
+//
+//        $user = $users->get(2);
 //
 //        dd(
 //            [
@@ -681,8 +682,10 @@ class AuthController extends Controller
 //                "in following"=>$user->following->pluck('id')->toArray(),
 //                "followers"=>$user->followers->toArray(),
 //                "in followers"=>in_array($user_id,$user->followers->pluck('id')->toArray()),
-//                "pending_follow_requests" => $user->pending_follow_requests->toArray(),
-//                "in pending"=>in_array($user_id,$user->pending_follow_requests->pluck('id')->toArray()),
+//                "users_pending_follow_requests" => $user->pending_follow_requests->toArray(),
+//                "in users pending"=>in_array($user_id,$user->pending_follow_requests->pluck('id')->toArray()),
+//                "my_requests_sent" => $requesting_user->pending_follow_requests->toArray(),
+//                "in my sent requests"=>in_array($user->id,$requesting_user->pending_follow_requests->pluck('id')->toArray()),
 //                "relationship"=>$user->getUserRelationship($user_id)
 //            ]
 //        );
