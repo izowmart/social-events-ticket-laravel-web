@@ -527,7 +527,7 @@ class AuthController extends Controller
                 [
                     'follower_id'             => 'required|exists:users,id',
                     'followed_id'             => 'required|exists:users,id|different:follower_id',
-                    'follow_request_response' => 'sometimes'
+                    'follow_request_response' => 'sometimes|integer'
                 ],
                 [
                     'follower_id.required'  => 'Kindly sign up',
@@ -550,7 +550,7 @@ class AuthController extends Controller
 
             $follower_id = $request->follower_id;
             $followed_id = $request->followed_id;
-            $follow_request_response = (bool)$request->follow_request_response;
+            $follow_request_response = $request->has('follow_request_response') ? $request->follow_request_response : null;
 
 //            dd($follow_request_response);
 
@@ -605,23 +605,25 @@ class AuthController extends Controller
                 if ($follow_record->status == 1) {
                     $follower->unfollows($followed_id);
                 } elseif ($follow_record->status == 2) {
-                    if ($follow_request_response == true) {
-                        $follower->approve_following($followed_id);
+                    if ($follow_request_response != null) {
+                        if ($follow_request_response == true) {
+                            $follower->approve_following($followed_id);
 
-                        //raise a follow notification for the followed user
-                        Notification::where('initializer_id', $follower_id)
-                            ->where('recipient_id', $followed_id)
-                            ->where('type', 4)
-                            ->update(
-                                [
-                                    'type'     => 3,
-                                    'model_id' => null,
-                                    'seen'     => false
-                                ]
-                            );
+                            //raise a follow notification for the followed user
+                            Notification::where('initializer_id', $follower_id)
+                                ->where('recipient_id', $followed_id)
+                                ->where('type', 4)
+                                ->update(
+                                    [
+                                        'type'     => 3,
+                                        'model_id' => null,
+                                        'seen'     => false
+                                    ]
+                                );
 
-                    } else {
-                        $follower->unfollows($followed_id);
+                        } else {
+                            $follower->unfollows($followed_id);
+                        }
                     }
                 }
             }
@@ -646,24 +648,33 @@ class AuthController extends Controller
         }
     }
 
-    public function follow_request(Request $request)
-    {
-        $validator = Validator::make($request->all(),
-            [
-                'follower_id' => 'required|exists:users,id',
-                'followed_id' => 'required|exists:users,id|different:follower_id',
-                'status'
-            ],
-            [
-                'follower_id.required'  => 'Kindly sign up',
-                'follower_id.exists'    => 'Kindly sign up!',
-                'followed_id:required'  => 'Kindly sign up!',
-                'followed_id:exists'    => 'Kindly sign up!',
-                'followed_id.different' => 'You cannot follow yourself!'
-            ]
-        );
-
-    }
+//    public function follow_request(Request $request)
+//    {
+//        $validator = Validator::make($request->all(),
+//            [
+//                'follower_id' => 'required|exists:users,id',
+//                'followed_id' => 'required|exists:users,id|different:follower_id',
+//                'action'      => 'required|integer'
+//            ],
+//            [
+//                'follower_id.required'  => 'Kindly sign up',
+//                'follower_id.exists'    => 'Kindly sign up!',
+//                'followed_id:required'  => 'Kindly sign up!',
+//                'followed_id:exists'    => 'Kindly sign up!',
+//                'followed_id.different' => 'You cannot follow yourself!'
+//            ]
+//        );
+//
+//        $action = $request->action;
+//        $follower_id = $request->follower_id;
+//        $followed_id = $request->followed_id;
+//
+//
+//
+//
+//        if (action)
+//
+//    }
 
 
     public function index()
