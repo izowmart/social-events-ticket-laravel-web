@@ -262,7 +262,7 @@ class PostController extends Controller
             $notification = new Notification();
             $notification->initializer_id = $user_id;
             $notification->recipient_id = $post->user_id;
-            $notification->type = 1;
+            $notification->type = Notification::LIKE_NOTIFICATION;
             $notification->model_id = $post->id;
             $notification->save();
 
@@ -417,7 +417,7 @@ class PostController extends Controller
             $notification = new Notification();
             $notification->initializer_id = $user->id;
             $notification->recipient_id = $post->user_id;
-            $notification->type = 4;
+            $notification->type = Notification::SHARE_NOTIFICATION;
             $notification->model_id = $post->id;
             $notification->save();
 

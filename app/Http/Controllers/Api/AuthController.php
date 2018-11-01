@@ -8,9 +8,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Traits\SendFCMNotification;
 use App\Http\Traits\UniversalMethods;
 use App\Notification;
+use App\Transformers\NotificationTransformer;
 use App\Transformers\UserTransformer;
 use App\User;
 use Carbon\Carbon;
+use function GuzzleHttp\Promise\exception_for;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -219,7 +221,6 @@ class AuthController extends Controller
 
         }
     }
-
 
     public function login_user(Request $request)
     {
@@ -498,20 +499,25 @@ class AuthController extends Controller
      */
     public function fetch_relations($user_id): array
     {
-        $user = User::findOrFail($user_id);
-        $data = [];
-        if ($user) {
-            $userTransformer = new UserTransformer();
-            $userTransformer->setUserId($user_id);
+        try {
+            $user = User::findOrFail($user_id);
+            $data = [];
+            if ($user) {
+                $userTransformer = new UserTransformer();
+                $userTransformer->setUserId($user_id);
 
-            $data =
-                [
-                    'followers' => fractal($user->followers, $userTransformer),
-                    'following' => fractal($user->following, $userTransformer)
-                ];
+                $data =
+                    [
+                        'followers' => fractal($user->followers, $userTransformer),
+                        'following' => fractal($user->following, $userTransformer)
+                    ];
+            }
+            return $data;
+        }catch (\Exception $exception){
+            logger("FAILED FETCHING USER RELATIONS FOR ID: " . $user_id . ". Reason: " .$exception->getMessage());
+            return [];
         }
 
-        return $data;
     }
 
     /**
@@ -576,11 +582,24 @@ class AuthController extends Controller
                         [
                             'initializer_id' => $follower_id,
                             'recipient_id'   => $followed_id,
-                            'type'           => 3,
+                            'type'           => Notification::FOLLOW_NOTIFICATION,
                             'model_id'       => null,
                             'seen'           => false
                         ]
                     );
+
+                    try {
+                        //send an FCM Notification
+                        $token = $followed->fcm_foken;
+
+                        $data = [
+                            'message' => $follower->username . ' started to follow you.'
+                        ];
+
+                        SendFCMNotification::sendNotification([$token], $data);
+                    } catch ( \Exception $exception ) {
+                        logger("FOLLOW FCM NOTIFICATION FAILED. Reason: " . $exception->getMessage());
+                    }
 
                 } else {
                     //raise a follow record with pending status
@@ -591,13 +610,24 @@ class AuthController extends Controller
                         [
                             'initializer_id' => $follower_id,
                             'recipient_id'   => $followed_id,
-                            'type'           => 4,
+                            'type'           => Notification::FOLLOW_REQUEST_NOTIFICATION,
                             'model_id'       => null,
                             'seen'           => false
                         ]
                     );
 
-                    //TODO:: also send them an FCM notification
+                    try {
+                        //send an FCM Notification
+                        $token = $followed->fcm_foken;
+
+                        $data = [
+                            'message' => $follower->username . ' requests to follow you.'
+                        ];
+
+                        SendFCMNotification::sendNotification([$token], $data);
+                    } catch ( \Exception $exception ) {
+                        logger("FOLLOW FCM NOTIFICATION FAILED. Reason: " . $exception->getMessage());
+                    }
 
                 }
             } //relationship exists
@@ -624,11 +654,31 @@ class AuthController extends Controller
                         } else {
                             $follower->unfollows($followed_id);
                         }
+
+                        //return a response to the followed with the updated notification records
+                        //this is because this is being requested by the followed person
+                        $notifications = Notification::where('recipient_id', '=', $followed_id)
+                            ->get();
+
+                        $data = $this->fetch_relations($followed_id);
+                        $data['notifications'] = fractal($notifications,
+                            new NotificationTransformer())->withResourceName('notifications');
+
+                        return response()->json([
+                            'success'   => true,
+                            'message'   => 'Successfully updated your network!',
+                            'data'      => $data
+                        ]);
                     }
                 }
             }
 
+
+            //return the response for when a relationship didn't exist
             $data = $this->fetch_relations($follower_id);
+            $notifications = Notification::where('recipient_id','=',$follower_id)
+                ->get();
+            $data['notifications'] = fractal($notifications, new NotificationTransformer())->withResourceName('notifications');
 
             return response()->json(
                 [
@@ -637,6 +687,7 @@ class AuthController extends Controller
                     'data'    => $data,
                 ]
             );
+
         } catch ( \Exception $exception ) {
             return response()->json(
                 [
