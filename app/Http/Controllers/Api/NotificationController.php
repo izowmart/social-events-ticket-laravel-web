@@ -6,6 +6,8 @@ use App\Http\Resources\NotificationResource;
 use App\Http\Traits\UniversalMethods;
 use App\Notification;
 use App\Transformers\NotificationTransformer;
+use App\Transformers\UserTransformer;
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Response;
@@ -17,10 +19,23 @@ class NotificationController extends Controller
     {
         try {
             $notifications = Notification::where('recipient_id', $user_id)->get();
+
+            $user_ids = $notifications->pluck('initializer_id')->toArray();
+
+            $users = User::whereIn('id', $user_ids)->get();
+
+            $userTransformer = new UserTransformer();
+            $userTransformer->setUserId($user_id);
+
+            $data = [
+                'notifications' => fractal($notifications,NotificationTransformer::class),
+                'users'         => fractal($users,$userTransformer)
+            ];
+
             return Response::json(array(
                     "success" => true,
                     "message" => "found " . count($notifications),
-                    "data" => fractal($notifications,NotificationTransformer::class),
+                    "data" => $data,
                 )
 
             );
