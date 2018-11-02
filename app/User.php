@@ -146,4 +146,10 @@ class User extends Authenticatable
     {
         return in_array($post_id, $this->likedPosts->pluck('post_id')->toArray());
     }
+
+    public function original_posts()
+    {
+        return $this->posts()->leftJoin('shares','posts.id','=','shares.new_post_id')
+            ->whereNull('shares.new_post_id');
+    }
 }

@@ -42,7 +42,7 @@ class UserTransformer extends TransformerAbstract
             'is_first_time_login'   => (bool) $user->first_time_login,
             'created_at'            => Carbon::parse($user->created_at)->toDateTimeString(),
             'updated_at'            => Carbon::parse($user->updated_at)->toDateTimeString(),
-            'posts'                 => $user->posts->count(),
+            'posts'                 => $user->original_posts->count(),
             'followers'             => $user->followers->count(),
             'following'             => $user->following->count(),
 //            'follower'              => (bool) ($this->user_id == $user->id || $this->requesting_user == null ) ? false : in_array($user->id,$this->requesting_user->followers->where('status','=',1)->pluck('id')->toArray()),
