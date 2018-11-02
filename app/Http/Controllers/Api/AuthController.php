@@ -500,7 +500,9 @@ class AuthController extends Controller
     public function fetch_relations($user_id): array
     {
         try {
-            $user = User::findOrFail($user_id);
+//            $user = User::findOrFail($user_id);
+            $user = User::with(['followers','following'])->where('id','=',$user_id)->first();
+
             $data = [];
             if ($user) {
                 $userTransformer = new UserTransformer();

@@ -26,6 +26,7 @@ class PostTransformer extends TransformerAbstract
             'id'                => $post->id,
             'username'          => $post->user->username,
             'venue'             => $post->venue->name,
+            'venue_id'          => $post->venue->id,
             'media_type'        => $post->media_type,
             'media_url'         => $post->media_url,
             'liked'             => $this->user->likesPost($post->id),
