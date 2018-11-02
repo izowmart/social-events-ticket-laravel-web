@@ -25,6 +25,7 @@ class PostTransformer extends TransformerAbstract
         return [
             'id'                => $post->id,
             'username'          => $post->user->username,
+            'creator_id'        => $post->user->id,
             'venue'             => $post->venue->name,
             'venue_id'          => $post->venue->id,
             'media_type'        => $post->media_type,

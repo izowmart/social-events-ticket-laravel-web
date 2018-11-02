@@ -413,23 +413,28 @@ class PostController extends Controller
             );
 
 
-            //create a notification record
-            $notification = new Notification();
-            $notification->initializer_id = $user->id;
-            $notification->recipient_id = $post->user_id;
-            $notification->type = Notification::SHARE_NOTIFICATION;
-            $notification->model_id = $post->id;
-            $notification->save();
+            //if sharing user is not the creator of the post,
+            //notify the creator of the share...
+            if($user->id != $post->user->id) {
 
-            DB::commit();
-            //raise an FMC notification for the post owner
-            $recipient = User::find($post->user_id);
-            $data = [
-                'message' => $user->name . ' has shared your post'
-            ];
+                //create a notification record
+                $notification = new Notification();
+                $notification->initializer_id = $user->id;
+                $notification->recipient_id = $post->user_id;
+                $notification->type = Notification::SHARE_NOTIFICATION;
+                $notification->model_id = $post->id;
+                $notification->save();
 
-            if (!empty($recipient->fcm_token)) {
-                SendFCMNotification::sendNotification([$recipient->fcm_token], $data);
+                DB::commit();
+                //raise an FMC notification for the post owner
+                $recipient = User::find($post->user_id);
+                $data = [
+                    'message' => $user->name . ' has shared your post'
+                ];
+
+                if (!empty($recipient->fcm_token)) {
+                    SendFCMNotification::sendNotification([$recipient->fcm_token], $data);
+                }
             }
 
             $postTransformer = new PostTransformer();
