@@ -73,7 +73,7 @@ class AdvertsController extends Controller
         $fileNameToStore = 'advert'.'_'.time().'.'.$extension;
         //upload image
 
-        $file_path = "uploads/adverts/";
+        $file_path = "/adverts/";
 
         $success = Storage::disk('uploads')->put($file_path.$fileNameToStore, File::get($image));
 
