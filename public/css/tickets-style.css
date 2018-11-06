@@ -111,3 +111,101 @@
 .details-description{
   margin-right: 40px;
 }
+
+/*tickets css*/
+
+
+
+.tickets-content
+
+{
+
+  width:800px;
+
+  height:auto;
+
+  border:1px solid #000;
+
+  
+
+}
+
+.tickets-content h1{
+
+  text-align: center;
+
+}
+
+.tickets-content p{
+
+  /*margin-top: 20px;*/
+
+  font-size: 20px;
+
+  font-weight: bold;
+
+}
+
+.tickets-qr
+
+{
+
+  float: left;
+
+  padding-right: 60px;
+
+}
+
+.ticket-position
+
+{
+
+  padding-top: 30px;
+
+  margin-left: 250px;
+
+
+
+}
+
+.ticket-sponsors {
+
+  height: 100px;
+
+  width: auto;
+
+  padding-top: 10px;
+
+}
+
+.ticket-info {
+
+  padding-top: 20px;
+
+}
+
+.ticket-end
+
+{
+
+  padding-bottom: 10px;
+
+}
+
+.ticket-powered-by
+
+{
+
+  font-size: 20px;
+
+  padding-left: 300px; 
+
+}
+
+.row {
+
+  width: 100%;
+
+}
+
+
