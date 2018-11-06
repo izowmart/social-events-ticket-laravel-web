@@ -42,8 +42,25 @@ return [
         ],
 
         'api' => [
-            'driver' => 'token',
+            'driver' => 'passport',
             'provider' => 'users',
+        ],
+
+        //Our admin custom driver.
+        'web_admin' => [
+            'driver' => 'session',
+            'provider' => 'admins',
+        ],
+        //Our event_organizer custom driver.
+        'web_event_organizer' => [
+            'driver' => 'session',
+            'provider' => 'event_organizers',
+        ],
+
+        //our scanners custom driver
+        'scanner' =>[
+            'driver' => 'session',
+            'provider' => 'scanners',
         ],
     ],
 
@@ -74,6 +91,22 @@ return [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
+        //admin user provider
+        'admins' => [
+            'driver' => 'eloquent',  //We are using eloquent model
+            'model' => App\Admin::class,
+        ],
+        //event_organizer user provider
+        'event_organizers' => [
+            'driver' => 'eloquent',  //We are using eloquent model
+            'model' => App\EventOrganizer::class,
+        ],
+
+        //scanners provider
+        'scanners' => [
+            'driver' => 'eloquent',
+            'model'     => App\Scanner::class,
+        ],
     ],
 
     /*
@@ -96,6 +129,31 @@ return [
             'provider' => 'users',
             'table' => 'password_resets',
             'expire' => 60,
+        ],
+        //admin password broker
+       'admins' => [
+            //user provider for admin
+           'provider' => 'admins',
+            //table to store password reset tokens for admin
+           'table' => 'password_resets',
+           //expire time for these tokens in minutes
+           'expire' => 60,
+       ],
+       //event organizer password broker
+       'event_organizers' => [
+            //user provider for event organizer
+           'provider' => 'event_organizers',
+            //table to store password reset tokens for event organizer
+           'table' => 'password_resets',
+           //expire time for these tokens in minutes
+           'expire' => 60,
+       ],
+
+        //scanners
+        'scanners' => [
+            'provider' => 'scanners',
+            'table'     => 'scanners_password_resets',
+            'expire'    => 60,
         ],
     ],
 
