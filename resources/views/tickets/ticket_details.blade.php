@@ -246,7 +246,11 @@
                                                                     body: JSON.stringify(params),
                                                                     mode: 'cors'
                                                                 }).then(response => response.json())}
-                                                                encrypt().then(response => {
+
+                                                                // this closes the modal with its overlay
+                                                                $('#exampleModal').modal('toggle');
+
+                                                             encrypt().then(response => {
                                                                                  console.log("response: "+JSON.stringify(response));
                                                                 MulaCheckout.renderMulaCheckout({merchantProperties: response, checkoutType: 'modal'})
 

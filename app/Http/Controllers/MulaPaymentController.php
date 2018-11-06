@@ -6,9 +6,12 @@ use App\Event;
 use App\Http\Traits\UniversalMethods;
 use App\PaymentRequest;
 use App\PaymentResponse;
+use App\Ticket;
 use App\TicketCustomer;
+use App\TicketPurchaseRequest;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class MulaPaymentController extends Controller
@@ -30,7 +33,7 @@ class MulaPaymentController extends Controller
     }
 
     /**
-     * we need to pass 
+     * we need to pass
      * event_id, event_ticket_cattegory_id & its no of ticke
      */
 
@@ -39,50 +42,49 @@ class MulaPaymentController extends Controller
         $data_array = [];
 
       
-       parse_str($request->getContent(),$data);
+       parse_str($request->getContent(),$data_array);
 
-       return response()->json(['data_array'=> $data_array]);
+//       return response()->json(['data_array'=> $data_array]);
 
     //    dd($request->all());
-    //    $validator = Validator::make($data_array, [
-    //         'first_name'=>'required',
-    //         'last_name'=>'required',            
-    //         'email'=>'required',
-    //         'phone'=>'required',
-    //         'event_id'=>'required',
-    //         'subtotal'=>'required',
-    //         'ticket_sale_end_date_time'=>'required'
-    //     ]); 
+        $validator = Validator::make($data_array, [
+             'first_name'=>'required|string',
+             'last_name'=>'required|string',
+             'email'=>'required|email',
+             'phone'=>'required',
+             'event_id'=>'required|integer',
+             'subtotal'=>'required|integer',
+             'ticket_sale_end_date_time'=>'required'
+         ]);
 
-    //     if($validator->fails()){
+         if($validator->fails()){
+             return redirect()->back()->withInput()->withErrors($validator->errors());
+         }
+//             return response()->json([
+//                 'message' => 'failed because of '.UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray())
+//             ]);
+//         }
 
-    //         return redirect()->back()->withInput();
-    //     }
-        //     return response()->json([
-        //         'message' => 'failed because of '.UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray())
-        //     ]);
-        // }
+        $user = User::where('email',$data_array['email'])->first();
+        $ticket_customer = TicketCustomer::updateOrCreate(
+            [
+                'email'         => $data_array['email'],
+            ],
+            [
+                'phone_number'  => UniversalMethods::formatPhoneNumber($data_array['phone']),
+                'first_name'    => $data_array['first_name'],
+                'last_name'     => $data_array['last_name'],
+                'user_id'       => $user != null ? $user->id : 0,
+            ]
+        );
 
-
-        $ticket_customer = new TicketCustomer;
-        $ticket_customer->first_name = $data_array['first_name'];
-        $ticket_customer->last_name = $data_array['last_name'];        
-        $ticket_customer->email = $data_array['email'];
-        $ticket_customer->phone_number = $data_array['phone'];
-        if($user = User::where('email',$data_array['email'])->first()!==null){
-            $ticket_customer->user_id = $user->id;
-        }
-        $ticket_customer->save();
-
-
-        $event_id = $request->event_id;
-        // $ticket_customer_id = $data_array['customer_id'];
+        $event_id = $data_array['event_id'];
 
         $event = Event::find($event_id);
-         $ticket_customer = TicketCustomer::find($ticket_customer_id);
+//        $ticket_customer = TicketCustomer::find($ticket_customer->id);
 
         $payload = [
-            "merchantTransactionID" => now()->timestamp."". uniqid(),
+            "merchantTransactionID" => now()->timestamp . "" . uniqid(),
             "customerFirstName"     => $ticket_customer->first_name,
             "customerLastName"      => $ticket_customer->last_name,
             "MSISDN"                => UniversalMethods::formatPhoneNumber($ticket_customer->phone_number),
@@ -104,9 +106,11 @@ class MulaPaymentController extends Controller
         //attach a pending payment request
         PaymentRequest::create([
             'merchantTransactionID'     => $payload['merchantTransactionID'],
-            'MSISDN'                    =>$payload['MSISDN'],
-            'customerEmail'             => $payload['customerEmail'],
-            'amount'                    => $payload['amount']
+            'amount'                    => $payload['amount'],
+            'ticket_customer_id'        => $ticket_customer->id,
+            'vip_quantity'              => $data_array['vip_quantity'],
+            'regular_quantity'          => $data_array['regular_quantity'],
+            'event_id'                  => $event_id
         ]);
 
         //The encryption method to be used
@@ -152,15 +156,12 @@ class MulaPaymentController extends Controller
             //confirm whether the payment should be accepted or not
             //check whether the MSISDN is recognized
             $pending_payment_request = PaymentRequest::where('merchantTransactionID', $result->merchantTransactionID)
-                ->where('MSISDN', UniversalMethods::formatPhoneNumber($result->MSISDN))
+//                ->where('MSISDN', UniversalMethods::formatPhoneNumber($result->MSISDN))
                 ->where('amount','=', $result->amountPaid)
-                ->where('pending', true)
+                ->where('payment_request_status', '=',0)
                 ->first();
 
             if ($pending_payment_request != null) {
-
-                //TODO:: create an tickets record and capture
-                //TODO:: ticket_customer_id, event_ticket_category_id, number_of_tickets
 
                 //accept the payment
                 return response()->json([
@@ -197,14 +198,47 @@ class MulaPaymentController extends Controller
     public function success(Request $request)
     {
         try {
-            $payload = $request->getContent();
+//            $payload = $request->getContent();
+
+//            return response()->json([$payload,$payload['merchantTransactionID']);
             //save the response to the db
             PaymentResponse::create([
                 'type'     => 'success',
-                'response' => $payload
+                'response' => $request->getContent()
             ]);
+
+            /**
+             * TODO: 1. update the pending payment request record
+             * TODO: 2. create a tickets record against that event
+             * TODO: 3. generate and email tickets (with branding) as pdf attachment(s)
+             * TODO: 4. create image for the tickets for the mobile app ?? do a table for that holds the url for this??
+             *
+             *
+             */
+
+            //update the pending payment request record
+            $pending_payment_request = PaymentRequest::where('merchantTransactionID', $request->merchantTransactionID)
+//                ->where('MSISDN', UniversalMethods::formatPhoneNumber($payload->MSISDN))
+                ->where('amount','=', $request->amountPaid)
+                ->where('payment_request_status', '=',0)
+                ->first();
+
+            $pending_payment_request->payment_request_status = 1;
+            $pending_payment_request->save();
+
+
+            //create a tickets record against that event
+            Ticket::create([
+                'event_id'              => $pending_payment_request->event_id,
+                'ticket_customer_id'    => $pending_payment_request->ticket_customer_id,
+                'bought_tickets_count'  => $pending_payment_request->vip_quantity+$pending_payment_request->regular_quantity
+            ]);
+
+            //TODO: 3. generate and email tickets (with branding) as pdf attachment(s)
+            //TODO: 4. create image for the tickets for the mobile app ?? do a table for that holds the url for this??
+
             //log the payment
-            logger("PAYMENT SUCCESS::  " . $payload);
+            logger("PAYMENT SUCCESS::  " .  $request->getContent());
 
             //display a success message to the user
             return view('payments.success');

@@ -19,7 +19,7 @@ class CreateTicketsTable extends Migration
             $table->foreign('ticket_customer_id')->references('id')->on('ticket_customers');
             $table->integer('event_id')->unsigned();
             $table->foreign('event_id')->references('id')->on('events');
-            $table->boolean('scan_status')->default(false);
+            $table->integer('bought_tickets_count');
             $table->timestamps();
         });
     }

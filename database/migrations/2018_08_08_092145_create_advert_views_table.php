@@ -19,7 +19,7 @@ class CreateAdvertViewsTable extends Migration
             $table->foreign('advert_id')->references('id')->on('adverts');
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
-            $table->integer('count')->default(1);
+            $table->double('duration',10,2)->default(0.00);
             $table->timestamps();
         });
     }
