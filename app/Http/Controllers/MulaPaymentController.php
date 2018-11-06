@@ -207,38 +207,20 @@ class MulaPaymentController extends Controller
                 'response' => $request->getContent()
             ]);
 
-            /**
-             * TODO: 1. update the pending payment request record
-             * TODO: 2. create a tickets record against that event
-             * TODO: 3. generate and email tickets (with branding) as pdf attachment(s)
-             * TODO: 4. create image for the tickets for the mobile app ?? do a table for that holds the url for this??
-             *
-             *
-             */
+            //log the payment
+            logger("PAYMENT SUCCESS::  " .  $request->getContent());
+
 
             //update the pending payment request record
-            $pending_payment_request = PaymentRequest::where('merchantTransactionID', $request->merchantTransactionID)
-//                ->where('MSISDN', UniversalMethods::formatPhoneNumber($payload->MSISDN))
-                ->where('amount','=', $request->amountPaid)
-                ->where('payment_request_status', '=',0)
-                ->first();
-
-            $pending_payment_request->payment_request_status = 1;
-            $pending_payment_request->save();
+            $pending_payment_request = $this->approvePendingPaymentRequest($request);
 
 
             //create a tickets record against that event
-            Ticket::create([
-                'event_id'              => $pending_payment_request->event_id,
-                'ticket_customer_id'    => $pending_payment_request->ticket_customer_id,
-                'bought_tickets_count'  => $pending_payment_request->vip_quantity+$pending_payment_request->regular_quantity
-            ]);
+            $this->createTickets($pending_payment_request);
 
             //TODO: 3. generate and email tickets (with branding) as pdf attachment(s)
             //TODO: 4. create image for the tickets for the mobile app ?? do a table for that holds the url for this??
 
-            //log the payment
-            logger("PAYMENT SUCCESS::  " .  $request->getContent());
 
             //display a success message to the user
             return view('payments.success');
@@ -260,8 +242,13 @@ class MulaPaymentController extends Controller
             //log the payment
             logger("PAYMENT FAILURE::  " . $payload);
 
+            //update the pending payment request record with failed status
+            $this->declinePendingPaymentRequest($request);
+
+
             //display a success message to the user
             return view('payments.failure');
+
         } catch ( \Exception $exception ) {
             logger("PAYMENT FAILURE error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
         }
@@ -281,6 +268,16 @@ class MulaPaymentController extends Controller
             ]);
             //log the payment
             logger("PAYMENT SUCCESS::  " . $payload);
+
+            //approve the pending payment request
+            $approved_pending_payment_request = $this->approvePendingPaymentRequest($request);
+
+            //raise tickets for the user
+            $this->createTickets($approved_pending_payment_request);
+
+            //TODO: 3. generate and email tickets (with branding) as pdf attachment(s)
+            //TODO: 4. create image for the tickets for the mobile app ?? do a table for that holds the url for this??
+
 
             //display a success message to the user
             return view('payments.mobile_success');
@@ -302,10 +299,67 @@ class MulaPaymentController extends Controller
             //log the payment
             logger("PAYMENT FAILURE::  " . $payload);
 
+            //update the pending payment request record with failed status
+            $this->declinePendingPaymentRequest($request);
+
             //display a success message to the user
             return view('payments.mobile_failure');
         } catch ( \Exception $exception ) {
             logger("PAYMENT FAILURE error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
         }
     }
+    /* end monile methods*/
+
+    /**
+     * Helper methods
+     */
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return mixed
+     */
+    public function approvePendingPaymentRequest(Request $request)
+    {
+        $pending_payment_request = PaymentRequest::where('merchantTransactionID', $request->merchantTransactionID)
+//                ->where('MSISDN', UniversalMethods::formatPhoneNumber($payload->MSISDN))
+            ->where('amount', '=', $request->amountPaid)
+            ->where('payment_request_status', '=', 0)
+            ->first();
+
+        $pending_payment_request->payment_request_status = 1;
+        $pending_payment_request->save();
+
+        return $pending_payment_request;
+    }
+
+    /**
+     * @param $pending_payment_request
+     */
+    public function createTickets($pending_payment_request): void
+    {
+        Ticket::create([
+            'event_id'             => $pending_payment_request->event_id,
+            'ticket_customer_id'   => $pending_payment_request->ticket_customer_id,
+            'bought_tickets_count' => $pending_payment_request->vip_quantity + $pending_payment_request->regular_quantity
+        ]);
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     */
+    public function declinePendingPaymentRequest(Request $request): void
+    {
+        $pending_payment_request = PaymentRequest::where('merchantTransactionID', $request->merchantTransactionID)
+//                ->where('MSISDN', UniversalMethods::formatPhoneNumber($payload->MSISDN))
+            ->where('amount', '=', $request->amountPaid)
+            ->where('payment_request_status', '=', 0)
+            ->first();
+
+        $pending_payment_request->payment_request_status = 2;
+        $pending_payment_request->save();
+    }
+
+
+
+    /* end helper methods */
 }
