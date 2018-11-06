@@ -190,11 +190,7 @@
                 var get_quantity = $("#"+quantity).val();
                 var get_total_price = get_price * get_quantity;
                 $("#"+total).text(get_total_price);
-                // var subtotal = $("#subtotal").val();
-                // main_total = (eval(main_total)-eval(subtotal)) +  eval(get_total_price);
-                // console.log("cal: "+main_total);
-                // $("#subtotal").val(Number(subtotal+get_total_price));
-                // $("#subtotal").val(main_total));
+
                 // iterate through each td based on class and add the values
                 var sum = 0;
                 $(".total").each(function() {
