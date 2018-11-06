@@ -223,3 +223,4 @@ Route::group(['prefix' => 'tickets'], function () {
     Route::get('{slug}', 'TicketsController@show')->name('ticket_details');
     
 });
+Route::get('display-tickets', 'TicketsController@displayTickets')->name('display-tickets');

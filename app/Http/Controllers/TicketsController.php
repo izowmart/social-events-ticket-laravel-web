@@ -64,4 +64,9 @@ class TicketsController extends Controller
 
 
     }
+
+    public function displayTickets()
+    {
+        return view('tickets.display-tickets');
+    }
 }
