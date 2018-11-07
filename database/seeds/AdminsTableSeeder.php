@@ -13,10 +13,10 @@ class AdminsTableSeeder extends Seeder
     public function run()
     {
         Admin::create([
-            'first_name' => 'John',
-            'last_name'  => 'Admin',
-            'email'      => 'johdoe@gmail.com',
-            'password'   => bcrypt('password')
+            'first_name' => 'Admin',
+            'last_name'  => 'User',
+            'email'      => 'info@fikaplaces.com',
+            'password'   => bcrypt('1nfoFIKAplac3s')
         ]);
     }
 }

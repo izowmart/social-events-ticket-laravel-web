@@ -15,8 +15,8 @@ class EventOrganizerSeeder extends Seeder
         EventOrganizer::create([
             'first_name' => 'John',
             'last_name'  => 'Organizer',
-            'email'      => 'johdoe@gmail.com',
-            'password'   => bcrypt('password')
+            'email'      => 'info@fikaplaces.com',
+            'password'   => bcrypt('1nfoFIKAplac3s')
         ]);
     }
 }
