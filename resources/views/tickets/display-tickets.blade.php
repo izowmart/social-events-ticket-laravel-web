@@ -1,12 +1,6 @@
 @extends('tickets.layouts')
 
 @section('content')
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8">
-</head>
-<body>
 	<!-- //the ticket -->
 	<div class="ticket-position">
 		<div class="tickets-content">
@@ -60,7 +54,5 @@
 			<p class="ticket-powered-by">Powered by FIKA Places <img class="ticket-sponsors" src="FikaIconWhite120x120.jpg"></p>
 		</div>
 	</div>
-</body>
-</html>
 @endsection
 
