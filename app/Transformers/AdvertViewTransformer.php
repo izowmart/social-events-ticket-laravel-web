@@ -20,7 +20,7 @@ class AdvertViewTransformer extends TransformerAbstract
         return [
             'advert_id' => $advertView->advert_id,
             'user_id'   => $advertView->user_id
-        ]
+        ];
     }
 
 }
