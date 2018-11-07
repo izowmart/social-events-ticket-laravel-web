@@ -34,4 +34,14 @@ class HomeController extends Controller
         return view('scanner.home');
     }
 
+    public function showPrivacyPolicy()
+    {
+        return view('privacy-policy');
+    }
+
+    public function showTermsAndConditions()
+    {
+        return view('terms-and-conditions');
+    }
+
 }

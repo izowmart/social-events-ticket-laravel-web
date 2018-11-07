@@ -223,4 +223,9 @@ Route::group(['prefix' => 'tickets'], function () {
     Route::get('{slug}', 'TicketsController@show')->name('ticket_details');
     
 });
+
 Route::get('display-tickets', 'TicketsController@displayTickets')->name('display-tickets');
+
+//Terms and conditions pages
+Route::get('terms-and-conditions', 'HomeController@showTermsAndConditions')->name('terms-and-conditions');
+Route::get('privacy-policy', 'HomeController@showPrivacyPolicy')->name('privacy-policy');
