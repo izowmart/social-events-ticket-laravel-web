@@ -44,7 +44,7 @@ class VenuesController extends Controller
     {
         $towns = Town::orderBy('name','asc')->get();
         return view('admin.pages.add_venue')->with('towns',$towns); 
-    }
+    } 
 
     public function showEditForm($slug)
     {
@@ -67,18 +67,39 @@ class VenuesController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all());
         
-        $this->validate($request, [
-            'venue_name'=>'required',
-            'longitude'=>'required',
-            'latitude'=>'required',
-            'town_id'=>'required',
-            'contact_person_name'=>'required',
-            'contact_person_phone'=>'required',
-            'contact_person_email'=>'required'
-        ]); 
+        if($request->hasFile('venue_image'))
+        {
 
-        
+            $this->validate($request, [
+                'venue_name'=>'required',
+                'longitude'=>'required',
+                'latitude'=>'required',
+                'town_id'=>'required',
+                'contact_person_name'=>'required',
+                'contact_person_phone'=>'required',
+                'contact_person_email'=>'required',
+                'venue_image' => 'image: jpg,png,jpeg',
+            ]); 
+
+            $name = $request->file('venue_image')->getClientOriginalName();
+            $filename = time().'_'. $name;
+            $request->file('venue_image')->move('venue_images', $filename);
+        }
+        else
+        {
+            $filename = 'pin.jpeg';
+            $this->validate($request, [
+                'venue_name'=>'required',
+                'longitude'=>'required',
+                'latitude'=>'required',
+                'town_id'=>'required',
+                'contact_person_name'=>'required',
+                'contact_person_phone'=>'required',
+                'contact_person_email'=>'required',
+            ]); 
+        }
         $venue = new Venue();
         $venue->name = $request->venue_name;
         $venue->town_id = $request->town_id;
@@ -87,10 +108,11 @@ class VenuesController extends Controller
         $venue->contact_person_name = $request->contact_person_name;
         $venue->contact_person_phone = $request->contact_person_phone;
         $venue->contact_person_email = $request->contact_person_email;
+        $venue->venue_image = $filename;
         
         $venue->save();
 
-        //Give message to admin after successfull registration
+        //Give message to admin after successful registration
         $request->session()->flash('status', 'Venue added successfully');
         return redirect($this->redirectPath);
     } 
