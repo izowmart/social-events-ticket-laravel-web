@@ -66,8 +66,10 @@ class EventsController extends Controller
             'description'=>'required',            
             'location'=>'required',
             'type'=>'required',
-            'image'=>'image',
+            'image'=>'image|mimes:jpg,jpeg,png,gif',
         ]); 
+
+        // dd($request->all());
 
         //check if its paid event and validate required fields
         // if($request->type==2){
@@ -146,7 +148,12 @@ class EventsController extends Controller
 
         //Give message after successfull operation
         $request->session()->flash('status', 'Event added successfully');
-        return redirect($this->EventOrganizerUnverifiedredirectPath);
+        if($request->type==1){
+            //if free event
+            return redirect($this->EventOrganizerFreeredirectPath);
+        }else{
+            return redirect($this->EventOrganizerUnverifiedredirectPath);
+        }
 
     }
 
@@ -157,6 +164,7 @@ class EventsController extends Controller
             'description'=>'required',            
             'location'=>'required',
             'type'=>'required',
+            'image'=>'nullable|image|mimes:jpg,jpeg,png,gif',
         ]); 
 
         //check if its paid event and validate required fields
