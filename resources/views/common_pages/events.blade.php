@@ -1,5 +1,9 @@
 @extends('common_pages.layouts')
 
+@section('styles')    
+<link type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css" rel="stylesheet">
+@endsection
+
 @section('content')
     @include('includes.header')
     @include('includes.side-menu')
@@ -36,6 +40,7 @@
                     <th>Name</th>
                     <th>Location</th>                   
                     <th>Type</th>
+                    <th>Image</th>
                     @if ($type!=='free')
                     <th>Status</th>                        
                     @endif
@@ -60,7 +65,14 @@
                             @else                                
                                 {{'paid'}}
                             @endif
-                        </td>    
+                        </td>   
+                        <td>
+                            <div class="zoom-gallery">
+                                <a href="{{ asset('storage/images/events/'.$event->media_url)}}" data-source="{{ asset('storage/images/events/'.$event->media_url)}}" class="btn btn-sm btn-outline-primary" data-info="{{$event->id}}">
+                                    View
+                                </a>
+                            </div>
+                        </td> 
                         @if ($type!=='free')                                           
                         <td>
                             @if ($event->status==1)
@@ -150,6 +162,7 @@
 });</script>
 <script type="text/javascript" src="{{ asset('js/plugins/bootstrap-notify.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/plugins/sweetalert.min.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js"></script>
 <script>
   function deleteBtn(id) {    
     swal({
@@ -170,6 +183,18 @@
       		
       	});
   }
+  $(document).ready(function() {
+      $('.zoom-gallery').magnificPopup({
+          delegate: 'a',
+          type: 'image',
+          closeOnContentClick: false,
+          closeBtnInside: false,
+          mainClass: 'mfp-with-zoom mfp-img-mobile',
+          image: {
+              verticalFit: true
+          }            
+      });
+  });
   
 </script>
 @if (session('status'))

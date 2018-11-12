@@ -287,14 +287,14 @@ class EventsController extends Controller
     public function Unverifiedindex(){
         $user = $this->CheckUserType();
         if($user=="Admin"){
-            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.id as event_organizer_id','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','events.media_url','event_organizers.id as event_organizer_id','event_organizers.first_name','event_organizers.last_name')
                     ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
                     ->where('events.status',0)
                     ->get();
         }else{
             //we will search for events that belong to current event organizer only
             $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.media_url','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
                     ->where('events.status',0)
                     ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
                     ->where('events.event_organizer_id',$event_organizer_id)                    
@@ -312,7 +312,7 @@ class EventsController extends Controller
     public function UnverifiedPaidindex(){
         $user = $this->CheckUserType();
         if($user=="Admin"){
-            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.id as event_organizer_id','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','events.media_url','event_organizers.id as event_organizer_id','event_organizers.first_name','event_organizers.last_name')
                     ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
                     ->where('events.type',2)
                     ->where('events.status',0)
@@ -320,7 +320,7 @@ class EventsController extends Controller
         }else{
             //we will search for events that belong to current event organizer only
             $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.media_url','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
                     ->where('events.type',2)
                     ->where('events.status',0)
                     ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
@@ -366,7 +366,7 @@ class EventsController extends Controller
     public function VerifiedPaidindex(){
         $user = $this->CheckUserType();
         if($user=="Admin"){
-            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.media_url','events.created_at','event_organizers.first_name','event_organizers.last_name')
                 ->where('events.type',2)
                 ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
                 ->whereIn('events.status',[1,2])
@@ -374,7 +374,7 @@ class EventsController extends Controller
         }else{
             //we will search for events that belong to current evenet organizer only
             $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.media_url','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
                 ->where('events.type',2)
                 ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
                 ->whereIn('events.status',[1,2])
@@ -393,14 +393,14 @@ class EventsController extends Controller
     public function Freeindex(){
         $user = $this->CheckUserType();
         if($user=="Admin"){
-            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.media_url','events.created_at','event_organizers.first_name','event_organizers.last_name')
                     ->where('events.type',1)
                     ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
                     ->get();
         }else{
             //we will search for events that belong to current evenet organizer only
             $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.media_url','events.created_at','event_organizers.first_name','event_organizers.last_name')
                     ->where('events.type',1)
                     ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
                     ->where('events.event_organizer_id',$event_organizer_id) 
