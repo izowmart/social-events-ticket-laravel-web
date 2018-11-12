@@ -36,7 +36,9 @@
                     <th>Name</th>
                     <th>Location</th>                   
                     <th>Type</th>
-                    <th>Status</th>
+                    @if ($type!=='free')
+                    <th>Status</th>                        
+                    @endif
                     @auth('web_event_organizer')                        
                     <th>Scanners</th> 
                     @endauth   
@@ -50,15 +52,16 @@
                 <tbody>
                     @foreach ($events as $event)
                     <tr class="item">
-                        <td>{{str_limit($event->name, $limit = 20, $end = '...')}}</td> 
-                        <td>{{str_limit($event->location, $limit = 15, $end = '...')}}</td>
+                        <td>{{str_limit($event->name, $limit = 55, $end = '...')}}</td> 
+                        <td>{{str_limit($event->location, $limit = 50, $end = '...')}}</td>                        
                         <td>
                             @if ($event->type==1)
                                 {{'free'}}
                             @else                                
                                 {{'paid'}}
                             @endif
-                        </td>                      
+                        </td>    
+                        @if ($type!=='free')                                           
                         <td>
                             @if ($event->status==1)
                                 {{'verified'}}
@@ -67,24 +70,19 @@
                             @else                                
                                 {{'unverified'}}
                             @endif
-                        </td>
+                        </td>                                             
+                        @endif
                         @auth('web_event_organizer') 
                         <td>{{ $event->scanners->count() }}
                             @if ($event->scanners->count()>0)
-                                <a href="{{ route('scanners') }}" onclick="event.preventDefault(); document.getElementById('scanner-form-{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">View</a>
-                                <form id="scanner-form-{{$event->id}}" action="{{ route('scanners') }}" method="POST" style="display: none;">
+                                <a href="{{ route('scanners',['event_slug'=>$event->slug]) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                {{-- <form id="scanner-form-{{$event->id}}" action="{{ route('scanners') }}" method="POST" style="display: none;">
                                     {{ csrf_field() }}
                                     <input type="hidden" name="id" value="{{$event->id}}">
                                     <input type="hidden" name="event_name" value="{{$event->name}}">
-                                </form>
+                                </form> --}}
                             @else
-                                <a href="{{ route('add_scanner') }}" onclick="event.preventDefault(); document.getElementById('scanner-form-{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">Add</a>
-                                <form id="scanner-form-{{$event->id}}" action="{{ route('add_scanner') }}" method="POST" style="display: none;">
-                                    {{ csrf_field() }}
-                                    <input type="hidden" name="id" value="{{$event->id}}">
-                                    <input type="hidden" name="event_name" value="{{$event->name}}">
-                                    <input type="hidden" name="event_status" value="{{$event->status}}">
-                                </form>
+                                <a href="{{ route('add_scanner',['event_slug'=>$event->slug]) }}" class="btn btn-sm btn-outline-primary">Add</a>
                             @endif
                         </td>   
                         @endauth

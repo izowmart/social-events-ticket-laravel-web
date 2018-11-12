@@ -20,12 +20,12 @@ class EventsController extends Controller
 {
     //admin redirect path
     protected $VerifiedPaidredirectPath = 'admin/events/verified/paid';
-    protected $VerifiedFreeredirectPath = 'admin/events/verified/free';
+    protected $FreeredirectPath = 'admin/events/free';
     protected $UnverifiedredirectPath = 'admin/events/unverified';
 
     //event organizer redirect path
     protected $EventOrganizerVerifiedPaidredirectPath = 'event_organizer/events/verified/paid';
-    protected $EventOrganizerVerifiedFreeredirectPath = 'event_organizer/events/verified/free';
+    protected $EventOrganizerFreeredirectPath = 'event_organizer/events/free';
     protected $EventOrganizerUnverifiedredirectPath = 'event_organizer/events/unverified';
 
     public function showAddForm(){
@@ -99,6 +99,10 @@ class EventsController extends Controller
         $event->description = $request->description;
         $event->media_url = $fileNameToStore;
         $event->type = $request->type;
+        //if its a free event we set to verified
+        if($event->type==1){
+            $event->status = 1;
+        }
         $event->save();
 
         $event_id = $event->id;
@@ -256,9 +260,9 @@ class EventsController extends Controller
 
         //redirect event organizer to approproate place
         $event_status = $event->status;
-        if($request->type==1 && $event_status!=0){
-            //if free event and not unverified
-            return redirect($this->EventOrganizerVerifiedFreeredirectPath);
+        if($request->type==1){
+            //if free event
+            return redirect($this->EventOrganizerFreeredirectPath);
 
         }else if($request->type==2 && $event_status!=0){
             //if paid event and not unverified
@@ -324,32 +328,32 @@ class EventsController extends Controller
 
     }
 
-    public function UnverifiedFreeindex(){
-        $user = $this->CheckUserType();
-        if($user=="Admin"){
-            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.id as event_organizer_id','event_organizers.first_name','event_organizers.last_name')
-                    ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
-                    ->where('events.type',1)
-                    ->where('events.status',0)
-                    ->get();
-        }else{
-            //we will search for events that belong to current event organizer only
-            $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
-                    ->where('events.type',1)
-                    ->where('events.status',0)
-                    ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
-                    ->where('events.event_organizer_id',$event_organizer_id)                    
-                    ->get();
+    // public function UnverifiedFreeindex(){
+    //     $user = $this->CheckUserType();
+    //     if($user=="Admin"){
+    //         $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.id as event_organizer_id','event_organizers.first_name','event_organizers.last_name')
+    //                 ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
+    //                 ->where('events.type',1)
+    //                 ->where('events.status',0)
+    //                 ->get();
+    //     }else{
+    //         //we will search for events that belong to current event organizer only
+    //         $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
+    //         $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+    //                 ->where('events.type',1)
+    //                 ->where('events.status',0)
+    //                 ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
+    //                 ->where('events.event_organizer_id',$event_organizer_id)                    
+    //                 ->get();
 
-        }
-        $data=array(
-           'type'=>'unverified free',
-           'events'=>$events
-        );
-        return view('common_pages.events')->with($data);
+    //     }
+    //     $data=array(
+    //        'type'=>'unverified free',
+    //        'events'=>$events
+    //     );
+    //     return view('common_pages.events')->with($data);
 
-    }
+    // }
 
     public function VerifiedPaidindex(){
         $user = $this->CheckUserType();
@@ -378,13 +382,12 @@ class EventsController extends Controller
         return view('common_pages.events')->with($data);        
     }
 
-    public function VerifiedFreeindex(){
+    public function Freeindex(){
         $user = $this->CheckUserType();
         if($user=="Admin"){
             $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
                     ->where('events.type',1)
                     ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
-                    ->whereIn('events.status',[1,2])
                     ->get();
         }else{
             //we will search for events that belong to current evenet organizer only
@@ -392,16 +395,15 @@ class EventsController extends Controller
             $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
                     ->where('events.type',1)
                     ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
-                    ->whereIn('events.status',[1,2])
                     ->where('events.event_organizer_id',$event_organizer_id) 
                     ->get();
 
         }
         $data=array(
-           'type'=>'verified free',
+           'type'=>'free',
            'events'=>$events
         );
-        return view('common_pages.events')->with($data);  
+        return view('common_pages.events')->with($data); 
         
     }
 
@@ -432,8 +434,8 @@ class EventsController extends Controller
         $request->session()->flash('status', 'Activated successfully');
 
         //check where the request came from and redirect back to that page
-        if ($type=="verified free") {            
-            return redirect($this->VerifiedFreeredirectPath);
+        if ($type=="free") {            
+            return redirect($this->FreeredirectPath);
         } else {            
             return redirect($this->VerifiedPaidredirectPath);
         }
@@ -451,8 +453,8 @@ class EventsController extends Controller
         $request->session()->flash('status', 'Deactivated successfully');
 
         //check where the request came from and redirect back to that page
-        if ($type=="verified free") {            
-            return redirect($this->VerifiedFreeredirectPath);
+        if ($type=="free") {            
+            return redirect($this->FreeredirectPath);
         } else {            
             return redirect($this->VerifiedPaidredirectPath);
         }
@@ -464,7 +466,7 @@ class EventsController extends Controller
         $event_status = $event->status;
         if($request->type==1 && $event_status!=0){
             //if free event and not unverified
-            $redirect = redirect($this->EventOrganizerVerifiedFreeredirectPath);
+            $redirect = redirect($this->EventOrganizerFreeredirectPath);
 
         }else if($request->type==2 && $event_status!=0){
             //if paid event and not unverified
