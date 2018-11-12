@@ -36,6 +36,7 @@
                     <th>Contact person name</th>
                     <th>Contact person phone</th>
                     <th>Contact person email</th>
+                    <th>Image</th>
                     <th>Location</th>
                     <th>Action</th>
                   </tr>
@@ -48,6 +49,7 @@
                         <td>{{$venue->contact_person_name}}</td>
                         <td>{{$venue->contact_person_phone}}</td>
                         <td>{{$venue->contact_person_email}}</td>
+                        <td><img height="100px" width="100px" src="{{asset('/venue_images/'.$venue->venue_image)}}"></td>
                         <td>
                             <a target="_blank" href="https://maps.google.com/maps?q={{$venue->latitude}},{{$venue->longitude}}" class="btn btn-sm btn-outline-primary">View</a>
                         </td>
