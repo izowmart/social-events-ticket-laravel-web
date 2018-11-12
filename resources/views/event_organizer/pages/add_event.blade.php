@@ -19,7 +19,7 @@
         <ul class="app-breadcrumb breadcrumb">
           <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
           <li class="breadcrumb-item"><a href="{{ route('event_organizer_home') }}">Home</a></li>
-          <li class="breadcrumb-item"><a href="{{ route('event_organizer_verified_free_events') }}">Events</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('event_organizer_free_events') }}">Events</a></li>
           <li class="breadcrumb-item"><a href="{{ route('add_event') }}">Add</a></li>
         </ul>
       </div>
@@ -119,20 +119,27 @@
                   </div>
                   <div id="paid-row">
                     <div class="row" id="category-row">
-                      <div class="col-md-4">
+                      <div class="col-md-10">
                         <div class="form-group">
-                            <label class="control-label">Category</label>
-                            <div class="form-group{{ $errors->has('category') ? ' has-error' : '' }}">    
-                                <select class="selectpicker" id="category" name="category[]" multiple>
-                                    @foreach ($ticket_categories as $ticket_category)
-                                        <option value="{{$ticket_category->id}}">{{$ticket_category->name}}</option>                                        
-                                    @endforeach
-                                </select>
+                            <label class="control-label">Ticket Type</label>
+                            <div class="form-group{{ $errors->has('category') ? ' has-error' : '' }}">   
+                                <div class="row">
+                                     @foreach ($ticket_categories as $ticket_category)
+                                        <div class="col-md-2">
+                                            <div class="animated-checkbox">
+                                                <label>
+                                                    <input type="checkbox" id="{{$ticket_category->id}}" class="ticket_type_checkbox" data-text="{{$ticket_category->name}}" name="category[]" value="{{$ticket_category->id}}"><span class="label-text">{{$ticket_category->name}}</span>
+                                                </label>
+                                            </div>
+                                        </div>                                       
+                                    @endforeach                                    
+                                </div>
                                 @if ($errors->has('type'))
                                     <span class="help-block">
                                         <strong>{{ $errors->first('category') }}</strong>
                                     </span>
                                 @endif
+                                <small class="form-text text-muted" id="ticket_type_help">You can choose one or more ticket types.</small> 
                             </div>
                         </div>
                       </div>
@@ -170,7 +177,7 @@
                           <label for="image">Image</label>
                           <div class="input-group">
                               <div class="custom-file">
-                                  <input type="file" aria-describedby="ImageHelp" name="image" onchange="readURL(this);" class="custom-file-input" id="image" required>
+                                  <input type="file" aria-describedby="ImageHelp" name="image" onchange="readURL(this);" accept="image/png,image/gif,image/jpeg" class="custom-file-input" id="image" required>
                                   <label class="custom-file-label" for="image">Click to choose image</label>                                                
                               </div>
                               <div class="invalid-feedback">
@@ -282,37 +289,15 @@
     $("#category-row").hide();
     $("#append-row").hide();
     $('#category').selectpicker();
-    $('#category').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-        
-        if (isSelected==true) {
-             $('#category option:selected').each(function () {
-                  var text = $(this).text();
-                 if (!selectedItems.includes(text)) {
-                    selectedItems.push(text);
-                    var value = $(this).val();
-                    //console.log("Clicked index: "+clickedIndex+"\tSelected value:"+value+"\tSelected text: "+text+"\t"+"\n");
-                    appendRows(text);
-                 }
-             }); 
-            
-        }else{                       
-            previousValue.forEach(Individual);
-            function Individual(value) {
-                var deselected_text = $('#category option').eq(clickedIndex).text();
-                var name = deselected_text.toLowerCase().split(' ').join('_');
-                var div = name+'_div';        
-
-                for(var i = selectedItems.length - 1; i >= 0; i--) {
-                    if(selectedItems[i] === deselected_text) {
-                        selectedItems.splice(i, 1);
-                        $('#'+div).slideUp("slow").remove();
-                    }
-                }         
-                
-            }
-
+    $(".ticket_type_checkbox").change(function() { 
+        if(this.checked) {
+            appendRows($(this).data('text'));
+        }else{
+            var name = $(this).data('text').toLowerCase().split(' ').join('_');
+            var div = name+'_div'; 
+            $('#'+div).slideUp("slow").remove();
         }
-        
+
     });
         
     $("#location-address").each(function() {
@@ -359,7 +344,7 @@
       name = category_name.toLowerCase().split(' ').join('_');
       id = name+"_category".split(' ').join('_');
       label = category_name;
-      var content = "<div class='row' id='"+name+"_div'><div class='col-md-4'><div class='form-group'><label class='control-label'>"+label+" Amount</label><div class='form-group'><label class='sr-only' for='exampleInputAmount'>Amount (in shillings)</label><div class='input-group'><div class='input-group-prepend'><span class='input-group-text'>Ksh</span></div><input class='form-control' id='"+id+"_amount' value='' name='"+name+"_amount' type='number' min='1' placeholder='Amount to be paid' required><div class='input-group-append'><span class='input-group-text'>.00</span></div></div></div></div></div><div class='col-md-3'><div class='form-group'><label class='control-label'>"+label+" No. of tickets</label><input class='form-control' type='number' id='"+id+"_tickets' name='"+name+"_tickets' value='' placeholder='Maximum number of tickets' required></div></div><div class='col-md-3'><label class='control-label'>"+label+" Ticket sale end date</label><div class='form-group'><div class='input-group date' id='datetimepicker1'><input class='form-control datetimepicker' type='text' id='"+id+"_ticket_sale_end_date' name='"+name+"_ticket_sale_end_date' value='' placeholder='Select date'  required></div></div></div></div>";     
+      var content = "<div class='row' id='"+name+"_div'><div class='col-md-4'><div class='form-group'><label class='control-label'>"+label+" Amount</label><div class='form-group'><label class='sr-only' for='exampleInputAmount'>Amount (in shillings)</label><div class='input-group'><div class='input-group-prepend'><span class='input-group-text'>Ksh</span></div><input class='form-control' id='"+id+"_amount' value='' name='"+name+"_amount' type='number' min='1' placeholder='Amount to be paid' required><div class='input-group-append'><span class='input-group-text'>.00</span></div></div></div></div></div><div class='col-md-3'><div class='form-group'><label class='control-label'>"+label+" No. of tickets</label><input class='form-control' type='number' id='"+id+"_tickets' name='"+name+"_tickets' value='' placeholder='Maximum number of tickets' required></div></div><div class='col-md-3'><label class='control-label'>"+label+" Ticket sales closes at</label><div class='form-group'><div class='input-group date' id='datetimepicker1'><input class='form-control datetimepicker' type='text' id='"+id+"_ticket_sale_end_date' name='"+name+"_ticket_sale_end_date' value='' placeholder='Select date'  required></div></div></div></div>";     
       $("#append-row").append(content).slideDown("slow");
       $("#"+name+"_div").hide();
       $("#"+name+"_div").slideDown("slow");

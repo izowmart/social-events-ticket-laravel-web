@@ -15,23 +15,20 @@
       <div class="app-title">
         <div>
           <h1><i class="fa fa-user-secret"></i> Scanners</h1>
-          <p>List of all scanners from {{$event_name}} event</p>
+          <p>List of all scanners from {{$event->name}} event</p>
         </div>
         <ul class="app-breadcrumb breadcrumb">
           <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
           <li class="breadcrumb-item"><a href="{{ route('admin_home') }}">Home</a></li>
           <li class="breadcrumb-item"><a href="{{ route('event_organizer_unverified_events') }}">Events</a></li>
-          <li class="breadcrumb-item"><a href="{{ route('scanners') }}">Scanners</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('scanners',['event_slug'=>$event->slug]) }}">Scanners</a></li>
         </ul>
       </div>
       <div class="row">
         <div class="col-md-12">
           <div class="tile">  
-              <p><a class="btn btn-primary icon-btn float-right" href="{{ route('add_scanner') }}" onclick="event.preventDefault(); document.getElementById('scanner-form-{{$event_id}}').submit();"><i class="fa fa-plus"></i>Add Scanner</a></p><br><br>
-                <form id="scanner-form-{{$event_id}}" action="{{ route('add_scanner') }}" method="POST" style="display: none;">
-                    {{ csrf_field() }}
-                    <input type="hidden" name="id" value="{{$event_id}}">
-                </form>
+              <p><a class="btn btn-primary icon-btn float-right" href="{{ route('add_scanner',['event_slug'=>$event->slug]) }}"><i class="fa fa-plus"></i>Add Scanner</a></p><br><br>
+                
             <div class="tile-body">
               <table class="table table-hover table-bordered" id="adminsTable">
                 <thead>
@@ -47,19 +44,13 @@
                         <td>{{ $scanner->first_name}} {{ $scanner->last_name}}</td>                        
                         <td>{{$scanner->email}}</td>
                         <td>
-                          <button onClick="document.getElementById('edit_form_{{$scanner->id}}').submit();" class="btn btn-sm btn-outline-primary">Edit</button>
-                          <form id="edit_form_{{$scanner->id}}" action="{{ route('edit_scanner') }}" method="POST" style="display: none;">
-                              {{ csrf_field() }}
-                              <input type="hidden" name="id" value="{{$scanner->id}}">
-                              <input type="hidden" name="event_status" value="{{$scanner->event_status}}">
-                              <input type="hidden" name="event_status" value="{{$scanner->event_status}}">
-                          </form>
+                          <a href="{{ route('edit_scanner', ['event_slug'=>$event->slug,'scanner_id'=>Crypt::encrypt($scanner->id)]) }}" class="btn btn-sm btn-outline-primary">Edit</a>
 
                           <button onClick="deleteBtn({{$scanner->id}})" class="btn btn-sm btn-outline-danger">Delete</button>
-                          <form id="delete_form_{{$scanner->id}}" action="{{ route('delete_scanner') }}" method="POST" style="display: none;">
+                          <form id="delete_form_{{$scanner->id}}" action="{{ route('delete_scanner',['event_slug'=>$event->slug]) }}" method="POST" style="display: none;">
                               {{ csrf_field() }}
                               <input type="hidden" name="id" value="{{$scanner->id}}">
-                              <input type="hidden" name="event_status" value="{{$scanner->event_status}}">
+                              <input type="hidden" name="event_slug" value="{{$event->slug}}">
                           </form>
                         </td>
                     </tr>                        

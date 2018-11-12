@@ -19,7 +19,7 @@
         <ul class="app-breadcrumb breadcrumb">
           <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
           <li class="breadcrumb-item"><a href="{{ route('event_organizer_home') }}">Home</a></li>
-          <li class="breadcrumb-item"><a href="{{ route('event_organizer_verified_free_events') }}">Events</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('event_organizer_free_events') }}">Events</a></li>
           <li class="breadcrumb-item"><a href="{{ route('edit_event', ['slug'=>$event->slug]) }}">Edit</a></li>
         </ul>
       </div>
@@ -130,16 +130,23 @@
                         <div class="form-group">
                             <label class="control-label">Category</label>
                             <div class="form-group{{ $errors->has('category') ? ' has-error' : '' }}">    
-                                <select class="selectpicker" id="category" name="category[]" multiple>
+                                <div class="row">
                                     @foreach ($ticket_categories as $ticket_category)
-                                        <option value="{{$ticket_category->id}}" id="category-{{$ticket_category->id}}">{{$ticket_category->name}}</option>                                        
-                                    @endforeach
-                                </select>
+                                        <div class="col-md-2">
+                                            <div class="animated-checkbox">
+                                                <label>
+                                                    <input type="checkbox" id="{{$ticket_category->id}}" class="ticket_type_checkbox" data-text="{{$ticket_category->name}}" name="category[]" value="{{$ticket_category->id}}"><span class="label-text">{{$ticket_category->name}}</span>
+                                                </label>
+                                            </div>
+                                        </div>                                       
+                                    @endforeach                                    
+                                </div>
                                 @if ($errors->has('type'))
                                     <span class="help-block">
                                         <strong>{{ $errors->first('category') }}</strong>
                                     </span>
                                 @endif
+                                <small class="form-text text-muted" id="ticket_type_help">You can choose one or more ticket types.</small> 
                             </div>
                         </div>
                       </div>
@@ -179,7 +186,7 @@
                           <img id="blah" src="{{ asset('storage/images/events') }} {{'/'.$event->media_url}}" height="400"><br><br>
                           <div class="input-group">
                               <div class="custom-file">
-                                  <input type="file" aria-describedby="ImageHelp" name="image" onchange="readURL(this);" class="custom-file-input" id="image">
+                                  <input type="file" aria-describedby="ImageHelp" name="image" accept="image/png,image/gif,image/jpeg" onchange="readURL(this);" class="custom-file-input" id="image">
                                   <label class="custom-file-label" for="image">Click to choose different image</label>                                                
                               </div>
                               <div class="invalid-feedback">
@@ -284,11 +291,9 @@
                 //fetch the ids for selected categories  
                 var category_id = '{{$ticket_category_detail->category_id}}';    
                 //add selected attribute to options that were selected     
-                $('#'+'category-'+category_id).attr('selected', 'selected');
-                //refresh the select to display added attributes
-                $('#category').selectpicker('refresh');
+                $('#'+category_id).attr('checked', 'checked');
                 //get the text for selected attribute and passit to appendRows method so that it adds its rows to the interface
-                var text = $('#category option[value='+category_id+']').text();
+                var text = $('#'+category_id).data('text');
                 appendRows(text);
                 //get and set the input values to the inputs created by the appendRows
                 var price = '{{$ticket_category_detail->price}}';
@@ -331,37 +336,47 @@
 
   $(document).ready(function() {    
     $("#hidden").hide();
-    $('#category').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-        
-        if (isSelected==true) {
-             $('#category option:selected').each(function () {
-                  var text = $(this).text();
-                 if (!selectedItems.includes(text)) {
-                    selectedItems.push(text);
-                    var value = $(this).val();
-                    appendRows(text);
-                 }
-             }); 
-            
-        }else{ 
-            // previousValue.forEach(Individual);
-            // function Individual(value) {
-                var deselected_text = $('#category option').eq(clickedIndex).text();
-                var name = deselected_text.toLowerCase().split(' ').join('_');
-                var div = name+'_div';        
-
-                for(var i = selectedItems.length - 1; i >= 0; i--) {
-                    if(selectedItems[i] === deselected_text) {
-                        selectedItems.splice(i, 1);
-                        $('#'+div).slideUp("slow").remove();
-                    }
-                }         
-                
-            //}
-
+    $(".ticket_type_checkbox").change(function() { 
+        if(this.checked) {
+            appendRows($(this).data('text'));
+        }else{
+            var name = $(this).data('text').toLowerCase().split(' ').join('_');
+            var div = name+'_div'; 
+            $('#'+div).slideUp("slow").remove();
         }
-        
+
     });
+    // $('#category').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+        
+    //     if (isSelected==true) {
+    //          $('#category option:selected').each(function () {
+    //               var text = $(this).text();
+    //              if (!selectedItems.includes(text)) {
+    //                 selectedItems.push(text);
+    //                 var value = $(this).val();
+    //                 appendRows(text);
+    //              }
+    //          }); 
+            
+    //     }else{ 
+    //         // previousValue.forEach(Individual);
+    //         // function Individual(value) {
+    //             var deselected_text = $('#category option').eq(clickedIndex).text();
+    //             var name = deselected_text.toLowerCase().split(' ').join('_');
+    //             var div = name+'_div';        
+
+    //             for(var i = selectedItems.length - 1; i >= 0; i--) {
+    //                 if(selectedItems[i] === deselected_text) {
+    //                     selectedItems.splice(i, 1);
+    //                     $('#'+div).slideUp("slow").remove();
+    //                 }
+    //             }         
+                
+    //         //}
+
+    //     }
+        
+    // });
         
     $("#location-address").each(function() {
       var target = this;

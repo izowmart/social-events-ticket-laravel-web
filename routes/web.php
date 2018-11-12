@@ -172,9 +172,8 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
     Route::group(['prefix'=>'events'], function () {
         Route::get('unverified', 'CommonPages\EventsController@Unverifiedindex')->name('admin_unverified_events');
         Route::get('unverified/paid', 'CommonPages\EventsController@UnverifiedPaidindex')->name('admin_unverified_paid_events');
-        Route::get('unverified/free', 'CommonPages\EventsController@UnverifiedFreeindex')->name('admin_unverified_free_events');
         Route::get('verified/paid', 'CommonPages\EventsController@VerifiedPaidindex')->name('admin_verified_paid_events');
-        Route::get('verified/free', 'CommonPages\EventsController@VerifiedFreeindex')->name('admin_verified_free_events');
+        Route::get('free', 'CommonPages\EventsController@Freeindex')->name('admin_free_events');
         Route::post('deactivate', 'CommonPages\EventsController@deactivate')->name('admin_deactivate_event_post');
         Route::post('verify', 'CommonPages\EventsController@verify')->name('admin_verify_event_post');
         Route::post('activate', 'CommonPages\EventsController@activate')->name('admin_activate_event_post');
@@ -192,9 +191,8 @@ Route::group(['middleware' => 'event_organizer_auth','prefix'=>'event_organizer'
     Route::group(['prefix'=>'events'], function () {
         Route::get('unverified', 'CommonPages\EventsController@Unverifiedindex')->name('event_organizer_unverified_events');
         Route::get('unverified/paid', 'CommonPages\EventsController@UnverifiedPaidindex')->name('event_organizer_unverified_paid_events');
-        Route::get('unverified/free', 'CommonPages\EventsController@UnverifiedFreeindex')->name('event_organizer_unverified_free_events');
         Route::get('verified/paid', 'CommonPages\EventsController@VerifiedPaidindex')->name('event_organizer_verified_paid_events');
-        Route::get('verified/free', 'CommonPages\EventsController@VerifiedFreeindex')->name('event_organizer_verified_free_events');
+        Route::get('free', 'CommonPages\EventsController@Freeindex')->name('event_organizer_free_events');
         Route::post('deactivate', 'CommonPages\EventsController@deactivate')->name('event_organizer_deactivate_event_post');
         Route::post('verify', 'CommonPages\EventsController@verify')->name('event_organizer_verify_event_post');
         Route::post('activate', 'CommonPages\EventsController@activate')->name('event_organizer_activate_event_post');    
@@ -204,12 +202,12 @@ Route::group(['middleware' => 'event_organizer_auth','prefix'=>'event_organizer'
         Route::post('edit', 'CommonPages\EventsController@update')->name('edit_event_post');   
         Route::post('delete', 'CommonPages\EventsController@destroy')->name('delete_event');
 
-        Route::group(['prefix'=>'scanners'], function () {
-            Route::post('/', 'EventOrganizerPages\ScannersController@index')->name('scanners');
-            Route::post('add', 'EventOrganizerPages\ScannersController@showAddForm')->name('add_scanner');   
-            Route::post('add/scanner', 'EventOrganizerPages\ScannersController@store')->name('add_scanner_post');    
-            Route::post('edit', 'EventOrganizerPages\ScannersController@showEditForm')->name('edit_scanner');   
-            Route::post('edit/update', 'EventOrganizerPages\ScannersController@update')->name('edit_scanner_post');   
+        Route::group(['prefix'=>'{event_slug}/scanners'], function () {
+            Route::get('/', 'EventOrganizerPages\ScannersController@index')->name('scanners');
+            Route::get('add', 'EventOrganizerPages\ScannersController@showAddForm')->name('add_scanner');   
+            Route::post('add', 'EventOrganizerPages\ScannersController@store')->name('add_scanner_post');    
+            Route::get('edit/{scanner_id}', 'EventOrganizerPages\ScannersController@showEditForm')->name('edit_scanner');   
+            Route::post('edit', 'EventOrganizerPages\ScannersController@update')->name('edit_scanner_post');   
             Route::post('delete', 'EventOrganizerPages\ScannersController@destroy')->name('delete_scanner');
 
         });
