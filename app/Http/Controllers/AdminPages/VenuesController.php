@@ -67,30 +67,8 @@ class VenuesController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
-        
-        if($request->hasFile('venue_image'))
-        {
 
-            $this->validate($request, [
-                'venue_name'=>'required',
-                'longitude'=>'required',
-                'latitude'=>'required',
-                'town_id'=>'required',
-                'contact_person_name'=>'required',
-                'contact_person_phone'=>'required',
-                'contact_person_email'=>'required',
-                'venue_image' => 'image: jpg,png,jpeg',
-            ]); 
-
-            $name = $request->file('venue_image')->getClientOriginalName();
-            $filename = time().'_'. $name;
-            $request->file('venue_image')->move('venue_images', $filename);
-        }
-        else
-        {
-            $filename = 'pin.jpeg';
-            $this->validate($request, [
+        $this->validate($request, [
                 'venue_name'=>'required',
                 'longitude'=>'required',
                 'latitude'=>'required',
@@ -99,7 +77,7 @@ class VenuesController extends Controller
                 'contact_person_phone'=>'required',
                 'contact_person_email'=>'required',
             ]); 
-        }
+
         $venue = new Venue();
         $venue->name = $request->venue_name;
         $venue->town_id = $request->town_id;
@@ -108,7 +86,21 @@ class VenuesController extends Controller
         $venue->contact_person_name = $request->contact_person_name;
         $venue->contact_person_phone = $request->contact_person_phone;
         $venue->contact_person_email = $request->contact_person_email;
-        $venue->venue_image = $filename;
+        if ($request->hasFile('venue_image')) {
+            $this->validate($request,[
+                'venue_image' => 'image: jpg,png,jpeg',
+            ]);
+            $name = $request->file('venue_image')->getClientOriginalName();
+            $filename = time().'_'. $name;
+            $request->file('venue_image')->move('venue_images', $filename);
+            $venue->venue_image = $filename;
+
+        }
+        else
+        {
+            $filename = 'pin.jpeg';
+            $venue->venue_image = $filename;
+        }
         
         $venue->save();
 
@@ -123,16 +115,17 @@ class VenuesController extends Controller
     {
         
         $this->validate($request, [
-            'id'=>'required',
             'venue_name'=>'required',
             'longitude'=>'required',
             'latitude'=>'required',
             'town_id'=>'required',
             'contact_person_name'=>'required',
             'contact_person_phone'=>'required',
-            'contact_person_email'=>'required'
+            'contact_person_email'=>'required',
         ]); 
-        
+
+
+
         $venue = Venue::find($request->id);
         $venue->town_id = $request->town_id;
         $venue->name = $request->venue_name;
@@ -141,6 +134,18 @@ class VenuesController extends Controller
         $venue->contact_person_name = $request->contact_person_name;
         $venue->contact_person_phone = $request->contact_person_phone;
         $venue->contact_person_email = $request->contact_person_email;
+        // $venue->venue_image = $filename;
+
+        if ($request->hasFile('venue_image')) {
+            $this->validate($request,[
+                'venue_image' => 'image: jpg,png,jpeg',
+            ]);
+            $name = $request->file('venue_image')->getClientOriginalName();
+            $filename = time().'_'. $name;
+            $request->file('venue_image')->move('venue_images', $filename);
+            $venue->venue_image = $filename;
+
+        }
         
         $venue->save();
 
