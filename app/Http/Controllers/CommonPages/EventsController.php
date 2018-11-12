@@ -37,8 +37,7 @@ class EventsController extends Controller
     public function showEditForm($slug){
         $ticket_categories = TicketCategory::all();
         
-        $event = Event::select('events.id','events.name','events.slug','events.description','events.location','events.latitude','events.longitude','events.type','events.slug','event_sponsor_media.media_url')
-                    ->join('event_sponsor_media', 'event_sponsor_media.event_id', '=', 'events.id')
+        $event = Event::select('events.id','events.name','events.slug','events.description','events.location','events.latitude','events.longitude','events.type','events.slug','events.media_url')
                     ->where('events.slug',$slug)
                     ->orderBy('id','desc')
                     ->first();
@@ -193,7 +192,9 @@ class EventsController extends Controller
         $event->longitude = $request->longitude;
         $event->latitude = $request->latitude;
         $event->description = $request->description;
-        $event->media_url = $fileNameToStore;
+        if ($request->hasFile('image')) {
+            $event->media_url = $fileNameToStore;
+        }
         $event->type = $request->type;
 
         $event->save();
