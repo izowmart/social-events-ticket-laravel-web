@@ -26,7 +26,7 @@ class UsersController extends Controller
     public function index()
     {
         $users = user::select('users.first_name','users.last_name','users.username','users.phone_number','users.status','users.gender','users.email','users.year_of_birth','users.app_version_code','countries.name')
-                ->join('countries', 'countries.id', '=', 'users.country_id')
+                ->leftJoin('countries', 'countries.id', '=', 'users.country_id') //show all users even those who have not indicated from which country they come from
                 ->get();
         return view('admin.pages.users')->with('users',$users); 
     }
@@ -35,7 +35,7 @@ class UsersController extends Controller
     {
         $users = user::where('users.id',Crypt::decrypt($id))
                 ->select('users.first_name','users.last_name','users.username','users.phone_number','users.status','users.gender','users.email','users.year_of_birth','users.app_version_code','countries.name')
-                ->join('countries', 'countries.id', '=', 'users.country_id')
+                ->leftJoin('countries', 'countries.id', '=', 'users.country_id') //show all users even those who have not indicated from which country they come from
                 ->get();
         return view('admin.pages.users')->with('users',$users); 
     }
