@@ -41,6 +41,8 @@ Route::group(['prefix' => 'auth'], function () use ($base_url) {
         //authenticated ones
         Route::group(['middleware' => 'auth:api'], function () use ($base_url) {
             Route::get('scanners', $base_url . 'Api\ScannerAuthController@index');
+            Route::get('events_tickets', $base_url . 'Api\ScannerAuthController@events_tickets');
+
         });
     });
 });
@@ -63,6 +65,7 @@ Route::group(['prefix' => 'user', 'middleware' => 'auth:api'], function () use (
     Route::post('report_abuse', $base_url . 'Api\PostController@report_abuse');
     Route::get('{id}/relations', $base_url . 'Api\AuthController@user_relations');
     Route::post('follow', $base_url . 'Api\AuthController@follow');
+
 
     Route::post('search','Api\SearchController@index');
     Route::post('venues/near', 'Api\VenueController@venues_near_me');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\EventScanner;
 use App\Helpers\ValidUserScannerPassword;
 use App\Http\Resources\ScannerResource;
 use App\Http\Traits\UniversalMethods;
@@ -158,6 +159,49 @@ class ScannerAuthController extends Controller
 
         }
 
+    }
+    //custom function to check ticket validity when scanning
+    public function events_tickets(Request $request){
+        try{
+            if($event = EventScanner::where('event_id',$request->event_id)){
+                if ($event->token == $request->token){
+                    if($event->status == false){
+                        $event = new EventScanner();
+                        $event->status=true;
+                        $event->update();
+                        return response()->json([
+                            'success' => true,
+                            'message' => "Ticket is valid",
+                            'data' => "$event"
+                        ],200);
+                    }else{
+                        return response()->json([
+                            'success' =>false,
+                            'message'=> "Ticket has already been scanned",
+                            'data' => []
+                        ],401
+                        );
+                    }
+                }else{
+                    return response()->json([
+                        'success' =>false,
+                        'message'=> "Invalid token",
+                        'data' => []
+                    ],401
+                    );
+                }
+            }else{
+                return response()->json([
+                    'success' =>false,
+                    'message'=> "Event doesn't exist",
+                    'data' => []
+                ],401
+                );
+            }
+
+        }catch(\Exception $exception){
+            return $exception->getMessage();
+        }
     }
 
 
