@@ -1,7 +1,8 @@
-@extends('common_pages.layouts')
+@extends('common_pages.layouts') 
 
 @section('styles')
 <link rel="stylesheet" type="text/css" href="//github.com/downloads/lafeber/world-flags-sprite/flags16.css" />
+<link rel="stylesheet" type="text/css" href="{{ asset('css/venues.css') }}" />
     
 @endsection
 
@@ -108,13 +109,22 @@
                     </div>
                   </div>
                   <div class="row">
-                    <div class="col-md-10">
+                    <div class="col-md-6">
                       <div class="form-group">
                         <label>Image of the venue (optional)</label>
                         <input type="file" class="form-control-file" name="venue_image">
                       </div>
-                    </div> 
+                    </div>
                   </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <label for="featured" class="btn btn-link">Tick if venue is featured</label>
+                      <input type="checkbox" value="1" id="featured" name="featured">
+                      <input type="text" class="form-control featured_description" placeholder="Enter the description of the venue" name="featured_description">
+                    </div>
+                  </div>
+                </div>
+              </div>
                   <div class="tile-footer">
                     <button class="btn btn-primary" type="submit">Submit</button>
                   </div>
