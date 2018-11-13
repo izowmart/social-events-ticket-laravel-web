@@ -355,7 +355,7 @@ class MulaPaymentController extends Controller
             $approved_pending_payment_request = $this->approvePendingPaymentRequest($request);
 
             //raise tickets for the user
-            $this->createTickets($approved_pending_payment_request);
+//            $this->createTickets($approved_pending_payment_request);
 
             //TODO: 3. generate and email tickets (with branding) as pdf attachment(s)
             //TODO: 4. create image for the tickets for the mobile app ?? do a table for that holds the url for this??
@@ -390,7 +390,7 @@ class MulaPaymentController extends Controller
             logger("PAYMENT FAILURE error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
         }
     }
-    /* end monile methods*/
+    /* end mobile methods*/
 
     /**
      * Helper methods
@@ -404,7 +404,7 @@ class MulaPaymentController extends Controller
     {
         $pending_payment_request = PaymentRequest::where('merchantTransactionID', $request->merchantTransactionID)
 //                ->where('MSISDN', UniversalMethods::formatPhoneNumber($payload->MSISDN))
-            ->where('amount', '=', $request->amountPaid)
+//            ->where('amount', '=', $request->amountPaid)
             ->where('payment_request_status', '=', 0)
             ->first();
 
@@ -412,18 +412,6 @@ class MulaPaymentController extends Controller
         $pending_payment_request->save();
 
         return $pending_payment_request;
-    }
-
-    /**
-     * @param $pending_payment_request
-     */
-    public function createTickets($pending_payment_request): void
-    {
-        Ticket::create([
-            'event_id'             => $pending_payment_request->event_id,
-            'ticket_customer_id'   => $pending_payment_request->ticket_customer_id,
-            'bought_tickets_count' => $pending_payment_request->vip_quantity + $pending_payment_request->regular_quantity
-        ]);
     }
 
     /**
@@ -441,7 +429,74 @@ class MulaPaymentController extends Controller
         $pending_payment_request->save();
     }
 
+    /**
+     * @param $ticket_type
+     * @param $event_id
+     * @param $ticket_category_id
+     * @param $ticket_customer_id
+     * @param $approved_payment_request_id
+     *
+     * @return mixed
+     */
+    public function createTickets($ticket_type,$event_id, $ticket_category_id, $ticket_customer_id, $approved_payment_request_id)
+    {
+        $payload = "" . now()->timestamp . "" . $event_id . "" . $ticket_category_id . "" . $ticket_customer_id . "" . $approved_payment_request_id;
+        $unique_ticket_identifier = hash_hmac('sha256', strtolower(trim($payload)), config('app.key'));
+
+        $event = Event::find($event_id);
+
+        $event_dates = $event->events_dates;
+
+        /*
+         * generate qr code for each ticket and save it as image
+         * this is to be used
+         * 1. on the pdf to be shared via email
+         * 2. on the app as an image...
+         */
+        $qr_code_image_name = now()->timestamp . ".png";
+        $qr_code = QrCode::format('png')->size(100)->generate('http://fikaplaces.com/tickets/' . $unique_ticket_identifier,
+            '../public/bought_tickets/qr_code_images/' . $qr_code_image_name);
+
+        /*
+        * Prepare the content for the ticket pdf template
+        */
+        $ticket_template_data = [
+            'event_name'                => $event->name,
+            'event_location'            => $event->location,
+            'event_start_date_time'     => $event_dates->first()->start,
+            'event_end_date_time'       => $event_dates->first()->end,
+            'ticket_type'               => $ticket_type,
+            'ticket_qr_code_image_name' => $qr_code_image_name,
+        ];
 
 
-    /* end helper methods */
+        //generate and save pdf
+        $ticket_name = "T" . now()->timestamp . uniqid();
+        $pdf_name = $ticket_name . ".pdf";
+        $pdf_dir = public_path('bought_tickets/pdfs');
+
+        if (!file_exists($pdf_dir)) {
+            mkdir($pdf_dir, 0777, true);
+        }
+
+        $ticket_pdf_path = $pdf_dir . '/' . $pdf_name;
+
+        //create the pdf for each ticket to be shared via email
+//        return PDF::loadView( 'tickets.display-tickets', $ticket_template_data)->save( $pdf_dir.'/'.$pdf_name )->stream($pdf_name);
+        $pdf = PDF::loadView('tickets.display-tickets', $ticket_template_data)->save($ticket_pdf_path);
+
+
+        $data = [
+            'event_id'           => $event_id,
+            'ticket_customer_id' => $ticket_customer_id,
+            'validation_token'   => $unique_ticket_identifier,
+            'qr_code_image_url'  => $qr_code_image_name,
+            'pdf_format_url'     => $pdf_name,
+            'ticket_category_id' => $ticket_category_id
+        ];
+
+        return $data;
+    }
+
+        /* end helper methods */
 }
