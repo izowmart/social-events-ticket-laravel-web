@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Event;
 use App\PaidEventCategory;
@@ -15,10 +16,12 @@ class TicketsController extends Controller
 {
     protected $redirectPath = 'tickets/';
     public function index(){
+        $today = Carbon::now()->toDateTimeString();
         $events = Event::select('events.id','events.name','events.description','events.location','events.latitude','events.longitude','ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.ticket_sale_end_date','events.type','events.slug','event_dates.start','event_dates.end','events.media_url')
                     ->join('event_dates', 'event_dates.event_id', '=', 'events.id')
                     ->leftJoin('ticket_category_details', 'ticket_category_details.event_id', '=', 'events.id')
                     ->where('events.status',1)
+            ->whereDate('event_dates.end','>=',$today) //NB:: only show current or upcoming events
                     ->orderBy('id','desc')
                     ->groupBy('events.slug')
                     ->get();

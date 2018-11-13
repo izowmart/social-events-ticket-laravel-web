@@ -1,6 +1,5 @@
-
 .page-row{
-    margin: 10px 35px 30px 35px;
+  margin: 10px 35px 30px 35px;
 }
 .card {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
@@ -15,7 +14,7 @@
   box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
 
 } */
-.image-container{    
+.image-container{
   overflow: hidden;
   position: relative;
   height: 300px;
@@ -26,18 +25,18 @@
 
 }
 .card-image{
-    width:100%;
-    position: absolute;
+  width:100%;
+  position: absolute;
 }
 .card-content {
   padding-left: 10px;
   padding-right: 10px;
 }
-.card .title{    
+.card .title{
   font-size: 20px;
   text-overflow: ellipsis;
   overflow: hidden;
-  margin-bottom: 0; 
+  margin-bottom: 0;
   text-decoration: none;
   padding-bottom: 0;
   color: #007D71;
@@ -49,7 +48,7 @@
 .card .description {
   color: rgb(75, 74, 74);
   font-size: 14px;
-  margin-bottom: 30px;  
+  margin-bottom: 30px;
   width: 280px;
   height: 1.2em;
 }
@@ -58,13 +57,13 @@
   font-size: 14px;
   text-overflow: ellipsis;
   overflow: hidden;
-  margin-bottom: 5px;  
+  margin-bottom: 5px;
   white-space: nowrap;
 }
 .card .dates {
   color: grey;
-  font-size: 14px; 
-  margin-bottom: 3px;   
+  font-size: 14px;
+  margin-bottom: 3px;
 }
 .card .price {
   color: grey;
@@ -126,7 +125,7 @@
 
   border:1px solid #000;
 
-  
+
 
 }
 
@@ -179,7 +178,7 @@
 }
 
 .ticket-info {
-\
+
   padding-top: 2%;
 
 }
@@ -198,7 +197,7 @@
 
   font-size: 20px;
 
-  padding-left: 25%; 
+  padding-left: 25%;
 
 }
 
@@ -208,6 +207,5 @@
 
 }
 
-//terms and conditions css
 
 
