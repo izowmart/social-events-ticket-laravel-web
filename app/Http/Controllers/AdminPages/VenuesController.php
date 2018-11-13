@@ -77,7 +77,7 @@ class VenuesController extends Controller
                 'contact_person_phone'=>'required',
                 'contact_person_email'=>'required',
             ]); 
-
+        $featured_status = $request->featured;
         $venue = new Venue();
         $venue->name = $request->venue_name;
         $venue->town_id = $request->town_id;
@@ -86,6 +86,11 @@ class VenuesController extends Controller
         $venue->contact_person_name = $request->contact_person_name;
         $venue->contact_person_phone = $request->contact_person_phone;
         $venue->contact_person_email = $request->contact_person_email;
+        if(empty($featured_status)) {
+            $featured_status = 0;
+        }
+        $venue->featured_status = $featured_status;
+        $venue->featured_description = $request->featured_description;
         if ($request->hasFile('venue_image')) {
             $this->validate($request,[
                 'venue_image' => 'image: jpg,png,jpeg',
