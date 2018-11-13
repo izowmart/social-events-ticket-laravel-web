@@ -48,7 +48,8 @@
                     <th>Scanners</th> 
                     @endauth   
                     @auth('web_admin')                
-                    <th>Added by</th>                          
+                    <th>Added by</th>    
+                    <th>Featured event</th>                      
                     @endauth              
                     <th>Created on</th>
                     <th>Action</th>
@@ -99,7 +100,8 @@
                         </td>   
                         @endauth
                         @auth('web_admin')                                               
-                        <td><a href="{{ route('single_event_organizer', ['id'=>Crypt::encrypt($event->event_organizer_id)]) }}">{{$event->first_name}} {{$event->last_name}}</a></td>                             
+                        <td><a href="{{ route('single_event_organizer', ['id'=>Crypt::encrypt($event->event_organizer_id)]) }}">{{$event->first_name}} {{$event->last_name}}</a></td>  
+                        <td>Yes</td>                           
                         @endauth
                         <td>{{date("jS M Y, g:i a", strtotime($event->created_at))}}</td>
                         <td>
