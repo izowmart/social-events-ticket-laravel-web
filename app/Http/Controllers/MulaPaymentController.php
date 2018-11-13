@@ -83,8 +83,9 @@ class MulaPaymentController extends Controller
         $event = Event::find($event_id);
 //        $ticket_customer = TicketCustomer::find($ticket_customer->id);
 
+        $merchantTransactionID = now()->timestamp . "" . uniqid();
         $payload = [
-            "merchantTransactionID" => now()->timestamp . "" . uniqid(),
+            "merchantTransactionID" => $merchantTransactionID,
             "customerFirstName"     => $ticket_customer->first_name,
             "customerLastName"      => $ticket_customer->last_name,
             "MSISDN"                => UniversalMethods::formatPhoneNumber($ticket_customer->phone_number),
@@ -103,15 +104,46 @@ class MulaPaymentController extends Controller
             "paymentWebhookUrl"     =>  route("process_payment"),
         ];
 
-        //attach a pending payment request
-        PaymentRequest::create([
+        //create a pending payment request
+        $payment_request = PaymentRequest::create([
             'merchantTransactionID'     => $payload['merchantTransactionID'],
             'amount'                    => $payload['amount'],
             'ticket_customer_id'        => $ticket_customer->id,
-            'vip_quantity'              => $data_array['vip_quantity'],
-            'regular_quantity'          => $data_array['regular_quantity'],
+            //            'vip_quantity'              => key_exists('vip_quantity',$data_array) ? $data_array['vip_quantity'] : 0,
+            //            'regular_quantity'          => key_exists('regular_quantity',$data_array) ? $data_array['regular_quantity'] : 0,
             'event_id'                  => $event_id
         ]);
+
+        //keep a record of the tickets quantities to be bought and their prices
+        $records_to_save = [];
+        foreach ($data_array as $index => $item) {
+            if (stristr($index, "quantity") === FALSE) {
+                continue;
+            }else{
+                //get the slug
+                $ticket_category_slug = substr($index,0,strpos($index,'_'));
+
+                //get the ticket category
+//                $ticket_category = TicketCategory::where('slug', $ticket_category_slug)->first();
+
+                //get the ticket category details record
+                $ticket_category_details = TicketCategoryDetail::join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
+                    ->where('event_id', $event_id)
+                    ->where('slug', $ticket_category_slug)
+                    ->select('ticket_category_details.id')
+                    ->first();
+
+
+                $record_to_save = [
+                    'payment_request_id'                => $payment_request->id,
+                    'ticket_category_detail_id'         => $ticket_category_details->id,
+                    'tickets_count'                     => (int)$item
+                ];
+
+                //save the ticket categories to be purchased with their counts
+                TicketPurchaseRequest::create($record_to_save);
+            }
+        }
 
         //The encryption method to be used
         $encrypt_method = "AES-256-CBC";
@@ -154,10 +186,10 @@ class MulaPaymentController extends Controller
 
 
             //confirm whether the payment should be accepted or not
-            //check whether the MSISDN is recognized
+            //check whether the merchantTransactionID & the amounts are recognized
             $pending_payment_request = PaymentRequest::where('merchantTransactionID', $result->merchantTransactionID)
 //                ->where('MSISDN', UniversalMethods::formatPhoneNumber($result->MSISDN))
-                ->where('amount','=', $result->amountPaid)
+//                ->where('amount','=', $result->amountPaid)
                 ->where('payment_request_status', '=',0)
                 ->first();
 
@@ -177,7 +209,7 @@ class MulaPaymentController extends Controller
                     'checkoutRequestID'     => $result->checkoutRequestID,
                     'merchantTransactionID' => $result->merchantTransactionID,
                     'statusCode'            => 180,
-                    'statusDescription'     => "Payment failed",
+                    'statusDescription'     => "Payment declined",
                     'receiptNumber'         => $result->merchantTransactionID,
                 ]);
             }
