@@ -33,7 +33,7 @@ class Event extends Model
     }
     public function events_dates()
     {
-        return $this->belongsTo('App\EventDate', 'event_id');
+        return $this->hasMany('App\EventDate', 'event_id');
     }
 
     public function tickets()
