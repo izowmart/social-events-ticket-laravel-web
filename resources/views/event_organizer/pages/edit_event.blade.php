@@ -1,8 +1,7 @@
 @extends('common_pages.layouts')
 
 @section('styles')
-<link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-datetimepicker-standalone.min.css') }}" /> 
-<link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-select.min.css') }}" />  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" type="text/css" href="{{ asset('css/summernote-bs4.css') }}" /> 
 @endsection
 
@@ -65,7 +64,7 @@
                             <label class="control-label">Event Start</label>
                             <div class="form-group{{ $errors->has('start') ? ' has-error' : '' }}">
                                 <div class='input-group date'>
-                                    <input class="form-control datetimepicker" type="text" name="dates[{{$event_date->id}}][start]" value="{{date('m/d/Y H:i A',strtotime($event_date->start))}}" placeholder="Select start date"  required>
+                                    <input class="form-control datetimepicker" type="text" name="dates[{{$event_date->id}}][start]" value="{{date('Y-m-d H:i',strtotime($event_date->start))}}" placeholder="Select start date"  required>
                                    
                                     @if ($errors->has('start'))
                                         <span class="help-block">
@@ -79,7 +78,7 @@
                         <div class="col-md-4">
                             <div class="form-group{{ $errors->has('stop') ? ' has-error' : '' }}">
                                 <label class="control-label">Event Stop</label>
-                                <input class="form-control datetimepicker" type="text" name="dates[{{$event_date->id}}][stop]" value="{{date('m/d/Y H:i A',strtotime($event_date->end))}}" placeholder="Select stop date"  required>
+                                <input class="form-control datetimepicker" type="text" name="dates[{{$event_date->id}}][stop]" value="{{date('Y-m-d H:i',strtotime($event_date->end))}}" placeholder="Select stop date"  required>
                                 @if ($errors->has('stop'))
                                     <span class="help-block">
                                         <strong>{{ $errors->first('stop') }}</strong>
@@ -217,12 +216,10 @@
 @endsection
 
 @section('other-scripts')
-<script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=true&libraries=places&key=AIzaSyBO5Else2rW4UNyXiCMp3y20JV7BseTMys"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=true&libraries=places&key=AIzaSyAWMiw7tAqWan2iOUqRzzM2BGQ9z6Pe8wI"></script>
 <script src="{{ asset('js/plugins/jquery.placepicker.js') }}"></script>
-<script src="{{ asset('js/plugins/moment.min.js') }}"></script>
-<script src="{{ asset('js/plugins/bootstrap-datetimepicker.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="{{ asset('js/plugins/summernote-bs4.min.js') }}"></script>
-<script src="{{ asset('js/plugins/bootstrap-select.min.js') }}"></script>
 <script>
     var room = {{$event_dates->last()->id}};
 
@@ -237,15 +234,11 @@
 
         objTo.appendChild(divtest)
 
-        $('.datetimepicker').datetimepicker({
-            icons: {
-                time: "fa fa-clock-o",
-                date: "fa fa-calendar",
-                up: "fa fa-arrow-up",
-                down: "fa fa-arrow-down",
-                previous: "	fa fa-angle-left",
-                next: "	fa fa-angle-right"
-            }
+        $(".datetimepicker").flatpickr({
+            enableTime: true,
+            altInput: true,
+            altFormat: "F j, Y H:i",
+            dateFormat: "Y-m-d H:i",
         });
     }
     function remove_date_fields(rid) {
@@ -298,7 +291,7 @@
                 //get and set the input values to the inputs created by the appendRows
                 var price = '{{$ticket_category_detail->price}}';
                 var no_of_tickets = {{$ticket_category_detail->no_of_tickets}};
-                var ticket_sale_end_date = "{{date('m/d/Y H:i A',strtotime($ticket_category_detail->ticket_sale_end_date))}}";
+                var ticket_sale_end_date = "{{date('Y-m-d H:i',strtotime($ticket_category_detail->ticket_sale_end_date))}}";
                 var slug = '{{$ticket_category_detail->slug}}';
 
                 $('#'+slug+'_category_amount').val(price);
@@ -346,37 +339,6 @@
         }
 
     });
-    // $('#category').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-        
-    //     if (isSelected==true) {
-    //          $('#category option:selected').each(function () {
-    //               var text = $(this).text();
-    //              if (!selectedItems.includes(text)) {
-    //                 selectedItems.push(text);
-    //                 var value = $(this).val();
-    //                 appendRows(text);
-    //              }
-    //          }); 
-            
-    //     }else{ 
-    //         // previousValue.forEach(Individual);
-    //         // function Individual(value) {
-    //             var deselected_text = $('#category option').eq(clickedIndex).text();
-    //             var name = deselected_text.toLowerCase().split(' ').join('_');
-    //             var div = name+'_div';        
-
-    //             for(var i = selectedItems.length - 1; i >= 0; i--) {
-    //                 if(selectedItems[i] === deselected_text) {
-    //                     selectedItems.splice(i, 1);
-    //                     $('#'+div).slideUp("slow").remove();
-    //                 }
-    //             }         
-                
-    //         //}
-
-    //     }
-        
-    // });
         
     $("#location-address").each(function() {
       var target = this;
@@ -395,15 +357,11 @@
       }).data('placepicker');
     });
 
-    $('.datetimepicker').datetimepicker({
-        icons: {
-            time: "fa fa-clock-o",
-            date: "fa fa-calendar",
-            up: "fa fa-arrow-up",
-            down: "fa fa-arrow-down",
-            previous: "	fa fa-angle-left",
-            next: "	fa fa-angle-right"
-        }
+    $(".datetimepicker").flatpickr({
+        enableTime: true,
+        altInput: true,
+        altFormat: "F j, Y H:i",
+        dateFormat: "Y-m-d H:i",
     });
 
     $('input[type=radio][name=type]').change(function() {
@@ -427,16 +385,12 @@
       $("#"+name+"_div").hide();
       $("#"+name+"_div").slideDown("slow");
 
-      $('.datetimepicker').datetimepicker({
-        icons: {
-            time: "fa fa-clock-o",
-            date: "fa fa-calendar",
-            up: "fa fa-arrow-up",
-            down: "fa fa-arrow-down",
-            previous: "	fa fa-angle-left",
-            next: "	fa fa-angle-right"
-        }
-    });
+      $(".datetimepicker").flatpickr({
+        enableTime: true,
+        altInput: true,
+        altFormat: "F j, Y H:i",
+        dateFormat: "Y-m-d H:i",
+      });
   }
 
 </script>

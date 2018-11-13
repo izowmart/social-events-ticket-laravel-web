@@ -2,8 +2,7 @@
 
 @section('styles')
 <link rel="stylesheet" type="text/css" href="{{ asset('css/summernote-bs4.css') }}" />   
-<link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-datetimepicker-standalone.min.css') }}" /> 
-<link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-select.min.css') }}" /> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 @endsection
 
 @section('content')
@@ -212,12 +211,10 @@
 @endsection
 
 @section('other-scripts')
-<script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=true&libraries=places&key=AIzaSyBO5Else2rW4UNyXiCMp3y20JV7BseTMys"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=true&libraries=places&key=AIzaSyAWMiw7tAqWan2iOUqRzzM2BGQ9z6Pe8wI"></script>
 <script src="{{ asset('js/plugins/jquery.placepicker.js') }}"></script>
-<script src="{{ asset('js/plugins/moment.min.js') }}"></script>
-<script src="{{ asset('js/plugins/bootstrap-datetimepicker.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="{{ asset('js/plugins/summernote-bs4.min.js') }}"></script>
-<script src="{{ asset('js/plugins/bootstrap-select.min.js') }}"></script>
 <script>    
     var room = 0;
 
@@ -232,15 +229,11 @@
 
         objTo.appendChild(divtest)
 
-        $('.datetimepicker').datetimepicker({
-            icons: {
-                time: "fa fa-clock-o",
-                date: "fa fa-calendar",
-                up: "fa fa-arrow-up",
-                down: "fa fa-arrow-down",
-                previous: "	fa fa-angle-left",
-                next: "	fa fa-angle-right"
-            }
+        $(".datetimepicker").flatpickr({
+            enableTime: true,
+            altInput: true,
+            altFormat: "F j, Y H:i",
+            dateFormat: "Y-m-d H:i",
         });
     }
 
@@ -288,7 +281,6 @@
     $("#hidden").hide();
     $("#category-row").hide();
     $("#append-row").hide();
-    $('#category').selectpicker();
     $(".ticket_type_checkbox").change(function() { 
         if(this.checked) {
             appendRows($(this).data('text'));
@@ -317,26 +309,22 @@
       }).data('placepicker');
     });
 
-    $('.datetimepicker').datetimepicker({
-        icons: {
-            time: "fa fa-clock-o",
-            date: "fa fa-calendar",
-            up: "fa fa-arrow-up",
-            down: "fa fa-arrow-down",
-            previous: "	fa fa-angle-left",
-            next: "	fa fa-angle-right"
-        }
+    $(".datetimepicker").flatpickr({
+        enableTime: true,
+        altInput: true,
+        altFormat: "F j, Y H:i",
+        dateFormat: "Y-m-d H:i",
     });
 
-        $('input[type=radio][name=type]').change(function() {
-            if (this.value == '2') {
-                $("#category-row").slideDown("slow");
-            }else {            
-                $("#append-row").empty().slideUp("slow");  
-                $('#category').selectpicker('deselectAll');
-                $("#category-row").slideUp("slow");
-            }
-        });
+    $('input[type=radio][name=type]').change(function() {
+        if (this.value == '2') {
+            $("#category-row").slideDown("slow");
+        }else {            
+            $("#append-row").empty().slideUp("slow");  
+            $('#category').selectpicker('deselectAll');
+            $("#category-row").slideUp("slow");
+        }
+    });
 
   }); 
 
@@ -349,16 +337,12 @@
       $("#"+name+"_div").hide();
       $("#"+name+"_div").slideDown("slow");
 
-      $('.datetimepicker').datetimepicker({
-        icons: {
-            time: "fa fa-clock-o",
-            date: "fa fa-calendar",
-            up: "fa fa-arrow-up",
-            down: "fa fa-arrow-down",
-            previous: "	fa fa-angle-left",
-            next: "	fa fa-angle-right"
-        }
-    });
+      $(".datetimepicker").flatpickr({
+            enableTime: true,
+            altInput: true,
+            altFormat: "F j, Y H:i",
+            dateFormat: "Y-m-d H:i",
+     });
   }
 
 </script>

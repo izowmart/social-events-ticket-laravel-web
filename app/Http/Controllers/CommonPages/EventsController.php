@@ -158,7 +158,7 @@ class EventsController extends Controller
     }
 
     public function update(Request $request){
-        //dd($request->all());
+        // dd($request->all());
         $this->validate($request, [
             'name'=>'required',
             'description'=>'required',            
