@@ -12,7 +12,7 @@ use App\TicketCategoryDetail;
 use App\TicketCustomer;
 use App\TicketPurchaseRequest;
 use App\User;
-use Barryvdh\DomPDF\PDF;
+use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -458,9 +458,16 @@ class MulaPaymentController extends Controller
          * 1. on the pdf to be shared via email
          * 2. on the app as an image...
          */
+
+        $qr_code_images_dir = public_path('bought_tickets/qr_code_images');
+
+        if (!file_exists($qr_code_images_dir)) {
+            mkdir($qr_code_images_dir, 0777, true);
+        }
+
         $qr_code_image_name = now()->timestamp . ".png";
         $qr_code = QrCode::format('png')->size(100)->generate('http://fikaplaces.com/tickets/' . $unique_ticket_identifier,
-            '../public/bought_tickets/qr_code_images/' . $qr_code_image_name);
+            $qr_code_images_dir.'/' . $qr_code_image_name);
 
         /*
         * Prepare the content for the ticket pdf template
