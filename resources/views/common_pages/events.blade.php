@@ -118,15 +118,14 @@
                             <input id="featured_event_to_input_{{$event->id}}" type="hidden" name="featured_event_to" value="">
                             </form>
                         </td>                           
-                        @endauth
+                        @endauth                        
+                        @auth('web_event_organizer')
                         <td>@if ($event->featured_event==2)
                             No
                         @else
                             Yes
                         @endif
                         </td>
-                        @auth('web_admin')
-
                         @endauth
                         <td>{{date("jS M Y, g:i a", strtotime($event->created_at))}}</td>
                         <td>
