@@ -48,9 +48,9 @@
                     <th>Scanners</th> 
                     @endauth   
                     @auth('web_admin')                
-                    <th>Added by</th>    
-                    <th>Featured event</th>                      
-                    @endauth              
+                    <th>Added by</th>                       
+                    @endauth           
+                    <th>Featured event</th>      
                     <th>Created on</th>
                     <th>Action</th>
                   </tr>
@@ -89,11 +89,6 @@
                         <td>{{ $event->scanners->count() }}
                             @if ($event->scanners->count()>0)
                                 <a href="{{ route('scanners',['event_slug'=>$event->slug]) }}" class="btn btn-sm btn-outline-primary">View</a>
-                                {{-- <form id="scanner-form-{{$event->id}}" action="{{ route('scanners') }}" method="POST" style="display: none;">
-                                    {{ csrf_field() }}
-                                    <input type="hidden" name="id" value="{{$event->id}}">
-                                    <input type="hidden" name="event_name" value="{{$event->name}}">
-                                </form> --}}
                             @else
                                 <a href="{{ route('add_scanner',['event_slug'=>$event->slug]) }}" class="btn btn-sm btn-outline-primary">Add</a>
                             @endif
@@ -101,7 +96,37 @@
                         @endauth
                         @auth('web_admin')                                               
                         <td><a href="{{ route('single_event_organizer', ['id'=>Crypt::encrypt($event->event_organizer_id)]) }}">{{$event->first_name}} {{$event->last_name}}</a></td>  
-                        <td>Yes</td>                           
+                        <td>
+                            <div class="btn-group" role="group" aria-label="Button group with nested dropdown"> 
+                            @if ($event->featured_event==2)
+                                <button id="active_status_btn_{{$event->id}}" class="btn btn-primary" type="button">{{'No'}}</button>
+                                <div class="btn-group" role="group">
+                                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right"><a class="dropdown-item" style="cursor: pointer;" onClick="event.preventDefault(); featuredEventBtn({{$event->id}},'yes')">Yes</a></div>
+                                </div>
+                            @else  
+                                <button class="btn btn-success" type="button">{{'Yes'}}</button>    
+                                <div class="btn-group" role="group">
+                                <button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right"><a class="dropdown-item" style="cursor: pointer;" onClick="event.preventDefault(); featuredEventBtn({{$event->id}},'no')">No</a></div>
+                                </div>              
+                            @endif
+                            </div>
+                            <form id="update_featured_event_{{$event->id}}" action="{{ route('admin_update_featured_event') }}" method="POST" style="display: none;">
+                            {{ csrf_field() }}
+                            <input type="hidden" name="id" value="{{$event->id}}">
+                            <input id="featured_event_to_input_{{$event->id}}" type="hidden" name="featured_event_to" value="">
+                            </form>
+                        </td>                           
+                        @endauth
+                        <td>@if ($event->featured_event==2)
+                            No
+                        @else
+                            Yes
+                        @endif
+                        </td>
+                        @auth('web_admin')
+
                         @endauth
                         <td>{{date("jS M Y, g:i a", strtotime($event->created_at))}}</td>
                         <td>
@@ -166,6 +191,14 @@
 <script type="text/javascript" src="{{ asset('js/plugins/sweetalert.min.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js"></script>
 <script>
+@auth('web_admin')
+  function featuredEventBtn(id,status_to) {
+    // console.log("Property id: "+id+'\t'+"Status to be updated to: "+status_to+"\n");
+    $('#featured_event_to_input_'+id).val(status_to);
+    $('#update_featured_event_'+id).submit();
+  }
+@endauth
+@auth('web_event_organizer')
   function deleteBtn(id) {    
     swal({
       		title: "Are you sure?",
@@ -185,6 +218,7 @@
       		
       	});
   }
+@endauth
   $(document).ready(function() {
       $('.zoom-gallery').magnificPopup({
           delegate: 'a',

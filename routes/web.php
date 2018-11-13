@@ -177,6 +177,7 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
         Route::post('deactivate', 'CommonPages\EventsController@deactivate')->name('admin_deactivate_event_post');
         Route::post('verify', 'CommonPages\EventsController@verify')->name('admin_verify_event_post');
         Route::post('activate', 'CommonPages\EventsController@activate')->name('admin_activate_event_post');
+        Route::post('update/featured_event', 'CommonPages\EventsController@updateFeaturedEvent')->name('admin_update_featured_event');
     });
     
 });
