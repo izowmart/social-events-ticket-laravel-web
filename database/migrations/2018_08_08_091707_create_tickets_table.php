@@ -19,8 +19,13 @@ class CreateTicketsTable extends Migration
             $table->foreign('ticket_customer_id')->references('id')->on('ticket_customers');
             $table->integer('event_id')->unsigned();
             $table->foreign('event_id')->references('id')->on('events');
-            $table->integer('bought_tickets_count');
+            $table->text('validation_token');
+            $table->text('qr_code_image_url');
+            $table->string('pdf_format_url');
+            $table->integer('ticket_category_id')->unsigned();
+            $table->foreign('ticket_category_id')->references('id')->on('ticket_categories');
             $table->timestamps();
+
         });
     }
 
