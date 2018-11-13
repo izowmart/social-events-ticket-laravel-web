@@ -4,15 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Event;
 use App\Http\Traits\UniversalMethods;
+use App\Mail\TicketsBought;
 use App\PaymentRequest;
 use App\PaymentResponse;
 use App\Ticket;
+use App\TicketCategoryDetail;
 use App\TicketCustomer;
 use App\TicketPurchaseRequest;
 use App\User;
+use Barryvdh\DomPDF\PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class MulaPaymentController extends Controller
 {
