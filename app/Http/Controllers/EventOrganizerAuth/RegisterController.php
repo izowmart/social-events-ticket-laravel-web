@@ -33,7 +33,7 @@ class RegisterController extends Controller
         $event_organizer = $this->create($request->all());
 
         //Give message to event_organizer after successfull registration
-        $request->session()->flash('status', 'Regestered successfully, please wait for your account to be verified by admin.');
+        $request->session()->flash('status', 'Regestered successfully, You can proceed to login.');
         return redirect($this->redirectPath);
     }
 
