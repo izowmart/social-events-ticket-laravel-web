@@ -168,4 +168,12 @@ class VenuesController extends Controller
         $request->session()->flash('status', 'Venue deleted successfully');
         return redirect($this->redirectPath);
     }
+
+    public function toggleFeatureStatus(Request $request)
+    {
+        $venue = Venue::find($request->id);
+        $venue->featured_status = !$venue->featured_status;
+        $venue->save();
+        return redirect($this->redirectPath);
+    }
 }

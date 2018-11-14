@@ -51,7 +51,14 @@
                         <td>{{$venue->contact_person_phone}}</td>
                         <td>{{$venue->contact_person_email}}</td>
                         <td><img height="100px" width="100px" src="{{asset('/venue_images/'.$venue->venue_image)}}"></td>
-                        <td><a href="{{ route('edit_venue', ['slug'=>$venue->slug]) }}" class="btn btn-sm btn-outline-primary">Feature</a></td>
+                        <td>
+                          @if($venue->featured_status == 0)
+                          <button onClick="featureBtn({{$venue->id}})" class="btn btn-sm btn-outline-primary">Feature</button>
+                          <form id="feature_venue{{$venue->id}}" action="{{ route('feature_venue') }}" method="POST" style="display: none;">
+                              {{ csrf_field() }}
+                              <input type="hidden" name="id" value="{{$venue->id}}">
+                          </form>
+                          @endif
                         <td>
                             <a target="_blank" href="https://maps.google.com/maps?q={{$venue->latitude}},{{$venue->longitude}}" class="btn btn-sm btn-outline-primary">View</a>
                         </td>
@@ -102,6 +109,25 @@
       	});
   }
   
+</script>
+<script >
+  function featureBtn(id) {
+    swal({
+  title: "An input!",
+  text: "Write something interesting:",
+  type: "input",
+  showCancelButton: true,
+  closeOnConfirm: false,
+  inputPlaceholder: "Write something"
+}, function (inputValue) {
+  if (inputValue === false) return false;
+  if (inputValue === "") {
+    swal.showInputError("You need to write something!");
+    return false
+  }
+  swal("Nice!", "You wrote: " + inputValue, "success");
+});
+  }
 </script>
 @if (session('status'))
     <script type="text/javascript">
