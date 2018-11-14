@@ -3,6 +3,7 @@
 @section('styles')
 <link rel="stylesheet" type="text/css" href="{{ asset('css/summernote-bs4.css') }}" />   
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="{{ asset('css/slim.min.css') }}">
 @endsection
 
 @section('content')
@@ -172,37 +173,29 @@
                   </div>
                   <div class="row">
                     <div class="col-md-10">
-                      <div class="form-group{{ $errors->has('image') ? ' has-error' : '' }}">
-                          <label for="image">Image</label>
-                          <div class="input-group">
-                              <div class="custom-file">
-                                  <input type="file" aria-describedby="ImageHelp" name="image" onchange="readURL(this);" accept="image/png,image/gif,image/jpeg" class="custom-file-input" id="image" required>
-                                  <label class="custom-file-label" for="image">Click to choose image</label>                                                
-                              </div>
-                              <div class="invalid-feedback">
-                                  Please select an image.
-                              </div>
-                          </div>   
-                          @if ($errors->has('image'))
+                      <div class="form-group{{ $errors->has('event_image') ? ' has-error' : '' }}">
+                          <label for="event_image">Event Image</label>
+                          <div class="slim" style="width: 300px; height: 400px"
+                                data-label="Drop your image here or click to choose"
+                                data-size="590,780"
+                                data-min-size="550,770">
+                                <input type="file" name="event_image[]" required/>
+                          </div>  
+                          @if ($errors->has('event_image'))
                               <span class="help-block">
-                                  <strong>{{ $errors->first('image') }}</strong>
+                                  <strong>{{ $errors->first('event_image') }}</strong>
                               </span>
-                          @endif                         
-                          <small class="form-text text-muted" id="ImageHelp">Preview of the image will be shown below.</small>                                        
-                          <div id="hidden">
-                              <br>
-                              <img id="blah" src="" height="400""><br><br>
-                          </div>
+                          @endif       
                       </div>
                     </div>
-                  </div>
-                  <div class="container">
+                  </div>                  
           
                   <div class="tile-footer">
                     <button class="btn btn-primary" type="submit">Submit</button>
                   </div>
                   
-              </form>              
+              </form>      
+                     
             </div>
           </div>
         </div>
@@ -215,6 +208,11 @@
 <script src="{{ asset('js/plugins/jquery.placepicker.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="{{ asset('js/plugins/summernote-bs4.min.js') }}"></script>
+<script src="{{ asset('js/plugins/slim.amd.js') }}"></script>
+<script src="{{ asset('js/plugins/slim.commonjs.js') }}"></script>
+<script src="{{ asset('js/plugins/slim.global.min.js') }}"></script>
+<script src="{{ asset('js/plugins/slim.jquery.min.js') }}"></script>
+<script src="{{ asset('js/plugins/slim.kickstart.min.js') }}"></script>
 <script>    
     var room = 0;
 
@@ -261,20 +259,6 @@
         ['help', ['help']]
         ]          
     });
-  function readURL(input) {
-    if (input.files && input.files[0]) {
-        var reader = new FileReader();
-
-        reader.onload = function (e) {
-            $('#blah')
-                .attr('src', e.target.result)
-                .height(400);            
-            $("#hidden").slideDown("slow");
-        };
-
-        reader.readAsDataURL(input.files[0]);
-    }
-  }
 
   $(document).ready(function() {
     var selectedItems = [];
