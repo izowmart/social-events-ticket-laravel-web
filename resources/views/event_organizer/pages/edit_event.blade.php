@@ -264,7 +264,6 @@
         ['help', ['help']]
         ]          
     });
-    $('#category').selectpicker();
     var selectedItems = [];
 </script>
 
@@ -369,7 +368,6 @@
             $("#category-row").slideDown("slow");
         }else {            
             $("#append-row").empty().slideUp("slow");  
-            $('#category').selectpicker('deselectAll');
             $("#category-row").slideUp("slow");
         }
     });
