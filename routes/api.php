@@ -42,7 +42,7 @@ Route::group(['prefix' => 'auth'], function () use ($base_url) {
         Route::group(['middleware' => 'auth:api'], function () use ($base_url) {
             Route::get('scanners', $base_url . 'Api\ScannerAuthController@index');
             Route::get('events_tickets', $base_url . 'Api\ScannerAuthController@events_tickets');
-/isaac
+
         });
     });
 });
