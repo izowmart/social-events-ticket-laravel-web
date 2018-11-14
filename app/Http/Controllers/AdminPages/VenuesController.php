@@ -25,7 +25,7 @@ class VenuesController extends Controller
      */
     public function index()
     {
-        $venues = Venue::select('venues.id','venues.slug','venues.name as venue_name','venues.contact_person_name','venues.contact_person_phone','venues.contact_person_email','venues.latitude','venues.longitude','venues.venue_image','towns.id as town_id','towns.name as town_name')
+        $venues = Venue::select('venues.id','venues.slug','venues.name as venue_name','venues.contact_person_name','venues.contact_person_phone','venues.contact_person_email','venues.latitude','venues.longitude','venues.venue_image','venues.featured_status','towns.id as town_id','towns.name as town_name')
                 ->join('towns', 'towns.id', '=', 'venues.town_id')
                 ->get();
         return view('admin.pages.venues')->with('venues',$venues); 
@@ -171,7 +171,6 @@ class VenuesController extends Controller
 
     public function featureVenue(Request $request)
     {
-        dd($request->all());
         $venue = Venue::find($request->id);
         $venue->featured_status = !$venue->featured_status;
         $venue->featured_description = $request->featured_description;
@@ -179,9 +178,9 @@ class VenuesController extends Controller
         return redirect($this->redirectPath);
     }
 
-    public function unfeatureVenue ($id)
+    public function unfeatureVenue($slug)
     {
-        $venue = Venue::find($request->id);
+        $venue = Venue::where('slug', '=', $slug)->first();
         $venue->featured_status = !$venue->featured_status;
         $venue->save();
         return redirect($this->redirectPath);

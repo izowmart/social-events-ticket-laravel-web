@@ -52,7 +52,7 @@
                         <td>{{$venue->contact_person_email}}</td>
                         <td><img height="100px" width="100px" src="{{asset('/venue_images/'.$venue->venue_image)}}"></td>
                         <td>
-                          @if($venue->featured_status == 0)
+                          @if($venue->featured_status==0)
                           <button onClick="featureBtn('{{$venue->id}}')" class="btn btn-sm btn-outline-primary">Feature</button>
                           <form id="feature_venue_{{$venue->id}}" action="{{ route('feature_venue') }}" method="POST" style="display: none;">
                               {{ csrf_field() }}
@@ -60,7 +60,7 @@
                               <input type="hidden" name="featured_description" value="" id="featured_description_{{$venue->id}}">
                           </form>
                           @else
-                          <a class="btn btn-sm btn-outline-danger" href="{{'unfeature_venue'}}"> Unfeature</a>
+                          <a class="btn btn-sm btn-outline-danger" href="{{route('unfeature_venue',['slug'=>$venue->slug])}}"> Unfeature</a>
                           @endif
                         <td>
                             <a target="_blank" href="https://maps.google.com/maps?q={{$venue->latitude}},{{$venue->longitude}}" class="btn btn-sm btn-outline-primary">View</a>
