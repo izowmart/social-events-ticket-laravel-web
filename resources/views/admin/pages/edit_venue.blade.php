@@ -28,7 +28,7 @@
         <div class="col-md-12">
           <div class="tile">              
             <div class="tile-body">
-              <form method="POST" action="{{ route('edit_venue_post') }}">
+              <form method="POST" action="{{ route('edit_venue_post') }}" enctype="multipart/form-data">
                 {{ csrf_field() }}
                   <div class="row">
                     <div class="col-md-10">
@@ -110,6 +110,14 @@
                         @endif 
                       </div>
                     </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-10">
+                      <div class="form-group">
+                        <label>Image of the venue (optional)</label>
+                        <input type="file" class="form-control-file" name="venue_image" value="{{ $venue->venue_image}}" >
+                      </div>
+                    </div> 
                   </div>
                   <div class="tile-footer">
                     <button class="btn btn-primary" type="submit">Submit</button>
