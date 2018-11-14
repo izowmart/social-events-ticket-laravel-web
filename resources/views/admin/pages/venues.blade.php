@@ -113,12 +113,12 @@
 <script >
   function featureBtn(id) {
     swal({
-  title: "An input!",
-  text: "Write something interesting:",
+  title: "Feature this venue?",
+  text: "Add a catchy description of the venue:",
   type: "input",
   showCancelButton: true,
   closeOnConfirm: false,
-  inputPlaceholder: "Write something"
+  inputPlaceholder: "Venue's description"
 }, function (inputValue) {
   if (inputValue === false) return false;
   if (inputValue === "") {
