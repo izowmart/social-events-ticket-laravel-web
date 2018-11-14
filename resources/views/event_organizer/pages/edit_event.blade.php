@@ -154,6 +154,14 @@
                     <div id="append-row">
                     
                     </div>
+                    <div class="row" id="ticket_sale_end_date_container">
+                        <div class='col-md-4'>
+                            <label class='control-label'>Tickets sale closes at</label>
+                            <div class='form-group'><div class='input-group date' id='datetimepicker1'>
+                                <input class='form-control datetimepicker' type='text' id='ticket_sale_end_date' name='ticket_sale_end_date' value='' placeholder='Select date'>
+                            </div>
+                        </div>
+                    </div>   
                   </div>
                   <div class="row">
                     <div class="col-md-10">
@@ -239,7 +247,7 @@
         $(".datetimepicker").flatpickr({
             enableTime: true,
             altInput: true,
-            altFormat: "F j, Y H:i",
+            altFormat: "J F, Y h:i K",
             dateFormat: "Y-m-d H:i",
         });
     }
@@ -275,6 +283,9 @@
         $(document).ready(function() {
             $("#category-row").slideDown("slow");
             $("#append-row").slideDown("slow");
+            $("#ticket_sale_end_date_container").slideDown("slow");
+            $('#ticket_sale_end_date').val('{{$event->getTicketSaleEndDate()->first()->ticket_sale_end_date}}');
+            $('#ticket_sale_end_date').attr('required', 'required');
         });
 
     </script>
@@ -307,7 +318,8 @@
         <script>   
         $(document).ready(function() {  
             $("#category-row").hide();
-            $("#append-row").hide();
+            $("#append-row").hide();            
+            $("#ticket_sale_end_date_container").hide();
         });
         </script>
     @endif 
@@ -322,7 +334,12 @@
         }else{
             var name = $(this).data('text').toLowerCase().split(' ').join('_');
             var div = name+'_div'; 
-            $('#'+div).slideUp("slow").remove();
+            $('#'+div).slideUp("normal", function() { $(this).remove(); } );
+            if ($(".ticket_type_checkbox:checked").length == 0){
+                // none of checkobx is checked
+                $("#ticket_sale_end_date_container").slideUp("slow");
+                $('#ticket_sale_end_date').attr('required', false);
+            }
         }
 
     });
@@ -347,7 +364,7 @@
     $(".datetimepicker").flatpickr({
         enableTime: true,
         altInput: true,
-        altFormat: "F j, Y H:i",
+        altFormat: "J F, Y h:i K",
         dateFormat: "Y-m-d H:i",
     });
 
@@ -357,6 +374,8 @@
         }else {            
             $("#append-row").empty().slideUp("slow");  
             $("#category-row").slideUp("slow");
+            $("#ticket_sale_end_date_container").slideUp("slow");
+            $('#ticket_sale_end_date').attr('required', false);
         }
     });
 
@@ -366,17 +385,12 @@
       name = category_name.toLowerCase().split(' ').join('_');
       id = name+"_category";
       label = category_name;
-      var content = "<div class='row' id='"+name+"_div'><div class='col-md-4'><div class='form-group'><label class='control-label'>"+label+" Amount</label><div class='form-group'><label class='sr-only' for='exampleInputAmount'>Amount (in shillings)</label><div class='input-group'><div class='input-group-prepend'><span class='input-group-text'>Ksh</span></div><input class='form-control' id='"+id+"_amount' value='' name='"+name+"_amount' type='number' min='1' placeholder='Amount to be paid' required><div class='input-group-append'><span class='input-group-text'>.00</span></div></div></div></div></div><div class='col-md-3'><div class='form-group'><label class='control-label'>"+label+" No. of tickets</label><input class='form-control' type='number' id='"+id+"_tickets' name='"+name+"_tickets' value='' placeholder='Maximum number of tickets' required></div></div><div class='col-md-3'><label class='control-label'>"+label+" Ticket sale end date</label><div class='form-group'><div class='input-group date' id='datetimepicker1'><input class='form-control datetimepicker' type='text' id='"+id+"_ticket_sale_end_date' name='"+name+"_ticket_sale_end_date' value='' placeholder='Select date'  required></div></div></div></div>";     
+      var content = "<div class='row' id='"+name+"_div'><div class='col-md-4'><div class='form-group'><label class='control-label'>"+label+" Amount</label><div class='form-group'><label class='sr-only' for='exampleInputAmount'>Amount (in shillings)</label><div class='input-group'><div class='input-group-prepend'><span class='input-group-text'>Ksh</span></div><input class='form-control' id='"+id+"_amount' value='' name='"+name+"_amount' type='number' min='1' placeholder='Amount to be paid' required><div class='input-group-append'><span class='input-group-text'>.00</span></div></div></div></div></div><div class='col-md-3'><div class='form-group'><label class='control-label'>"+label+" No. of tickets</label><input class='form-control' type='number' id='"+id+"_tickets' name='"+name+"_tickets' value='' placeholder='Maximum number of tickets' required></div></div></div></div>";     
       $("#append-row").append(content).slideDown("slow");
       $("#"+name+"_div").hide();
       $("#"+name+"_div").slideDown("slow");
-
-      $(".datetimepicker").flatpickr({
-        enableTime: true,
-        altInput: true,
-        altFormat: "F j, Y H:i",
-        dateFormat: "Y-m-d H:i",
-      });
+      $("#ticket_sale_end_date_container").slideDown("slow");
+      $('#ticket_sale_end_date').attr('required', 'required');
   }
 
 </script>

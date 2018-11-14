@@ -15,6 +15,7 @@ use App\Classes\Slim;
 use App\Scanner;
 use App\EventScanner;
 use App\TicketCategory;
+use App\TicketSaleEndDate;
 use App\TicketCategoryDetail;
 
 class EventsController extends Controller
@@ -43,7 +44,7 @@ class EventsController extends Controller
                     ->orderBy('id','desc')
                     ->first();
         $event_dates = EventDate::select('id','start','end')->where('event_id',$event->id)->get();
-        $ticket_category_details = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.ticket_sale_end_date','ticket_category_details.category_id','ticket_categories.slug','ticket_categories.name')
+        $ticket_category_details = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.category_id','ticket_categories.slug','ticket_categories.name')
                                     ->join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
                                     ->where('event_id', $event->id)
                                     ->get();
@@ -57,6 +58,137 @@ class EventsController extends Controller
         //dd($data);
 
         return view('event_organizer.pages.edit_event')->with($data);
+
+    }
+
+    public function store(Request $request){
+                        
+        $this->validate($request, [
+            'name'=>'required',
+            'description'=>'required',            
+            'location'=>'required',
+            'type'=>'required',
+            'ticket_sale_end_date'=>'nullable|date',
+            'event_image'=>'required|array'
+        ]); 
+
+        $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
+
+        $event = new Event();
+        $event->name = $request->name;
+        $event->event_organizer_id = $event_organizer_id;
+        $event->location = $request->location;
+        $event->longitude = $request->longitude;
+        $event->latitude = $request->latitude;
+        $event->description = $request->description;
+        $event->media_url = $this->upload_image('event_image');
+        $event->type = $request->type;
+        //if its a free event we set to verified
+        if($event->type==1){
+            $event->status = 1;
+        }
+        $event->save();
+        $this->insert_event_dates($request->dates,$event->id);
+
+        // $event_sponsor_media = new EventSponsorMedia();
+        // $event_sponsor_media->event_id = $event_id;
+        // $event_sponsor_media->media_url = $fileNameToStore;
+        // $event_sponsor_media->save();
+
+        //insert price and category if it's a paid event
+        if($request->type==2){
+            $this->insert_ticket_category_details($request,$event->id);
+            $ticket_sale_end_date = new TicketSaleEndDate();
+            $ticket_sale_end_date->event_id = $event->id;
+            $ticket_sale_end_date->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->ticket_sale_end_date));
+            $ticket_sale_end_date->save();
+        }
+
+        //Give message after successfull operation
+        $request->session()->flash('status', 'Event added successfully');
+        if($request->type==1){
+            //if free event
+            return redirect($this->EventOrganizerFreeredirectPath);
+        }else{
+            return redirect($this->EventOrganizerUnverifiedredirectPath);
+        }
+
+    }
+
+    public function update(Request $request){
+        $this->validate($request, [
+            'name'=>'required',
+            'description'=>'required',            
+            'location'=>'required',
+            'type'=>'required',
+            'ticket_sale_end_date'=>'nullable|date',
+            'event_image'=>'nullable|array'
+        ]);         
+
+        $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
+        $event = Event::find($request->id);
+        //get previous event type before updating event
+        $prev_event_type = $event->type;
+        $event->name = $request->name;
+        $event->event_organizer_id = $event_organizer_id;
+        $event->location = $request->location;
+        $event->longitude = $request->longitude;
+        $event->latitude = $request->latitude;
+        $event->description = $request->description;
+        // check if image was updated
+        if($request->event_image['0']!=null){
+            $event->media_url = $this->upload_image('event_image');
+            //delete the previous image
+            unlink(public_path('storage/images/events/'.$request->previous_image_url));
+        }
+        $event->type = $request->type;
+        $event->save();
+
+        $event_id = $event->id;
+
+        //delete previous dates and insert new ones
+        $event_date = EventDate::where('event_id',$event_id);
+        $event_date->delete();
+        $this->insert_event_dates($request->dates,$event_id);
+
+        //check if it was a paid event and changed to free. If so we will delete its record from ticket_category_details table
+        if($request->type==1 && $prev_event_type==2){
+            $ticket_category_details = TicketCategoryDetail::where('event_id',$request->id);
+            $ticket_category_details->delete();
+            
+        }
+
+        //update price and category if it's a paid event
+        if($request->type==2){
+            //delete all its records from ticket_category_details table and insert the new ones
+            $ticket_category_details = TicketCategoryDetail::where('event_id',$request->id);
+            $ticket_category_details->delete();            
+            $this->insert_ticket_category_details($request,$event_id);
+
+            $ticket_sale_end_date = TicketSaleEndDate::where('event_id',$request->id)->first();
+            $ticket_sale_end_date->event_id = $event->id;
+            $ticket_sale_end_date->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->ticket_sale_end_date));  
+            $ticket_sale_end_date->save();  
+        }
+
+        //Give message after successfull operation
+        $request->session()->flash('status', 'Event updated successfully');
+
+        //redirect event organizer to approproate place
+        $event_status = $event->status;
+        if($request->type==1){
+            //if free event
+            return redirect($this->EventOrganizerFreeredirectPath);
+
+        }else if($request->type==2 && $event_status!=0){
+            //if paid event and not unverified
+            return redirect($this->EventOrganizerVerifiedPaidredirectPath);
+
+        }else{
+            //if its unverified
+            return redirect($this->EventOrganizerUnverifiedredirectPath);
+
+        }
 
     }
 
@@ -104,138 +236,16 @@ class EventsController extends Controller
             //creat names for inputs
             $amount = $ticket_slug.'_amount';
             $tickets = $ticket_slug.'_tickets';
-            $ticket_sale_end_date = $ticket_slug.'_ticket_sale_end_date';
 
             $ticket_category_details = new TicketCategoryDetail;
             $ticket_category_details->event_id = $event_id;
             $ticket_category_details->category_id = $ticket_category->id;
             $ticket_category_details->price = $request->$amount;
             $ticket_category_details->no_of_tickets = $request->$tickets;
-            $ticket_category_details->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->$ticket_sale_end_date));
             $ticket_category_details->save();
             
         }
         return;
-
-    }
-
-    public function store(Request $request){
-                        
-        $this->validate($request, [
-            'name'=>'required',
-            'description'=>'required',            
-            'location'=>'required',
-            'type'=>'required',
-            'event_image'=>'required|array'
-        ]); 
-
-        $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-
-        $event = new Event();
-        $event->name = $request->name;
-        $event->event_organizer_id = $event_organizer_id;
-        $event->location = $request->location;
-        $event->longitude = $request->longitude;
-        $event->latitude = $request->latitude;
-        $event->description = $request->description;
-        $event->media_url = $this->upload_image('event_image');
-        $event->type = $request->type;
-        //if its a free event we set to verified
-        if($event->type==1){
-            $event->status = 1;
-        }
-        $event->save();
-        $this->insert_event_dates($request->dates,$event->id);
-
-        // $event_sponsor_media = new EventSponsorMedia();
-        // $event_sponsor_media->event_id = $event_id;
-        // $event_sponsor_media->media_url = $fileNameToStore;
-        // $event_sponsor_media->save();
-
-        //insert price and category if it's a paid event
-        if($request->type==2){
-            $this->insert_ticket_category_details($request,$event->id);
-        }
-
-        //Give message after successfull operation
-        $request->session()->flash('status', 'Event added successfully');
-        if($request->type==1){
-            //if free event
-            return redirect($this->EventOrganizerFreeredirectPath);
-        }else{
-            return redirect($this->EventOrganizerUnverifiedredirectPath);
-        }
-
-    }
-
-    public function update(Request $request){
-        $this->validate($request, [
-            'name'=>'required',
-            'description'=>'required',            
-            'location'=>'required',
-            'type'=>'required',
-            'event_image'=>'nullable|array'
-        ]);         
-
-        $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-        $event = Event::find($request->id);
-        //get previous event type before updating event
-        $prev_event_type = $event->type;
-        $event->name = $request->name;
-        $event->event_organizer_id = $event_organizer_id;
-        $event->location = $request->location;
-        $event->longitude = $request->longitude;
-        $event->latitude = $request->latitude;
-        $event->description = $request->description;
-        // check if image was updated
-        if($request->event_image['0']!=null){
-            $event->media_url = $this->upload_image('event_image');
-            //delete the previous image
-            unlink(public_path('storage/images/events/'.$request->previous_image_url));
-        }
-        $event->type = $request->type;
-        $event->save();
-
-        $event_id = $event->id;
-
-        //delete previous dates and insert new ones
-        $event_date = EventDate::where('event_id',$event_id);
-        $event_date->delete();
-        $this->insert_event_dates($request->dates,$event_id);
-
-        //check if it was a paid event and changed to free. If so we will delete its record from ticket_category_details table
-        if($request->type==1 && $prev_event_type==2){
-            $ticket_category_details = TicketCategoryDetail::where('event_id',$request->id);
-            $ticket_category_details->delete();
-            
-        }
-
-        //update price and category if it's a paid event
-        if($request->type==2){
-            //delete all its records from ticket_category_details table and insert the new ones
-            $ticket_category_details = TicketCategoryDetail::where('event_id',$request->id);
-            $ticket_category_details->delete();            
-            $this->insert_ticket_category_details($request,$event_id);          
-        }
-
-        //Give message after successfull operation
-        $request->session()->flash('status', 'Event updated successfully');
-
-        //redirect event organizer to approproate place
-        $event_status = $event->status;
-        if($request->type==1){
-            //if free event
-            return redirect($this->EventOrganizerFreeredirectPath);
-
-        }else if($request->type==2 && $event_status!=0){
-            //if paid event and not unverified
-            return redirect($this->EventOrganizerVerifiedPaidredirectPath);
-
-        }else{
-            //if its unverified
-            return redirect($this->EventOrganizerUnverifiedredirectPath);
-
-        }
 
     }
 
