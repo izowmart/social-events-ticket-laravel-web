@@ -53,10 +53,11 @@
                         <td><img height="100px" width="100px" src="{{asset('/venue_images/'.$venue->venue_image)}}"></td>
                         <td>
                           @if($venue->featured_status == 0)
-                          <button onClick="featureBtn({{$venue->id}})" class="btn btn-sm btn-outline-primary">Feature</button>
-                          <form id="feature_venue{{$venue->id}}" action="{{ route('feature_venue') }}" method="POST" style="display: none;">
+                          <button onClick="featureBtn('{{$venue->id}}')" class="btn btn-sm btn-outline-primary">Feature</button>
+                          <form id="feature_venue_{{$venue->id}}" action="{{ route('feature_venue') }}" method="POST" style="display: none;">
                               {{ csrf_field() }}
                               <input type="hidden" name="id" value="{{$venue->id}}">
+                              <input type="hidden" name="featured_description" value="" id="featured_description">
                           </form>
                           @endif
                         <td>
@@ -120,14 +121,17 @@
   closeOnConfirm: false,
   inputPlaceholder: "Venue's description"
 }, function (inputValue) {
-  if (inputValue === false) return false;
-  if (inputValue === "") {
-    swal.showInputError("You need to write something!");
-    return false
-  }
-  swal("Nice!", "You wrote: " + inputValue, "success");
-});
-  }
+    if (inputValue === false) return false;
+    if (inputValue === " ") {
+      swal.showInputError("You need to write something!");
+      return false
+    }
+    $form = "feature_venue_"+id;
+    document.getElementById('featured_description').value = inputValue;
+    document.getElementById($form).submit();
+  });
+
+}
 </script>
 @if (session('status'))
     <script type="text/javascript">

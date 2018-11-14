@@ -171,8 +171,13 @@ class VenuesController extends Controller
 
     public function toggleFeatureStatus(Request $request)
     {
+        // dd($request->all());
         $venue = Venue::find($request->id);
         $venue->featured_status = !$venue->featured_status;
+        if($request->has('featured_description'))
+        {
+            $venue->featured_description = $request->featured_description;
+        }
         $venue->save();
         return redirect($this->redirectPath);
     }
