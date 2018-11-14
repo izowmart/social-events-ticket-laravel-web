@@ -57,8 +57,10 @@
                           <form id="feature_venue_{{$venue->id}}" action="{{ route('feature_venue') }}" method="POST" style="display: none;">
                               {{ csrf_field() }}
                               <input type="hidden" name="id" value="{{$venue->id}}">
-                              <input type="hidden" name="featured_description" value="" id="featured_description">
+                              <input type="hidden" name="featured_description" value="" id="featured_description_{{$venue->id}}">
                           </form>
+                          @else
+                          <a class="btn btn-sm btn-outline-danger" href="{{'unfeature_venue'}}"> Unfeature</a>
                           @endif
                         <td>
                             <a target="_blank" href="https://maps.google.com/maps?q={{$venue->latitude}},{{$venue->longitude}}" class="btn btn-sm btn-outline-primary">View</a>
@@ -127,7 +129,8 @@
       return false
     }
     $form = "feature_venue_"+id;
-    document.getElementById('featured_description').value = inputValue;
+    $featured = "featured_description_"+id;
+    document.getElementById($featured).value = inputValue;
     document.getElementById($form).submit();
   });
 
