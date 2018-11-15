@@ -21,7 +21,6 @@ class CreateTicketCategoryDetailsTable extends Migration
             $table->foreign('category_id')->references('id')->on('ticket_categories');
             $table->string('price');
             $table->integer('no_of_tickets');
-            $table->datetime('ticket_sale_end_date');
             $table->timestamps();
         });
     }
