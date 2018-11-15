@@ -1,0 +1,9 @@
+
+.featured_description {
+	display: none;
+}
+
+#featured:checked ~ *.featured_description {
+	display: block;
+}
+

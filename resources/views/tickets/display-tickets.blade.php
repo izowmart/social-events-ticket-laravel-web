@@ -38,7 +38,7 @@
                                                         </div>
                                                 @endif --}}
 	<!-- This code goes when the real variables come in -->
-		<div class="ticket-end">
+		<!-- <div class="ticket-end">
 			<div class="container-fluid">
 				<div class="row">
 					<div class="col-sm">
@@ -55,12 +55,12 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div> -->
 		<!-- End of code that goes -->
 	</div>
-	<div class="row">
-		<p class="ticket-powered-by">Powered by FIKA Places <img class="ticket-sponsors" src="FikaIconWhite120x120.jpg"></p>
-	</div>
+</div>
+<div class="row">
+	<p class="ticket-powered-by">Powered by FIKA Places <img class="ticket-sponsors" src="FikaIconWhite120x120.jpg"></p>
 </div>
 </body>
 </html>

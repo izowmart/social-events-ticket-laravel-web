@@ -11,9 +11,11 @@ use App\Event;
 use App\EventSponsorMedia;
 use App\EventDate;
 use App\EventPrice;
+use App\Classes\Slim;
 use App\Scanner;
 use App\EventScanner;
 use App\TicketCategory;
+use App\TicketSaleEndDate;
 use App\TicketCategoryDetail;
 
 class EventsController extends Controller
@@ -42,7 +44,7 @@ class EventsController extends Controller
                     ->orderBy('id','desc')
                     ->first();
         $event_dates = EventDate::select('id','start','end')->where('event_id',$event->id)->get();
-        $ticket_category_details = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.ticket_sale_end_date','ticket_category_details.category_id','ticket_categories.slug','ticket_categories.name')
+        $ticket_category_details = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.category_id','ticket_categories.slug','ticket_categories.name')
                                     ->join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
                                     ->where('event_id', $event->id)
                                     ->get();
@@ -66,29 +68,10 @@ class EventsController extends Controller
             'description'=>'required',            
             'location'=>'required',
             'type'=>'required',
-            'image'=>'image|mimes:jpg,jpeg,png,gif',
+            'ticket_sale_end_date'=>'nullable|date',
+            'event_image'=>'required|array',
+            'event_sponsor_image'=>'nullable|array'
         ]); 
-
-        // dd($request->all());
-
-        //check if its paid event and validate required fields
-        // if($request->type==2){
-        //     //get selected categories
-        //     $ticket_category = TicketCategory::find($single_category);
-        //     $ticket_slug = $ticket_category->slug;
-        // }
-
-        // Handle image upload
-
-        $filenameWithExt = $request->file('image')->getClientOriginalName();
-        //get just file name
-        $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-        //get just ext
-        $extension = $request->file('image')->getClientOriginalExtension();
-        //file name to store
-        $fileNameToStore = 'event'.'_'.time().'.'.$extension;
-        //upload image
-        $path = $request->file('image')->storeAs('public/images/events',$fileNameToStore);
 
         $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
 
@@ -99,51 +82,31 @@ class EventsController extends Controller
         $event->longitude = $request->longitude;
         $event->latitude = $request->latitude;
         $event->description = $request->description;
-        $event->media_url = $fileNameToStore;
+        $event->media_url = $this->uploadImage('event_image','/public/storage/images/events',0);
         $event->type = $request->type;
         //if its a free event we set to verified
         if($event->type==1){
             $event->status = 1;
         }
         $event->save();
+        $this->insertEventDates($request->dates,$event->id);
 
-        $event_id = $event->id;
-
-        foreach ($request->dates as $date) {
-            //echo 'start: '.$date['start']. 'stop: '.$date['stop'].'<br>';
-            $event_date = new EventDate();
-            $event_date->event_id = $event_id;
-            $event_date->start = date('Y-m-d H:i:s',strtotime($date['start']));
-            $event_date->end = date('Y-m-d H:i:s',strtotime($date['stop']));
-            $event_date->save();
-        }
-
-        // $event_sponsor_media = new EventSponsorMedia();
-        // $event_sponsor_media->event_id = $event_id;
-        // $event_sponsor_media->media_url = $fileNameToStore;
-        // $event_sponsor_media->save();
+        if($request->has('sponsor_images_checkbox')) {
+            if($request->event_sponsor_image['0']!=null){
+                //insert the event sponsor media images
+                $this->insertEventSponsorImages($request->event_sponsor_image,$event->id);
+    
+            }
+        }               
 
         //insert price and category if it's a paid event
         if($request->type==2){
+            $this->insertTicketCategoryDetails($request,$event->id);
 
-            foreach($request->category as $single_category){
-                //get the slug of category from db
-                $ticket_category = TicketCategory::find($single_category);
-                $ticket_slug = $ticket_category->slug;
-                //creat names for inputs
-                $amount = $ticket_slug.'_amount';
-                $tickets = $ticket_slug.'_tickets';
-                $ticket_sale_end_date = $ticket_slug.'_ticket_sale_end_date';
-
-                $ticket_category_details = new TicketCategoryDetail;
-                $ticket_category_details->event_id = $event_id;
-                $ticket_category_details->category_id = $ticket_category->id;
-                $ticket_category_details->price = $request->$amount;
-                $ticket_category_details->no_of_tickets = $request->$tickets;
-                $ticket_category_details->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->$ticket_sale_end_date));
-                $ticket_category_details->save();
-                
-            }
+            $ticket_sale_end_date = new TicketSaleEndDate();
+            $ticket_sale_end_date->event_id = $event->id;
+            $ticket_sale_end_date->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->ticket_sale_end_date));
+            $ticket_sale_end_date->save();
         }
 
         //Give message after successfull operation
@@ -158,77 +121,53 @@ class EventsController extends Controller
     }
 
     public function update(Request $request){
-        // dd($request->all());
         $this->validate($request, [
             'name'=>'required',
             'description'=>'required',            
             'location'=>'required',
             'type'=>'required',
-            'image'=>'nullable|image|mimes:jpg,jpeg,png,gif',
-        ]); 
-
-        //check if its paid event and validate required fields
-        // if($request->type==2){
-        //     //get selected categories
-        //     $ticket_category = TicketCategory::find($single_category);
-        //     $ticket_slug = $ticket_category->slug;
-        // }
-
-        // check if image was updated
-        if ($request->hasFile('image')) {
-            // Handle image upload
-            $filenameWithExt = $request->file('image')->getClientOriginalName();
-            //get just file name
-            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-            //get just ext
-            $extension = $request->file('image')->getClientOriginalExtension();
-            //file name to store
-            $fileNameToStore = 'event'.'_'.time().'.'.$extension;
-            //upload image
-            $path = $request->file('image')->storeAs('public/images/events',$fileNameToStore);
-
-            //delete the previous image
-            unlink(public_path('storage/images/events/'.$request->previous_image_url));
-        }
+            'ticket_sale_end_date'=>'nullable|date',
+            'event_image'=>'nullable|array'
+        ]);         
 
         $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-
         $event = Event::find($request->id);
-
         //get previous event type before updating event
         $prev_event_type = $event->type;
-
         $event->name = $request->name;
         $event->event_organizer_id = $event_organizer_id;
         $event->location = $request->location;
         $event->longitude = $request->longitude;
         $event->latitude = $request->latitude;
         $event->description = $request->description;
-        if ($request->hasFile('image')) {
-            $event->media_url = $fileNameToStore;
+        // check if image was updated
+        if($request->event_image['0']!=null){
+            $event->media_url = $this->uploadImage('event_image','/public/storage/images/events',0);
+            //delete the previous image
+            Storage::delete('images/events/'.$event->previous_image_url);
+            // unlink(public_path('storage/images/events/'.$request->previous_image_url));
         }
         $event->type = $request->type;
-
         $event->save();
 
         $event_id = $event->id;
 
+        if($request->has('sponsor_images_checkbox')) {
+            if($request->event_sponsor_image['0']!=null){
+                //we delete all previous images if they exist
+                $this->deleteSponsorImages($event->id);
+                //insert the new event sponsor media images
+                $this->insertEventSponsorImages($request->event_sponsor_image,$event->id);    
+            }
+        } else{
+            //if its unchecked delete if its present on db
+            $this->deleteSponsorImages($event->id);
+        }
+
         //delete previous dates and insert new ones
         $event_date = EventDate::where('event_id',$event_id);
         $event_date->delete();
-        foreach ($request->dates as $date) {
-            $event_date = new EventDate();
-            $event_date->event_id = $event_id;
-            $event_date->start = date('Y-m-d H:i:s',strtotime($date['start']));
-            $event_date->end = date('Y-m-d H:i:s',strtotime($date['stop']));
-            $event_date->save();
-        }
-
-        if ($request->hasFile('image')) {
-            $event_sponsor_media = EventSponsorMedia::where('event_id',$event_id)->first();
-            $event_sponsor_media->media_url = $fileNameToStore;
-            $event_sponsor_media->save();
-        }
+        $this->insertEventDates($request->dates,$event_id);
 
         //check if it was a paid event and changed to free. If so we will delete its record from ticket_category_details table
         if($request->type==1 && $prev_event_type==2){
@@ -241,26 +180,13 @@ class EventsController extends Controller
         if($request->type==2){
             //delete all its records from ticket_category_details table and insert the new ones
             $ticket_category_details = TicketCategoryDetail::where('event_id',$request->id);
-            $ticket_category_details->delete();
-            
-            foreach($request->category as $single_category){
-                //get the slug of category from db
-                $ticket_category = TicketCategory::find($single_category);
-                $ticket_slug = $ticket_category->slug;
-                //creat names for inputs
-                $amount = $ticket_slug.'_amount';
-                $tickets = $ticket_slug.'_tickets';
-                $ticket_sale_end_date = $ticket_slug.'_ticket_sale_end_date';
+            $ticket_category_details->delete();            
+            $this->insertTicketCategoryDetails($request,$event_id);
 
-                $ticket_category_details = new TicketCategoryDetail;
-                $ticket_category_details->event_id = $event_id;
-                $ticket_category_details->category_id = $ticket_category->id;
-                $ticket_category_details->price = $request->$amount;
-                $ticket_category_details->no_of_tickets = $request->$tickets;
-                $ticket_category_details->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->$ticket_sale_end_date));
-                $ticket_category_details->save();
-                
-            }           
+            $ticket_sale_end_date = TicketSaleEndDate::where('event_id',$request->id)->first();
+            $ticket_sale_end_date->event_id = $event->id;
+            $ticket_sale_end_date->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->ticket_sale_end_date));  
+            $ticket_sale_end_date->save();  
         }
 
         //Give message after successfull operation
@@ -281,6 +207,77 @@ class EventsController extends Controller
             return redirect($this->EventOrganizerUnverifiedredirectPath);
 
         }
+
+    }
+
+    //Expects the image name, the storage location of the image and the image array index
+    public function uploadImage($image_name,$storage_location,$index){
+
+        // Pass Slim's getImages the name of your file input
+        $images = Slim::getImages($image_name);
+
+        $image = $images[$index];
+        // Grab the ouput data (data modified after Slim has done its thing)
+        if ( isset($image['output']['data']) )
+        {
+            // Original file name
+            $name = $image['output']['name'];
+
+            // Base64 of the image
+            $data = $image['output']['data'];
+
+            // Server path
+            $path = base_path() . $storage_location;
+
+            // Save the file to the server
+            $file = Slim::saveFile($data, $name, $path);
+
+            return $file['name'];
+
+        } 
+        
+    }
+
+    public function insertEventSponsorImages($images,$event_id){
+        for ($i=0; $i < count($images); $i++) { 
+            $event_sponsor_media = new EventSponsorMedia();
+            $event_sponsor_media->event_id = $event_id;
+            $event_sponsor_media->media_url = $this->uploadImage('event_sponsor_image','/public/storage/images/event_sponsors',$i);
+            $event_sponsor_media->save();
+        }
+        return;
+    }
+
+    public function insertEventDates($dates,$event_id){
+        foreach ($dates as $date) {
+            //echo 'start: '.$date['start']. 'stop: '.$date['stop'].'<br>';
+            $event_date = new EventDate();
+            $event_date->event_id = $event_id;
+            $event_date->start = date('Y-m-d H:i:s',strtotime($date['start']));
+            $event_date->end = date('Y-m-d H:i:s',strtotime($date['stop']));
+            $event_date->save();
+        }
+        return;
+    }
+
+    public function insertTicketCategoryDetails($request,$event_id){
+        foreach($request->category as $single_category){
+            //get the slug of category from db
+            $ticket_category = TicketCategory::find($single_category);
+            $ticket_slug = $ticket_category->slug;
+            //creat names for inputs
+            $amount = $ticket_slug.'_amount';
+            $tickets = $ticket_slug.'_tickets';
+
+            $ticket_category_details = new TicketCategoryDetail;
+            $ticket_category_details->event_id = $event_id;
+            $ticket_category_details->category_id = $ticket_category->id;
+            $ticket_category_details->price = $request->$amount;
+            $ticket_category_details->no_of_tickets = $request->$tickets;
+            $ticket_category_details->save();
+            
+        }
+        return;
 
     }
 
@@ -560,6 +557,20 @@ class EventsController extends Controller
         return $redirect;
 
     } 
+
+    public function deleteSponsorImages($event_id){
+        //check if record exist first
+        if(EventSponsorMedia::where('event_id',$event_id)->count()>0){
+            $sponsor_images = EventSponsorMedia::where('event_id',$event_id)->get();
+            foreach($sponsor_image as $single_sponser_image){
+                //delete image
+                Storage::delete('images/event_sponsors/'.$single_sponser_image->media_url);
+                $single_sponser_image->delete();                
+            }
+
+        }
+        return;
+    }
 
     public function CheckUserType(){
         //we check whether the logged in user is admin or event organizer

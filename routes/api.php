@@ -37,11 +37,12 @@ Route::group(['prefix' => 'auth'], function () use ($base_url) {
         Route::post('register', $base_url . 'Api\ScannerAuthController@register');
         Route::post('login', $base_url . 'Api\ScannerAuthController@login');
         Route::post('reset_password_email', $base_url . 'Api\ScannerAuthController@reset_password');
+        Route::post('events_tickets', $base_url . 'Api\ScannerAuthController@events_tickets');
 
         //authenticated ones
         Route::group(['middleware' => 'auth:api'], function () use ($base_url) {
             Route::get('scanners', $base_url . 'Api\ScannerAuthController@index');
-            Route::get('events_tickets', $base_url . 'Api\ScannerAuthController@events_tickets');
+//            Route::post('events_tickets', $base_url . 'Api\ScannerAuthController@events_tickets');
 
         });
     });

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateEventSponsorMediaTable extends Migration
+class CreateTicketScanTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateEventSponsorMediaTable extends Migration
      */
     public function up()
     {
-        Schema::create('event_sponsor_media', function (Blueprint $table) {
+        Schema::create('ticket_scans', function (Blueprint $table) {
+
             $table->increments('id');
-            $table->string('media_url');
-            $table->integer('event_id')->unsigned();
-            $table->foreign('event_id')->references('id')->on('events');
+            $table->integer("ticket_id");
+            $table->integer("scanner_id");
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ class CreateEventSponsorMediaTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('event_sponsor_media');
+        Schema::dropIfExists('ticket_scan');
     }
 }

@@ -3,6 +3,13 @@
 @section('styles')
 <link rel="stylesheet" type="text/css" href="{{ asset('css/summernote-bs4.css') }}" />   
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="{{ asset('css/slim.min.css') }}">
+<style>
+    .slim {
+        border-radius: 0.5rem;
+    }
+    
+</style>
 @endsection
 
 @section('content')
@@ -12,7 +19,7 @@
     <main class="app-content">
       <div class="app-title">
         <div>
-          <h1><i class="fa fa-edit"></i> Add Event</h1>
+          <h1><i class="fa fa-calendar-plus-o"></i> Add Event</h1>
           <p>Fill the form below to add a new event</p>
         </div>
         <ul class="app-breadcrumb breadcrumb">
@@ -82,7 +89,8 @@
                                         <strong>{{ $errors->first('stop') }}</strong>
                                     </span>
                                 @endif
-                            </div>                          
+                            </div>  
+                            <small class="form-text text-muted" id="date_help">For event with multiple dates click the plus button to add more dates.</small>                         
                         </div>
                         <div class="col-sm-1 pt-4">
                             <div class="form-group">
@@ -92,6 +100,45 @@
                        </div>
                     </div>
                   </div>
+                  <div class="row">
+                    <div class="col-md-10">
+                      <div class="form-group{{ $errors->has('event_image') ? ' has-error' : '' }}">
+                          <label for="event_image">Event Image</label>
+                          <div class="slim" style="width: 300px; height: 400px"
+                                data-label="Drop your image here or click to choose"
+                                data-size="590,780"
+                                data-min-size="550,770">
+                                <input type="file" name="event_image[]" required/>
+                          </div>  
+                          @if ($errors->has('event_image'))
+                              <span class="help-block">
+                                  <strong>{{ $errors->first('event_image') }}</strong>
+                              </span>
+                          @endif       
+                      </div>
+                    </div>
+                  </div> 
+                  <div class="row">
+                    <div class="col-md-10">
+                        <div class="form-group{{ $errors->has('location') ? ' has-error' : '' }}">
+                            <label for="location">Location</label>
+                            <input type="text" class="form-control" aria-describedby="LocationHelp" value="Nairobi, Kenya" name="location" id="location-address" aria-describedby="locationHelp" data-latitude-input="#location-lat" data-longitude-input="#location-lon" placeholder="The name of the venue" required>
+                           
+                            @if ($errors->has('location'))
+                                <span class="help-block">
+                                    <strong>{{ $errors->first('location') }}</strong>
+                                </span>
+                            @endif
+                            
+                            <small class="form-text text-muted" id="LocationHelp">Type the name or click the location on the map.</small> 
+                        </div>  
+                        <div class="form-group">
+                          <div id="location" style="height: 400px;"></div>
+                          <input type="hidden" class="form-control" value="-1.2920659" name="latitude" style="width: 110px" id="location-lat" />
+                          <input type="hidden" class="form-control" value="36.8219462" name="longitude" style="width: 110px" id="location-lon" />
+                        </div>        
+                    </div>                    
+                  </div> 
                   <div class="row">
                     <div class="col-md-4">
                       <div class="form-group{{ $errors->has('type') ? ' has-error' : '' }}">
@@ -115,8 +162,7 @@
                           </div>
                       </div>
                     </div>
-                  </div>
-                  <div id="paid-row">
+                   </div>
                     <div class="row" id="category-row">
                       <div class="col-md-10">
                         <div class="form-group">
@@ -146,75 +192,74 @@
                     <div id="append-row">
                     
                     </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-10">
-                        <div class="form-group{{ $errors->has('location') ? ' has-error' : '' }}">
-                            <label for="location">Location</label>
-                            <input type="text" class="form-control" aria-describedby="LocationHelp" value="Nairobi, Kenya" name="location" id="location-address" aria-describedby="locationHelp" data-latitude-input="#location-lat" data-longitude-input="#location-lon" placeholder="The name of the venue" required>
-                           
-                            @if ($errors->has('location'))
-                                <span class="help-block">
-                                    <strong>{{ $errors->first('location') }}</strong>
-                                </span>
-                            @endif
-                            
-                            <small class="form-text text-muted" id="LocationHelp">Type the name or click the location on the map.</small> 
-                        </div>  
-                        <div class="form-group">
-                          <div id="location" style="height: 400px;"></div>
-                          <input type="hidden" class="form-control" value="-1.2920659" name="latitude" style="width: 110px" id="location-lat" />
-                          <input type="hidden" class="form-control" value="36.8219462" name="longitude" style="width: 110px" id="location-lon" />
-                        </div>                                                      
-                        
+                    <div class="row" id="ticket_sale_end_date_container">
+                        <div class='col-md-4'>
+                            <label class='control-label'>Tickets sale closes at</label>
+                            <div class='form-group'>
+                                <div class='input-group date' id='datetimepicker1'>
+                                  <input class='form-control datetimepicker' type='text' id='ticket_sale_end_date' name='ticket_sale_end_date' value='' placeholder='Select date'>
+                                </div>
+                            </div>
+                        </div>                    
+                    </div>    
+                    <div class="row" id="sponsor_images_checkbox_row">
+                        <div class="col-md-10">
+                            <div class="animated-checkbox">
+                                <label>
+                                    <input type="checkbox" id="sponsor_images_checkox" name="sponsor_images_checkbox"><span class="label-text">I have event sponsor images</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                    
-                  </div>
-                  <div class="row">
-                    <div class="col-md-10">
-                      <div class="form-group{{ $errors->has('image') ? ' has-error' : '' }}">
-                          <label for="image">Image</label>
-                          <div class="input-group">
-                              <div class="custom-file">
-                                  <input type="file" aria-describedby="ImageHelp" name="image" onchange="readURL(this);" accept="image/png,image/gif,image/jpeg" class="custom-file-input" id="image" required>
-                                  <label class="custom-file-label" for="image">Click to choose image</label>                                                
-                              </div>
-                              <div class="invalid-feedback">
-                                  Please select an image.
-                              </div>
-                          </div>   
-                          @if ($errors->has('image'))
-                              <span class="help-block">
-                                  <strong>{{ $errors->first('image') }}</strong>
-                              </span>
-                          @endif                         
-                          <small class="form-text text-muted" id="ImageHelp">Preview of the image will be shown below.</small>                                        
-                          <div id="hidden">
-                              <br>
-                              <img id="blah" src="" height="400""><br><br>
-                          </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="container">
+                    <div class="row" id="event_sponsor_image_row">
+                        <div class="col-md-12">
+                            <div class="row" id="append_event_sponsor_image">
+                                <div class="col-md-3">
+                                        <label for="event_image">Event Sponsor Image</label>
+                                    <div class="form-group{{ $errors->has('event_image') ? ' has-error' : '' }}">
+                                        <div class="slim" style="width: 250px; height: 250px"
+                                            data-ratio="1:1"
+                                            data-label="Drop your image here or click to choose"
+                                            data-size="300,500"
+                                            data-min-size="200,200">
+                                            <input id="sponsor_image_input" type="file" name="event_sponsor_image[]"/>
+                                        </div>  
+                                        @if ($errors->has('event_image'))
+                                            <span class="help-block">
+                                                <strong>{{ $errors->first('event_image') }}</strong>
+                                            </span>
+                                        @endif       
+                                    </div>
+                                </div>
+                            </div> 
+                            <small class="form-text" id="event_sponsor_image_error" style="color: red"></small>                            
+                            <button class="btn btn-primary" style="text-align: center" type="button" onclick="event_sponsor_image();"><i class="fa fa-plus"></i></button>
+                            <small class="form-text text-muted" id="ticket_type_help">To add more event sponsor images click the plus button.</small> 
+                        </div>
+                    </div>                            
           
-                  <div class="tile-footer">
-                    <button class="btn btn-primary" type="submit">Submit</button>
-                  </div>
+                    <div class="tile-footer">
+                        <button class="btn btn-primary" type="submit">Submit</button>
+                    </div>
                   
-              </form>              
+              </form>      
+                     
             </div>
           </div>
         </div>
       </div>
     </main>
 @endsection
+{{-- TODO:: validate if user has select paid event, he must check at least one event type --}}
 
 @section('other-scripts')
 <script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=true&libraries=places&key=AIzaSyAWMiw7tAqWan2iOUqRzzM2BGQ9z6Pe8wI"></script>
 <script src="{{ asset('js/plugins/jquery.placepicker.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="{{ asset('js/plugins/summernote-bs4.min.js') }}"></script>
+<script src="{{ asset('js/plugins/slim.global.min.js') }}"></script>
+<script src="{{ asset('js/plugins/slim.jquery.min.js') }}"></script>
+<script src="{{ asset('js/plugins/slim.kickstart.min.js') }}"></script>
 <script>    
     var room = 0;
 
@@ -227,18 +272,45 @@
         var rdiv = 'removeclass' + room;
         divtest.innerHTML = '<div class="row"> <div class="col-md-10"> <div class="row"> <div class="col-md-4"> <label class="control-label">Event Start</label> <div class="form-group"> <div class="input-group" date> <input class="form-control datetimepicker" type="text" name="dates['+room+'][start]" placeholder="Select start date" required> </div> </div> </div> <div class="col-md-3"></div> <div class="col-md-4"> <div class="form-group"> <label class="control-label">Event Stop</label> <input class="form-control datetimepicker" type="text" name="dates['+room+'][stop]" placeholder="Select stop date" required> </div> </div> <div class="col-sm-1 pt-4"> <div class="form-group"> <button class="btn btn-success" type="button" onclick="remove_date_fields(' + room + ');"><i class="fa fa-minus"></i></button> </div> </div> </div> </div> </div>';
 
-        objTo.appendChild(divtest)
+        objTo.appendChild(divtest);
 
         $(".datetimepicker").flatpickr({
             enableTime: true,
             altInput: true,
-            altFormat: "F j, Y H:i",
+            altFormat: "J F, Y h:i K",
             dateFormat: "Y-m-d H:i",
         });
     }
 
     function remove_date_fields(rid) {
         $('.removeclass' + rid).remove();
+    }
+
+    var event_sponsor_images = 0;
+    function event_sponsor_image(){
+        if(event_sponsor_images>2){
+            $("#event_sponsor_image_error").text('You can upload a maximum of four images');   
+        }else{            
+            event_sponsor_images++;
+            var content = '<div class="col-md-3"><label>.</label> <div class="form-group"> <div class="slim" id="slim-'+event_sponsor_images+'" style="width: 250px; height: 250px" data-ratio="1:1" data-label="Drop your image here or click to choose" data-size="300,500" data-min-size="200,300"> <input type="file" name="event_sponsor_image[]" required/> </div> </div> </div>';
+            $("#append_event_sponsor_image").append(content);
+            $('#slim-'+event_sponsor_images).slim({
+                ratio: '1:1',
+                minSize: {
+                    width: 200,
+                    height: 200,
+                },
+                crop: {
+                    x: 0,
+                    y: 0,
+                    width: 300,
+                    height: 500
+                },
+                download: false,
+                label: 'Drop your image here or click to choose'
+            });
+            // $('#slim-'+event_sponsor_images).slim('parse');
+        }
     }
 
     $('.summernote').summernote({
@@ -261,34 +333,37 @@
         ['help', ['help']]
         ]          
     });
-  function readURL(input) {
-    if (input.files && input.files[0]) {
-        var reader = new FileReader();
-
-        reader.onload = function (e) {
-            $('#blah')
-                .attr('src', e.target.result)
-                .height(400);            
-            $("#hidden").slideDown("slow");
-        };
-
-        reader.readAsDataURL(input.files[0]);
-    }
-  }
 
   $(document).ready(function() {
-    var selectedItems = [];
     $("#hidden").hide();
     $("#category-row").hide();
     $("#append-row").hide();
+    $("#ticket_sale_end_date_container").hide();
+    $("#sponsor_images_checkbox_row").hide();
+    $("#event_sponsor_image_row").hide();
     $(".ticket_type_checkbox").change(function() { 
         if(this.checked) {
             appendRows($(this).data('text'));
         }else{
             var name = $(this).data('text').toLowerCase().split(' ').join('_');
             var div = name+'_div'; 
-            $('#'+div).slideUp("slow").remove();
-        }
+            $('#'+div).slideUp("normal", function() { $(this).remove(); } );
+            if ($(".ticket_type_checkbox:checked").length == 0){
+                // none of checkobx is checked
+                $("#ticket_sale_end_date_container").slideUp("slow");
+                $('#ticket_sale_end_date').attr('required', false);
+            }
+        }        
+
+    });
+
+    $("#sponsor_images_checkox").change(function() { 
+        if(this.checked) {
+            $("#event_sponsor_image_row").slideDown("slow");
+            $('#sponsor_image_input').attr('required', 'required');
+        }else{
+            $("#event_sponsor_image_row").slideUp("slow");
+        }        
 
     });
         
@@ -312,17 +387,19 @@
     $(".datetimepicker").flatpickr({
         enableTime: true,
         altInput: true,
-        altFormat: "F j, Y H:i",
+        altFormat: "J F, Y h:i K",
         dateFormat: "Y-m-d H:i",
     });
 
     $('input[type=radio][name=type]').change(function() {
+        $("#sponsor_images_checkbox_row").slideDown("slow");
         if (this.value == '2') {
             $("#category-row").slideDown("slow");
         }else {            
             $("#append-row").empty().slideUp("slow");  
-            $('#category').selectpicker('deselectAll');
             $("#category-row").slideUp("slow");
+            $("#ticket_sale_end_date_container").slideUp("slow");
+            $('#ticket_sale_end_date').attr('required', false);
         }
     });
 
@@ -332,17 +409,12 @@
       name = category_name.toLowerCase().split(' ').join('_');
       id = name+"_category".split(' ').join('_');
       label = category_name;
-      var content = "<div class='row' id='"+name+"_div'><div class='col-md-4'><div class='form-group'><label class='control-label'>"+label+" Amount</label><div class='form-group'><label class='sr-only' for='exampleInputAmount'>Amount (in shillings)</label><div class='input-group'><div class='input-group-prepend'><span class='input-group-text'>Ksh</span></div><input class='form-control' id='"+id+"_amount' value='' name='"+name+"_amount' type='number' min='1' placeholder='Amount to be paid' required><div class='input-group-append'><span class='input-group-text'>.00</span></div></div></div></div></div><div class='col-md-3'><div class='form-group'><label class='control-label'>"+label+" No. of tickets</label><input class='form-control' type='number' id='"+id+"_tickets' name='"+name+"_tickets' value='' placeholder='Maximum number of tickets' required></div></div><div class='col-md-3'><label class='control-label'>"+label+" Ticket sales closes at</label><div class='form-group'><div class='input-group date' id='datetimepicker1'><input class='form-control datetimepicker' type='text' id='"+id+"_ticket_sale_end_date' name='"+name+"_ticket_sale_end_date' value='' placeholder='Select date'  required></div></div></div></div>";     
+      var content = "<div class='row' id='"+name+"_div'><div class='col-md-4'><div class='form-group'><label class='control-label'>"+label+" Amount</label><div class='form-group'><label class='sr-only' for='exampleInputAmount'>Amount (in shillings)</label><div class='input-group'><div class='input-group-prepend'><span class='input-group-text'>Ksh</span></div><input class='form-control' id='"+id+"_amount' value='' name='"+name+"_amount' type='number' min='1' placeholder='Amount to be paid' required><div class='input-group-append'><span class='input-group-text'>.00</span></div></div></div></div></div><div class='col-md-3'><div class='form-group'><label class='control-label'>"+label+" No. of tickets</label><input class='form-control' type='number' id='"+id+"_tickets' name='"+name+"_tickets' value='' placeholder='Maximum number of tickets' required></div></div></div></div>";     
       $("#append-row").append(content).slideDown("slow");
       $("#"+name+"_div").hide();
       $("#"+name+"_div").slideDown("slow");
-
-      $(".datetimepicker").flatpickr({
-            enableTime: true,
-            altInput: true,
-            altFormat: "F j, Y H:i",
-            dateFormat: "Y-m-d H:i",
-     });
+      $("#ticket_sale_end_date_container").slideDown("slow");
+      $('#ticket_sale_end_date').attr('required', 'required');
   }
 
 </script>

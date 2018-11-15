@@ -7,6 +7,8 @@ use App\Helpers\ValidUserScannerPassword;
 use App\Http\Resources\ScannerResource;
 use App\Http\Traits\UniversalMethods;
 use App\Scanner;
+use App\Ticket;
+use App\TicketScan;
 use App\Transformers\ScannerTransformer;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -65,7 +67,7 @@ class ScannerAuthController extends Controller
 
                 //generate token for the scanner
                 //create token for the user
-                $tokenResult = $scanner->createToken('Personal Access Token');
+                $tokenResult = $scanner->createToken('Scanner Personal Access Token');
                 $token = $tokenResult->token;
                 $token->expires_at = Carbon::now()->addWeeks(1);
                 $token->save();
@@ -162,46 +164,56 @@ class ScannerAuthController extends Controller
     }
     //custom function to check ticket validity when scanning
     public function events_tickets(Request $request){
+
         try{
-            if($event = EventScanner::where('event_id',$request->event_id)){
-                if ($event->token == $request->token){
-                    if($event->status == false){
-                        $event = new EventScanner();
-                        $event->status=true;
-                        $event->update();
-                        return response()->json([
-                            'success' => true,
-                            'message' => "Ticket is valid",
-                            'data' => "$event"
-                        ],200);
-                    }else{
-                        return response()->json([
-                            'success' =>false,
-                            'message'=> "Ticket has already been scanned",
-                            'data' => []
-                        ],401
-                        );
-                    }
+            $validator =Validator::make($request->all(),
+            [
+                'validation_token' => 'required|exists:tickets,validation_token'
+            ],
+            [
+                'validation_token.required' => 'Please provide a token',
+                'validation_token.exists' => 'Ticket not found'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
+                        'data'    => []
+                    ], 200
+                );
+            } else{
+                //
+                $ticket = Ticket::where('validation_token',$request->validation_token)->first();
+                $ticket_id = $ticket->id;
+
+                if(!TicketScan::where('ticket_id',$ticket_id)->exists()){
+
+                    $ticket = new TicketScan();
+                    $ticket->ticket_id = $ticket_id;
+                    $ticket->scanner_id = $request->scanner_id;
+                    $ticket->save();
+                    return response()->json([
+                        'success' => true,
+                        'message' => "Ticket is valid",
+                        'data' => $ticket
+                    ],200);
+
                 }else{
                     return response()->json([
                         'success' =>false,
-                        'message'=> "Invalid token",
-                        'data' => []
-                    ],401
+                        'message'=> "Ticket has already been scanned!",
+                    ],201
                     );
                 }
-            }else{
-                return response()->json([
-                    'success' =>false,
-                    'message'=> "Event doesn't exist",
-                    'data' => []
-                ],401
-                );
             }
+
 
         }catch(\Exception $exception){
             return $exception->getMessage();
         }
+
     }
 
 
