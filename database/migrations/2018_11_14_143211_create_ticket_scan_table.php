@@ -13,7 +13,7 @@ class CreateTicketScanTable extends Migration
      */
     public function up()
     {
-        Schema::create('ticket_scan', function (Blueprint $table) {
+        Schema::create('ticket_scans', function (Blueprint $table) {
 
             $table->increments('id');
             $table->integer("ticket_id");
