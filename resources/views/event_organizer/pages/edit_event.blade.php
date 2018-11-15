@@ -99,7 +99,48 @@
                        </div>
                     </div>
                   </div>  
-                  @endforeach                  
+                  @endforeach                 
+                  <div class="row">
+                    <div class="col-md-10">
+                        <div class="form-group{{ $errors->has('event_image') ? ' has-error' : '' }}">
+                            <label for="event_image">Event Image</label>
+                            <div class="slim" style="width: 300px; height: 400px"
+                                    data-label="Drop your image here or click to choose"
+                                    data-size="590,780"
+                                    data-min-size="550,770">
+                                    <img src="{{ asset('storage/images/events') }} {{'/'.$event->media_url}}" >
+                                    <input type="file" name="event_image[]"/>
+                            </div>  
+                            @if ($errors->has('event_image'))
+                                <span class="help-block">
+                                    <strong>{{ $errors->first('event_image') }}</strong>
+                                </span>
+                            @endif       
+                        </div>
+                    </div>
+                   </div>      
+                   
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div class="form-group{{ $errors->has('location') ? ' has-error' : '' }}">
+                                <label for="location">Location</label>
+                                <input type="text" class="form-control" aria-describedby="LocationHelp" value="{{ $event->location}}" name="location" id="location-address" aria-describedby="locationHelp" data-latitude-input="#location-lat" data-longitude-input="#location-lon" placeholder="The name of the venue" required>
+                                
+                                @if ($errors->has('location'))
+                                    <span class="help-block">
+                                        <strong>{{ $errors->first('location') }}</strong>
+                                    </span>
+                                @endif
+                                
+                                <small class="form-text text-muted" id="LocationHelp">Type the name or click the location on the map.</small> 
+                            </div>  
+                            <div class="form-group">
+                                <div id="location" style="height: 400px;"></div>
+                                <input type="hidden" class="form-control" value="{{ $event->latitude}}" name="latitude" style="width: 110px" id="location-lat" />
+                                <input type="hidden" class="form-control" name="longitude" value="{{ $event->longitude}}" style="width: 110px" id="location-lon" />
+                            </div> 
+                        </div>                        
+                    </div>       
                    <div class="row">
                     <div class="col-md-4">
                       <div class="form-group{{ $errors->has('type') ? ' has-error' : '' }}">
@@ -163,48 +204,65 @@
                         </div>
                     </div>   
                   </div>
-                  <div class="row">
-                    <div class="col-md-10">
-                        <div class="form-group{{ $errors->has('location') ? ' has-error' : '' }}">
-                            <label for="location">Location</label>
-                            <input type="text" class="form-control" aria-describedby="LocationHelp" value="{{ $event->location}}" name="location" id="location-address" aria-describedby="locationHelp" data-latitude-input="#location-lat" data-longitude-input="#location-lon" placeholder="The name of the venue" required>
-                           
-                            @if ($errors->has('location'))
-                                <span class="help-block">
-                                    <strong>{{ $errors->first('location') }}</strong>
-                                </span>
-                            @endif
-                            
-                            <small class="form-text text-muted" id="LocationHelp">Type the name or click the location on the map.</small> 
-                        </div>  
-                        <div class="form-group">
-                          <div id="location" style="height: 400px;"></div>
-                          <input type="hidden" class="form-control" value="{{ $event->latitude}}" name="latitude" style="width: 110px" id="location-lat" />
-                          <input type="hidden" class="form-control" name="longitude" value="{{ $event->longitude}}" style="width: 110px" id="location-lon" />
-                        </div>                                                      
-                        
-                    </div>
-                    
-                  </div>
-                  <div class="row">
-                    <div class="col-md-10">
-                        <div class="form-group{{ $errors->has('event_image') ? ' has-error' : '' }}">
-                            <label for="event_image">Event Image</label>
-                            <div class="slim" style="width: 300px; height: 400px"
-                                    data-label="Drop your image here or click to choose"
-                                    data-size="590,780"
-                                    data-min-size="550,770">
-                                    <img src="{{ asset('storage/images/events') }} {{'/'.$event->media_url}}" >
-                                    <input type="file" name="event_image[]"/>
-                            </div>  
-                            @if ($errors->has('event_image'))
-                                <span class="help-block">
-                                    <strong>{{ $errors->first('event_image') }}</strong>
-                                </span>
-                            @endif       
+                  <div class="row" id="sponsor_images_checkbox_row">
+                        <div class="col-md-10">
+                            <div class="animated-checkbox">
+                                <label>
+                                    <input type="checkbox" id="sponsor_images_checkox" name="sponsor_images_checkbox"><span class="label-text">I have event sponsor images</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
-                  </div>
+                    <div class="row" id="event_sponsor_image_row">
+                        <div class="col-md-12">
+                            <div class="row" id="append_event_sponsor_image">
+                                @if (!empty($first_image = $event->getEventSponsorMedia()->first()))
+                                @foreach ($event->getEventSponsorMedia()->get() as $single_sponsor_media)
+                                <div class="col-md-3">
+                                    <label for="event_image">Event Sponsor Image</label>
+                                    <div class="form-group{{ $errors->has('event_image') ? ' has-error' : '' }}">
+                                        <div class="slim" style="width: 250px; height: 250px"
+                                            data-ratio="1:1"
+                                            data-label="Drop your image here or click to choose"
+                                            data-size="300,500"
+                                            data-min-size="200,200">
+                                            <img src="{{ asset('storage/images/event_sponsors/'.$single_sponsor_media->media_url) }}" alt="sponsor image">
+                                            
+                                            <input id="sponsor_image_input" type="file" name="event_sponsor_image[]"/>
+                                        </div>  
+                                        @if ($errors->has('event_image'))
+                                            <span class="help-block">
+                                                <strong>{{ $errors->first('event_image') }}</strong>
+                                            </span>
+                                        @endif       
+                                    </div>
+                                </div>                                    
+                                @endforeach
+                                @else
+                                <div class="col-md-3">
+                                    <label for="event_image">Event Sponsor Image</label>
+                                    <div class="form-group{{ $errors->has('event_image') ? ' has-error' : '' }}">
+                                        <div class="slim" style="width: 250px; height: 250px"
+                                            data-ratio="1:1"
+                                            data-label="Drop your image here or click to choose"
+                                            data-size="300,500"
+                                            data-min-size="200,200">
+                                            <input id="sponsor_image_input" type="file" name="event_sponsor_image[]"/>
+                                        </div>  
+                                        @if ($errors->has('event_image'))
+                                            <span class="help-block">
+                                                <strong>{{ $errors->first('event_image') }}</strong>
+                                            </span>
+                                        @endif       
+                                    </div>
+                                </div>
+                                @endif
+                            </div> 
+                            <small class="form-text" id="event_sponsor_image_error" style="color: red"></small>                            
+                            <button class="btn btn-primary" style="text-align: center" type="button" onclick="event_sponsor_image();"><i class="fa fa-plus"></i></button>
+                            <small class="form-text text-muted" id="ticket_type_help">To add more event sponsor images click the plus button.</small> 
+                        </div>
+                    </div>
                   
                   <input type="hidden" name="id" value="{{$event->id}}">  
                   <input type="hidden" name="previous_image_url" value="{{$event->media_url}}">                  
@@ -254,6 +312,44 @@
     function remove_date_fields(rid) {
         $('.removeclass' + rid).remove();
     }
+</script>
+
+    @if (!empty($first_image = $event->getEventSponsorMedia()->first()))
+    {{-- we set the value of event_sponsor_image to match those of already existing sponsor images --}}
+    <script>
+        var event_sponsor_images = {{$event->getEventSponsorMedia()->count()}}-1;
+    </script>
+    @else
+    <script>
+        var event_sponsor_images = 0;
+    </script>
+    @endif
+<script>
+    function event_sponsor_image(){
+        if(event_sponsor_images>2){
+            $("#event_sponsor_image_error").text('You can upload a maximum of four images');   
+        }else{            
+            event_sponsor_images++;
+            var content = '<div class="col-md-3"><label>.</label> <div class="form-group"> <div class="slim" id="slim-'+event_sponsor_images+'" style="width: 250px; height: 250px" data-ratio="1:1" data-label="Drop your image here or click to choose" data-size="300,500" data-min-size="200,300"> <input type="file" name="event_sponsor_image[]"/> </div> </div> </div>';
+            $("#append_event_sponsor_image").append(content);
+            $('#slim-'+event_sponsor_images).slim({
+                ratio: '1:1',
+                minSize: {
+                    width: 200,
+                    height: 200,
+                },
+                crop: {
+                    x: 0,
+                    y: 0,
+                    width: 300,
+                    height: 500
+                },
+                download: false,
+                label: 'Drop your image here or click to choose'
+            });
+            // $('#slim-'+event_sponsor_images).slim('parse');
+        }
+    }
     $('.summernote').summernote({
         height: 350, // set editor height
         minHeight: null, // set minimum height of editor
@@ -274,7 +370,6 @@
         ['help', ['help']]
         ]          
     });
-    var selectedItems = [];
 </script>
 
 @if($event->type==2)
@@ -295,7 +390,7 @@
             $(document).ready(function() {
                 //fetch the ids for selected categories  
                 var category_id = '{{$ticket_category_detail->category_id}}';    
-                //add selected attribute to options that were selected     
+                // add selected attribute to options that were selected     
                 $('#'+category_id).attr('checked', 'checked');
                 //get the text for selected attribute and passit to appendRows method so that it adds its rows to the interface
                 var text = $('#'+category_id).data('text');
@@ -326,8 +421,7 @@
 
 <script>
 
-  $(document).ready(function() {    
-    $("#hidden").hide();
+  $(document).ready(function() {   
     $(".ticket_type_checkbox").change(function() { 
         if(this.checked) {
             appendRows($(this).data('text'));
@@ -369,6 +463,7 @@
     });
 
     $('input[type=radio][name=type]').change(function() {
+        $("#sponsor_images_checkbox_row").slideDown("slow");
         if (this.value == '2') {
             $("#category-row").slideDown("slow");
         }else {            
@@ -377,6 +472,16 @@
             $("#ticket_sale_end_date_container").slideUp("slow");
             $('#ticket_sale_end_date').attr('required', false);
         }
+    });
+
+    $("#sponsor_images_checkox").change(function() { 
+        if(this.checked) {
+            $("#event_sponsor_image_row").slideDown("slow");
+            $('#sponsor_image_input').attr('required', 'required');
+        }else{
+            $("#event_sponsor_image_row").slideUp("slow");
+        }        
+
     });
 
   }); 
@@ -394,18 +499,21 @@
   }
 
 </script>
-@if($event->type==2)
-    @foreach ($ticket_category_details as $ticket_category_detail)
-        <script>
-            $(document).ready(function() {
-                //fetch the names for selected categories  
-                var name= '{{$ticket_category_detail->name}}';    
-                //push them into selecteditems array  
-                selectedItems.push(name);  
-            });
-        </script>         
-            
-    @endforeach
-@endif 
+@if (!empty($event->getEventSponsorMedia()->first()))
+@foreach ($event->getEventSponsorMedia()->get() as $single_event_sponsor_media)
+
+    
+@endforeach
+
+<script>
+    $('#sponsor_images_checkox').attr('checked', 'checked');
+    $("#event_sponsor_image_row").slideDown("slow");
+    // $('#sponsor_image_input').attr('required', 'required');
+</script>
+@else
+<script>    
+    $("#event_sponsor_image_row").hide();
+</script>
+@endif
 
 @endsection

@@ -132,7 +132,7 @@
 @endsection
 
 @section('other-scripts')
-<script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=true&libraries=places&key=AIzaSyBO5Else2rW4UNyXiCMp3y20JV7BseTMys"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=true&libraries=places&key=AIzaSyAWMiw7tAqWan2iOUqRzzM2BGQ9z6Pe8wI"></script>
 <script src="https://cdn.jsdelivr.net/npm/places.js@1.10.0"></script>
 <script src="{{ asset('js/plugins/jquery.placepicker.js') }}"></script>
 <script>

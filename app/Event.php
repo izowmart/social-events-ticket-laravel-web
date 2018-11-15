@@ -44,4 +44,8 @@ class Event extends Model
     public function getTicketSaleEndDate() {
         return TicketSaleEndDate::where('event_id',$this->id);
     }
+
+    public function getEventSponsorMedia() {
+        return EventSponsorMedia::where('event_id',$this->id);
+    }
 }
