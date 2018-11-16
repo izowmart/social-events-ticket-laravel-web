@@ -1,7 +1,8 @@
 @extends('tickets.layouts')
 
 @section('content')
-<div class="row page-row">
+{{-- <div class="row page-row"> --}}
+<div class="row">
     @foreach ($events as $event)
     <div class="col-md-3 col-sm-12">
         <div class="card">
