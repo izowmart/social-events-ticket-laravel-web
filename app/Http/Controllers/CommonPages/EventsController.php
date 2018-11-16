@@ -240,10 +240,12 @@ class EventsController extends Controller
 
     public function insertEventSponsorImages($images,$event_id){
         for ($i=0; $i < count($images); $i++) { 
-            $event_sponsor_media = new EventSponsorMedia();
-            $event_sponsor_media->event_id = $event_id;
-            $event_sponsor_media->media_url = $this->uploadImage('event_sponsor_image','/public/storage/images/event_sponsors',$i);
-            $event_sponsor_media->save();
+            if($images[$i]!=null){                
+                $event_sponsor_media = new EventSponsorMedia();
+                $event_sponsor_media->event_id = $event_id;
+                $event_sponsor_media->media_url = $this->uploadImage('event_sponsor_image','/public/storage/images/event_sponsors',$i);
+                $event_sponsor_media->save();
+            }
         }
         return;
     }
@@ -562,9 +564,9 @@ class EventsController extends Controller
         //check if record exist first
         if(EventSponsorMedia::where('event_id',$event_id)->count()>0){
             $sponsor_images = EventSponsorMedia::where('event_id',$event_id)->get();
-            foreach($sponsor_image as $single_sponser_image){
+            foreach($sponsor_images as $single_sponser_image){
                 //delete image
-                Storage::delete('images/event_sponsors/'.$single_sponser_image->media_url);
+                unlink(public_path('storage/images/event_sponsors/'.$single_sponser_image->media_url));
                 $single_sponser_image->delete();                
             }
 
