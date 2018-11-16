@@ -17,7 +17,7 @@ class TicketsController extends Controller
     protected $redirectPath = 'tickets/';
     public function index(){
         $today = Carbon::now()->toDateTimeString();
-        $events = Event::select('events.id','events.name','events.description','events.location','events.latitude','events.longitude','ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.ticket_sale_end_date','events.type','events.slug','event_dates.start','event_dates.end','events.media_url')
+        $events = Event::select('events.id','events.name','events.description','events.location','events.latitude','events.longitude','ticket_category_details.price','ticket_category_details.no_of_tickets','events.type','events.slug','event_dates.start','event_dates.end','events.media_url','events.ticket_sale_end_date')
                     ->join('event_dates', 'event_dates.event_id', '=', 'events.id')
                     ->leftJoin('ticket_category_details', 'ticket_category_details.event_id', '=', 'events.id')
                     ->where('events.status',1)
@@ -30,13 +30,13 @@ class TicketsController extends Controller
     }
 
     public function show($slug){
-        $event = Event::select('events.id','events.name','events.description','events.location','events.latitude','events.longitude','ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.ticket_sale_end_date','events.type','events.status','events.slug','events.created_at','event_dates.start','event_dates.end','events.media_url')
+        $event = Event::select('events.id','events.name','events.description','events.location','events.latitude','events.longitude','ticket_category_details.price','ticket_category_details.no_of_tickets','events.type','events.status','events.slug','events.created_at','event_dates.start','event_dates.end','events.media_url','events.ticket_sale_end_date')
                     ->join('event_dates', 'event_dates.event_id', '=', 'events.id')
                     ->leftJoin('ticket_category_details', 'ticket_category_details.event_id', '=', 'events.id')
                     ->where('slug',$slug)
                     ->orderBy('id','desc')
                     ->first();
-        $ticket_categories = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.ticket_sale_end_date','ticket_categories.name','ticket_categories.slug')
+        $ticket_categories = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_categories.name','ticket_categories.slug')
                                 ->where('ticket_category_details.event_id',$event->id)
                                 ->join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
                                 ->get();
