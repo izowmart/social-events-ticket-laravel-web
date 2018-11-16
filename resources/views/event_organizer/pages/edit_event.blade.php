@@ -109,7 +109,7 @@
                             <div class="slim" style="width: 300px; height: 400px"
                                     data-label="Drop your image here or click to choose"
                                     data-size="590,780"
-                                    data-min-size="430,770">
+                                    data-min-size="430,730">
                                     <img src="{{ asset('storage/images/events') }} {{'/'.$event->media_url}}" >
                                     <input type="file" name="event_image[]"/>
                             </div>  
