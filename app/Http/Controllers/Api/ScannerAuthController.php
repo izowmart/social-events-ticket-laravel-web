@@ -181,14 +181,16 @@ class ScannerAuthController extends Controller
                         'success' => false,
                         'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
                         'data'    => []
-                    ], 200
+                    ], 201
                 );
             } else{
                 //
                 $ticket = Ticket::where('validation_token',$request->validation_token)->first();
                 $ticket_id = $ticket->id;
 
-                if(!TicketScan::where('ticket_id',$ticket_id)->exists()){
+                $ticketScanQueryBuilder = TicketScan::where('ticket_id',$ticket_id);
+
+                if(!$ticketScanQueryBuilder->exists()){
 
                     $ticket = new TicketScan();
                     $ticket->ticket_id = $ticket_id;
@@ -201,9 +203,13 @@ class ScannerAuthController extends Controller
                     ],200);
 
                 }else{
+                    $ticket_scan = $ticketScanQueryBuilder->first();
+
+                    $time_difference = $ticket_scan->created_at->diffForHumans();
+
                     return response()->json([
                         'success' =>false,
-                        'message'=> "Ticket has already been scanned!",
+                        'message'=> "Ticket was scanned ".$time_difference,
                     ],201
                     );
                 }
