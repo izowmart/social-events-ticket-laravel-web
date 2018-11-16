@@ -107,7 +107,7 @@
                           <div class="slim" style="width: 300px; height: 400px"
                                 data-label="Drop your image here or click to choose"
                                 data-size="590,780"
-                                data-min-size="550,770">
+                                data-min-size="430,770">
                                 <input type="file" name="event_image[]" required/>
                           </div>  
                           @if ($errors->has('event_image'))
@@ -154,6 +154,7 @@
                                 <input type="radio" value="2" name="type" required><span class="label-text">Paid</span>
                               </label>
                             </div>
+                            <small class="form-text" id="event_type_error" style="color: red"></small> 
                             @if ($errors->has('type'))
                                 <span class="help-block">
                                     <strong>{{ $errors->first('type') }}</strong>
@@ -369,6 +370,7 @@
             $('#sponsor_image_input').attr('required', 'required');
         }else{
             $("#event_sponsor_image_row").slideUp("slow");
+            $('#sponsor_image_input').attr('required', false);
         }        
 
     });
@@ -422,6 +424,14 @@
       $("#ticket_sale_end_date_container").slideDown("slow");
       $('#ticket_sale_end_date').attr('required', 'required');
   }
+  $("form").submit(function(e){
+    if($('#paid').is(':checked') && $('.ticket_type_checkbox:checkbox:checked').length < 1){
+        e.preventDefault();            
+        $('#event_type_error').text('For paid event, you have to select at least one ticket type')
+    } else{
+        $('form').unbind('submit').submit();
+    }        
+  });
 
 </script>
 @endsection

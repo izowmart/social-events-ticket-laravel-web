@@ -15,7 +15,6 @@ use App\Classes\Slim;
 use App\Scanner;
 use App\EventScanner;
 use App\TicketCategory;
-use App\TicketSaleEndDate;
 use App\TicketCategoryDetail;
 
 class EventsController extends Controller
@@ -39,7 +38,7 @@ class EventsController extends Controller
     public function showEditForm($slug){
         $ticket_categories = TicketCategory::all();
         
-        $event = Event::select('events.id','events.name','events.slug','events.description','events.location','events.latitude','events.longitude','events.type','events.slug','events.media_url')
+        $event = Event::select('events.id','events.name','events.slug','events.description','events.location','events.latitude','events.longitude','events.type','events.slug','events.media_url','events.ticket_sale_end_date')
                     ->where('events.slug',$slug)
                     ->orderBy('id','desc')
                     ->first();
@@ -62,7 +61,7 @@ class EventsController extends Controller
     }
 
     public function store(Request $request){
-                        
+                            
         $this->validate($request, [
             'name'=>'required',
             'description'=>'required',            
@@ -82,10 +81,14 @@ class EventsController extends Controller
         $event->longitude = $request->longitude;
         $event->latitude = $request->latitude;
         $event->description = $request->description;
+        //if it is paid event we insert ticket_sale_end_date
+        if($request->type==2 && $request->has('ticket_sale_end_date')){
+            $event->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->ticket_sale_end_date));
+        }
         $event->media_url = $this->uploadImage('event_image','/public/storage/images/events',0);
         $event->type = $request->type;
         //if its a free event we set to verified
-        if($event->type==1){
+        if($request->type==1){
             $event->status = 1;
         }
         $event->save();
@@ -102,11 +105,6 @@ class EventsController extends Controller
         //insert price and category if it's a paid event
         if($request->type==2){
             $this->insertTicketCategoryDetails($request,$event->id);
-
-            $ticket_sale_end_date = new TicketSaleEndDate();
-            $ticket_sale_end_date->event_id = $event->id;
-            $ticket_sale_end_date->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->ticket_sale_end_date));
-            $ticket_sale_end_date->save();
         }
 
         //Give message after successfull operation
@@ -140,11 +138,19 @@ class EventsController extends Controller
         $event->longitude = $request->longitude;
         $event->latitude = $request->latitude;
         $event->description = $request->description;
+        //if its a free event we set to verified
+        if($request->type==1){
+            $event->status = 1;
+        }
+        //if it is paid event we insert ticket_sale_end_date
+        if($request->type==2&&$request->has('ticket_sale_end_date')){
+            $event->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->ticket_sale_end_date));
+        }
         // check if image was updated
         if($request->event_image['0']!=null){
             $event->media_url = $this->uploadImage('event_image','/public/storage/images/events',0);
             //delete the previous image
-            Storage::delete('images/events/'.$event->previous_image_url);
+            unlink(public_path('storage/images/events/'.$event->previous_image_url));
             // unlink(public_path('storage/images/events/'.$request->previous_image_url));
         }
         $event->type = $request->type;
@@ -182,11 +188,6 @@ class EventsController extends Controller
             $ticket_category_details = TicketCategoryDetail::where('event_id',$request->id);
             $ticket_category_details->delete();            
             $this->insertTicketCategoryDetails($request,$event_id);
-
-            $ticket_sale_end_date = TicketSaleEndDate::where('event_id',$request->id)->first();
-            $ticket_sale_end_date->event_id = $event->id;
-            $ticket_sale_end_date->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->ticket_sale_end_date));  
-            $ticket_sale_end_date->save();  
         }
 
         //Give message after successfull operation
@@ -541,16 +542,15 @@ class EventsController extends Controller
             $ticket_category_details->delete();
         }
 
-        //delete event_sponsor_media table
-        $event_sponsor_media = EventSponsorMedia::where('event_id',$request->id);
-        $event_sponsor_media->delete();
+        //delete event_sponsor_media 
+        $this->deleteSponsorImages($request->id);
 
         //delete event_dates table
         $event_dates = EventDate::where('event_id',$request->id);
         $event_dates->delete();
 
         //delete image
-        Storage::delete('images/events/'.$event->image_url);
+        unlink(public_path('storage/images/events/'.$event->media_url));
 
         //finally delete events table
         $event->delete();

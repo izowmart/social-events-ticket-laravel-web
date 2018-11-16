@@ -41,10 +41,6 @@ class Event extends Model
         return $this->hasMany('App\EventTicketCategory','event_id');
     }
 
-    public function getTicketSaleEndDate() {
-        return TicketSaleEndDate::where('event_id',$this->id);
-    }
-
     public function sponsor_media(){
         return $this->hasMany('App\EventSponsorMedia','event_id')->orderBy('id', 'asc');
     }

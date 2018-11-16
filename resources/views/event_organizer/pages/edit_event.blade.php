@@ -109,7 +109,7 @@
                             <div class="slim" style="width: 300px; height: 400px"
                                     data-label="Drop your image here or click to choose"
                                     data-size="590,780"
-                                    data-min-size="550,770">
+                                    data-min-size="430,770">
                                     <img src="{{ asset('storage/images/events') }} {{'/'.$event->media_url}}" >
                                     <input type="file" name="event_image[]"/>
                             </div>  
@@ -156,8 +156,9 @@
                             <div class="animated-radio-button form-check-inline">
                               <label>
                                 <input type="radio" value="2" @if($event->type==2) checked @endif name="type" id="paid" required><span class="label-text">Paid</span>
-                              </label>
+                              </label>   
                             </div>
+                            <small class="form-text" id="event_type_error" style="color: red"></small> 
                             @if ($errors->has('type'))
                                 <span class="help-block">
                                     <strong>{{ $errors->first('type') }}</strong>
@@ -171,7 +172,7 @@
                     <div class="row" id="category-row">
                       <div class="col-md-4">
                         <div class="form-group">
-                            <label class="control-label">Category</label>
+                            <label class="control-label">Ticket Type</label>
                             <div class="form-group{{ $errors->has('category') ? ' has-error' : '' }}">    
                                 <div class="row">
                                     @foreach ($ticket_categories as $ticket_category)
@@ -389,7 +390,7 @@
             $("#category-row").slideDown("slow");
             $("#append-row").slideDown("slow");
             $("#ticket_sale_end_date_container").slideDown("slow");
-            $('#ticket_sale_end_date').val('{{$event->getTicketSaleEndDate()->first()->ticket_sale_end_date}}');
+            $('#ticket_sale_end_date').val('{{$event->ticket_sale_end_date}}');
             $('#ticket_sale_end_date').attr('required', 'required');
         });
 
@@ -490,6 +491,7 @@
             $('#sponsor_image_input').attr('required', 'required');
         }else{
             $("#event_sponsor_image_row").slideUp("slow");
+            $('#sponsor_image_input').attr('required', false);
         }        
 
     });
@@ -507,6 +509,14 @@
       $("#ticket_sale_end_date_container").slideDown("slow");
       $('#ticket_sale_end_date').attr('required', 'required');
   }
+  $("form").submit(function(e){
+    if($('#paid').is(':checked') && $('.ticket_type_checkbox:checkbox:checked').length < 1){
+        e.preventDefault();            
+        $('#event_type_error').text('For paid event, you have to select at least one ticket type')
+    } else{
+        $('form').unbind('submit').submit();
+    }        
+  });
 
 </script>
 @if (!empty($event->getEventSponsorMedia()->first()))
