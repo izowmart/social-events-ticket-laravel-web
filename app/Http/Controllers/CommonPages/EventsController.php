@@ -35,6 +35,41 @@ class EventsController extends Controller
 
     }
 
+    public function showAddTicketTemplate($slug){
+        $event = Event::where('slug',$slug)->first();
+        $event_dates = EventDate::select('id','start','end')->where('event_id',$event->id)->get();
+        $ticket_category_details = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.category_id','ticket_categories.slug','ticket_categories.name')
+                                    ->join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
+                                    ->where('event_id', $event->id)
+                                    ->get();
+        $data = array(
+            'event'=>$event,
+            'event_dates'=>$event_dates,
+            'ticket_category_details'=>$ticket_category_details
+        );   
+        return view('event_organizer.pages.select_ticket_template')->with($data);
+
+    }
+
+    public function saveTicketTemplate(Request $request){
+        $this->validate($request, [
+            'ticket_template'=>'required|numeric',
+            'event_id'=>'required|numeric'
+        ]); 
+        $event = Event::find($request->event_id);
+        $event->ticket_template = $request->ticket_template;
+        //we remove draft status
+        $event->status = 0;
+        $event->save();
+
+        //Give message after successfull operation
+        $request->session()->flash('status', 'Ticket template updated successfully');
+
+        return redirect($this->EventOrganizerUnverifiedredirectPath);
+        
+
+    }
+
     public function showEditForm($slug){
         $ticket_categories = TicketCategory::all();
         
@@ -54,7 +89,6 @@ class EventsController extends Controller
             'ticket_categories'=>$ticket_categories,
             'ticket_category_details'=>$ticket_category_details
         );   
-        //dd($data);
 
         return view('event_organizer.pages.edit_event')->with($data);
 
@@ -81,9 +115,10 @@ class EventsController extends Controller
         $event->longitude = $request->longitude;
         $event->latitude = $request->latitude;
         $event->description = $request->description;
-        //if it is paid event we insert ticket_sale_end_date
+        //if it is paid event we insert ticket_sale_end_date and set status to draft
         if($request->type==2 && $request->has('ticket_sale_end_date')){
             $event->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->ticket_sale_end_date));
+            $event->status = 3;
         }
         $event->media_url = $this->uploadImage('event_image','/public/storage/images/events',0);
         $event->type = $request->type;
@@ -107,13 +142,14 @@ class EventsController extends Controller
             $this->insertTicketCategoryDetails($request,$event->id);
         }
 
-        //Give message after successfull operation
-        $request->session()->flash('status', 'Event added successfully');
         if($request->type==1){
             //if free event
+            $request->session()->flash('status', 'Event added successfully');
             return redirect($this->EventOrganizerFreeredirectPath);
         }else{
-            return redirect($this->EventOrganizerUnverifiedredirectPath);
+            //for paid event redirect to choose ticket template            
+            $request->session()->flash('status', 'Event added successfully. Choose the ticket template');
+            return redirect('event_organizer/events/add/ticket-template/'.$event->slug);
         }
 
     }
@@ -192,6 +228,14 @@ class EventsController extends Controller
 
         //Give message after successfull operation
         $request->session()->flash('status', 'Event updated successfully');
+
+        //if the user checked that he needs to update ticket template. But first we ensure the sponsor images are there
+        if($request->has('sponsor_images_checkbox')) {
+            if($request->has('update_ticket_template_checkbox')) {
+                return redirect('event_organizer/events/add/ticket-template/'.$event->slug);
+            }
+            
+        }
 
         //redirect event organizer to approproate place
         $event_status = $event->status;

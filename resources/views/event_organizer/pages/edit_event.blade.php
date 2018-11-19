@@ -270,6 +270,13 @@
                             <button class="btn btn-primary" style="text-align: center" type="button" onclick="event_sponsor_image();"><i class="fa fa-plus"></i></button>
                             <small class="form-text text-muted" id="ticket_type_help">To add more event sponsor images click the plus button.</small> 
                         </div>
+                        <div class="col-md-10">
+                            <div class="animated-checkbox">
+                                <label>
+                                    <input type="checkbox" name="update_ticket_template_checkbox"><span class="label-text">I need to update the ticket template too</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                   
                   <input type="hidden" name="id" value="{{$event->id}}">  
