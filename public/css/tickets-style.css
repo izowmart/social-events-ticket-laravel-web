@@ -113,7 +113,9 @@
 
 /*tickets css*/
 
-
+.ticket-template{
+  display: block;
+}
 
 .tickets-content
 
@@ -132,6 +134,8 @@
 .tickets-content h1{
 
   text-align: center;
+  margin-left: 20px;
+  margin-top: 10px;
 
 }
 
@@ -150,6 +154,16 @@
 {
 
   float: left;
+
+  padding-right: 6%;
+
+}
+
+.tickets2-qr
+
+{
+
+  float: right;
 
   padding-right: 6%;
 
@@ -180,6 +194,13 @@
 .ticket-info {
 
   padding-top: 2%;
+  margin-left: 20px;
+
+}
+
+.ticket-info span {
+
+  font-size: 22px;
 
 }
 

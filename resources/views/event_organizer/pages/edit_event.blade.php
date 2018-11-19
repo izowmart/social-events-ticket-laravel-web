@@ -270,6 +270,13 @@
                             <button class="btn btn-primary" style="text-align: center" type="button" onclick="event_sponsor_image();"><i class="fa fa-plus"></i></button>
                             <small class="form-text text-muted" id="ticket_type_help">To add more event sponsor images click the plus button.</small> 
                         </div>
+                        <div class="col-md-10">
+                            <div class="animated-checkbox">
+                                <label>
+                                    <input type="checkbox" name="update_ticket_template_checkbox"><span class="label-text">I need to update the ticket template too</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                   
                   <input type="hidden" name="id" value="{{$event->id}}">  
@@ -303,9 +310,12 @@
         var divtest = document.createElement("div");
         divtest.setAttribute("class", "form-group removeclass" + room);
         var rdiv = 'removeclass' + room;
-        divtest.innerHTML = '<div class="row"> <div class="col-md-10"> <div class="row"> <div class="col-md-4"> <label class="control-label">Event Start</label> <div class="form-group"> <div class="input-group" date> <input class="form-control datetimepicker" type="text" name="dates['+room+'][start]" placeholder="Select start date" required> </div> </div> </div> <div class="col-md-3"></div> <div class="col-md-4"> <div class="form-group"> <label class="control-label">Event Stop</label> <input class="form-control datetimepicker" type="text" name="dates['+room+'][stop]" placeholder="Select stop date" required> </div> </div> <div class="col-sm-1 pt-4"> <div class="form-group"> <button class="btn btn-success" type="button" onclick="remove_date_fields(' + room + ');"><i class="fa fa-minus"></i></button> </div> </div> </div> </div> </div>';
+        divtest.innerHTML = '<div class="row" id="date-row'+room+'"> <div class="col-md-10"> <div class="row"> <div class="col-md-4"> <label class="control-label">Event Start</label> <div class="form-group"> <div class="input-group" date> <input class="form-control datetimepicker" type="text" name="dates['+room+'][start]" placeholder="Select start date" required> </div> </div> </div> <div class="col-md-3"></div> <div class="col-md-4"> <div class="form-group"> <label class="control-label">Event Stop</label> <input class="form-control datetimepicker" type="text" name="dates['+room+'][stop]" placeholder="Select stop date" required> </div> </div> <div class="col-sm-1 pt-4"> <div class="form-group"> <button class="btn btn-success" type="button" onclick="remove_date_fields(' + room + ');"><i class="fa fa-minus"></i></button> </div> </div> </div> </div> </div>';
 
-        objTo.appendChild(divtest)
+        objTo.appendChild(divtest);
+
+        $("#date-row"+room).hide();
+        $("#date-row"+room).slideDown("slow");
 
         $(".datetimepicker").flatpickr({
             enableTime: true,
@@ -315,7 +325,7 @@
         });
     }
     function remove_date_fields(rid) {
-        $('.removeclass' + rid).remove();
+        $('.removeclass' + rid).slideUp("normal", function() { $(this).remove(); } );
     }
 </script>
 
