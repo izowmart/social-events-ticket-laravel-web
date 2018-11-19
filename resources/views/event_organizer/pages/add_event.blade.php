@@ -251,7 +251,6 @@
       </div>
     </main>
 @endsection
-{{-- TODO:: validate if user has select paid event, he must check at least one event type --}}
 
 @section('other-scripts')
 <script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=true&libraries=places&key=AIzaSyAWMiw7tAqWan2iOUqRzzM2BGQ9z6Pe8wI"></script>
@@ -270,9 +269,12 @@
         var divtest = document.createElement("div");
         divtest.setAttribute("class", "form-group removeclass" + room);
         var rdiv = 'removeclass' + room;
-        divtest.innerHTML = '<div class="row"> <div class="col-md-10"> <div class="row"> <div class="col-md-4"> <label class="control-label">Event Start</label> <div class="form-group"> <div class="input-group" date> <input class="form-control datetimepicker" type="text" name="dates['+room+'][start]" placeholder="Select start date" required> </div> </div> </div> <div class="col-md-3"></div> <div class="col-md-4"> <div class="form-group"> <label class="control-label">Event Stop</label> <input class="form-control datetimepicker" type="text" name="dates['+room+'][stop]" placeholder="Select stop date" required> </div> </div> <div class="col-sm-1 pt-4"> <div class="form-group"> <button class="btn btn-success" type="button" onclick="remove_date_fields(' + room + ');"><i class="fa fa-minus"></i></button> </div> </div> </div> </div> </div>';
+        divtest.innerHTML = '<div class="row" id="date-row'+room+'"> <div class="col-md-10"> <div class="row"> <div class="col-md-4"> <label class="control-label">Event Start</label> <div class="form-group"> <div class="input-group" date> <input class="form-control datetimepicker" type="text" name="dates['+room+'][start]" placeholder="Select start date" required> </div> </div> </div> <div class="col-md-3"></div> <div class="col-md-4"> <div class="form-group"> <label class="control-label">Event Stop</label> <input class="form-control datetimepicker" type="text" name="dates['+room+'][stop]" placeholder="Select stop date" required> </div> </div> <div class="col-sm-1 pt-4"> <div class="form-group"> <button class="btn btn-success" type="button" onclick="remove_date_fields(' + room + ');"><i class="fa fa-minus"></i></button> </div> </div> </div> </div> </div>';
 
         objTo.appendChild(divtest);
+
+        $("#date-row"+room).hide();
+        $("#date-row"+room).slideDown("slow");
 
         $(".datetimepicker").flatpickr({
             enableTime: true,
@@ -283,7 +285,7 @@
     }
 
     function remove_date_fields(rid) {
-        $('.removeclass' + rid).remove();
+        $('.removeclass' + rid).slideUp("normal", function() { $(this).remove(); } );
     }
 
     var event_sponsor_images = 0;
