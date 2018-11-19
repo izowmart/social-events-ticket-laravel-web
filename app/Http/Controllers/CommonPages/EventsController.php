@@ -73,10 +73,14 @@ class EventsController extends Controller
     public function showEditForm($slug){
         $ticket_categories = TicketCategory::all();
         
-        $event = Event::select('events.id','events.name','events.slug','events.description','events.location','events.latitude','events.longitude','events.type','events.slug','events.media_url','events.ticket_sale_end_date')
+        $event = Event::select('events.id','events.name','events.slug','events.description','events.status','events.location','events.latitude','events.longitude','events.type','events.slug','events.media_url','events.ticket_sale_end_date')
                     ->where('events.slug',$slug)
                     ->orderBy('id','desc')
                     ->first();
+        //make sure the event is not yet verified by admin
+        if($event->status==1){
+            return redirect($this->EventOrganizerVerifiedPaidredirectPath);            
+        }
         $event_dates = EventDate::select('id','start','end')->where('event_id',$event->id)->get();
         $ticket_category_details = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.category_id','ticket_categories.slug','ticket_categories.name')
                                     ->join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
