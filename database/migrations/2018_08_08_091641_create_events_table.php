@@ -27,7 +27,7 @@ class CreateEventsTable extends Migration
             $table->datetime('ticket_sale_end_date')->nullable();
             $table->integer('status')->default(0)->comment('0- unverified, 1 - verified, 2 - deactivated, 3 - draft');
             $table->integer('featured_event')->default(2)->comment('1 - yes, 2 - no');
-            $table->integer('ticket_template')->default(1);
+            $table->integer('ticket_template')->nullable();
             $table->string('slug');
             $table->timestamps();
         });
