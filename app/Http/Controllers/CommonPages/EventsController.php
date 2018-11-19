@@ -37,6 +37,10 @@ class EventsController extends Controller
 
     public function showAddTicketTemplate($slug){
         $event = Event::where('slug',$slug)->first();
+        //make sure the event is not yet verified by admin
+        if($event->status==1){
+            return redirect($this->EventOrganizerVerifiedPaidredirectPath);            
+        }
         $event_dates = EventDate::select('id','start','end')->where('event_id',$event->id)->get();
         $ticket_category_details = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.category_id','ticket_categories.slug','ticket_categories.name')
                                     ->join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
@@ -58,8 +62,10 @@ class EventsController extends Controller
         ]); 
         $event = Event::find($request->event_id);
         $event->ticket_template = $request->ticket_template;
-        //we remove draft status
-        $event->status = 0;
+        //we update the staus to unverified onl if it was draft
+        if($event->status==3){
+            $event->status = 0;
+        }
         $event->save();
 
         //Give message after successfull operation
