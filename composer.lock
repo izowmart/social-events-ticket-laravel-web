@@ -1799,16 +1799,16 @@
         },
         {
             "name": "league/oauth2-server",
-            "version": "7.3.0",
+            "version": "7.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/oauth2-server.git",
-                "reference": "a61c6a318acc155769ae9afc693fd18d91475587"
+                "reference": "f2cd3646ffe92a5ce83942cb487702e34b0cf504"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/oauth2-server/zipball/a61c6a318acc155769ae9afc693fd18d91475587",
-                "reference": "a61c6a318acc155769ae9afc693fd18d91475587",
+                "url": "https://api.github.com/repos/thephpleague/oauth2-server/zipball/f2cd3646ffe92a5ce83942cb487702e34b0cf504",
+                "reference": "f2cd3646ffe92a5ce83942cb487702e34b0cf504",
                 "shasum": ""
             },
             "require": {
@@ -1872,7 +1872,7 @@
                 "secure",
                 "server"
             ],
-            "time": "2018-11-13T20:17:20+00:00"
+            "time": "2018-11-15T22:37:18+00:00"
         },
         {
             "name": "monolog/monolog",
