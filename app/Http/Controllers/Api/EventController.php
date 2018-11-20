@@ -6,6 +6,7 @@ use App\Event;
 use App\Http\Resources\EventResource;
 use App\Scanner;
 use App\Transformers\EventTransformer;
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Response;
@@ -30,11 +31,46 @@ class EventController extends Controller
             );
         } catch ( \Exception $exception ) {
             return Response::json([
-                    "success" => "false",
                     "message" => "error fetching events!" . $exception,
                 ]
 
             );
+        }
+    }
+    //my_tickets
+    public function my_tickets(Resquest $request){
+
+        $user = $request->user();
+
+        $event = Event::join('tickets','tickets.event_id', '=','events.id')
+                ->join('ticket_category_details','ticket_category_details.event_id','=','events.id')
+                ->where('ticket_customers.user_id','=','user.id');
+
+        try{
+            if ($event= Event::where('id',$request->event_id)->first()){
+
+                if ($event->user_id !=$request->user()){
+                    return \response()->json([
+                        'message'=>''
+                    ],401);
+                }
+
+                return \response()->json([
+                    'message'=>'found events',
+                    'data'=>$event
+                ],200);
+
+
+            }
+
+
+        }catch (\Exception $exception){
+            return Response::json([
+               "success" => "false",
+               "message" => "error fetching my_tickets!" . $exception,
+            ]
+            );
+
         }
     }
 

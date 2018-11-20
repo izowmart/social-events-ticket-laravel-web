@@ -4,6 +4,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" type="text/css" href="{{ asset('css/summernote-bs4.css') }}" /> 
 <link rel="stylesheet" href="{{ asset('css/slim.min.css') }}">
+<script src="{{ asset('js/plugins/slim.jquery.min.js') }}"></script>
+<script src="{{ asset('js/plugins/slim.kickstart.min.js') }}"></script>
 @endsection
 
 @section('content')
@@ -107,7 +109,7 @@
                             <div class="slim" style="width: 300px; height: 400px"
                                     data-label="Drop your image here or click to choose"
                                     data-size="590,780"
-                                    data-min-size="550,770">
+                                    data-min-size="430,730">
                                     <img src="{{ asset('storage/images/events') }} {{'/'.$event->media_url}}" >
                                     <input type="file" name="event_image[]"/>
                             </div>  
@@ -124,7 +126,7 @@
                         <div class="col-md-10">
                             <div class="form-group{{ $errors->has('location') ? ' has-error' : '' }}">
                                 <label for="location">Location</label>
-                                <input type="text" class="form-control" aria-describedby="LocationHelp" value="{{ $event->location}}" name="location" id="location-address" aria-describedby="locationHelp" data-latitude-input="#location-lat" data-longitude-input="#location-lon" placeholder="The name of the venue" required>
+                                <input type="text" class="form-control" aria-describedby="LocationHelp" value="{{ $event->location}}" name="location" id="location-address" aria-describedby="locationHelp" data-latitude-input="#location-lat" data-longitude-input="#location-lon" placeholder="The location of event" required>
                                 
                                 @if ($errors->has('location'))
                                     <span class="help-block">
@@ -154,8 +156,9 @@
                             <div class="animated-radio-button form-check-inline">
                               <label>
                                 <input type="radio" value="2" @if($event->type==2) checked @endif name="type" id="paid" required><span class="label-text">Paid</span>
-                              </label>
+                              </label>   
                             </div>
+                            <small class="form-text" id="event_type_error" style="color: red"></small> 
                             @if ($errors->has('type'))
                                 <span class="help-block">
                                     <strong>{{ $errors->first('type') }}</strong>
@@ -169,7 +172,7 @@
                     <div class="row" id="category-row">
                       <div class="col-md-4">
                         <div class="form-group">
-                            <label class="control-label">Category</label>
+                            <label class="control-label">Ticket Type</label>
                             <div class="form-group{{ $errors->has('category') ? ' has-error' : '' }}">    
                                 <div class="row">
                                     @foreach ($ticket_categories as $ticket_category)
@@ -208,7 +211,7 @@
                         <div class="col-md-10">
                             <div class="animated-checkbox">
                                 <label>
-                                    <input type="checkbox" id="sponsor_images_checkox" name="sponsor_images_checkbox"><span class="label-text">I have event sponsor images</span>
+                                    <input type="checkbox" id="sponsor_images_checkox" name="sponsor_images_checkbox"><span class="label-text">I have logos for event sponsors</span>
                                 </label>
                             </div>
                         </div>
@@ -217,19 +220,24 @@
                         <div class="col-md-12">
                             <div class="row" id="append_event_sponsor_image">
                                 @if (!empty($first_image = $event->getEventSponsorMedia()->first()))
-                                @foreach ($event->getEventSponsorMedia()->get() as $single_sponsor_media)
+                                {{-- @foreach ($event->getEventSponsorMedia as $single_sponsor_media) --}}
+                                @foreach ($event->sponsor_media as $single_sponsor_media)
                                 <div class="col-md-3">
                                     <label for="event_image">Event Sponsor Image</label>
                                     <div class="form-group{{ $errors->has('event_image') ? ' has-error' : '' }}">
-                                        <div class="slim" style="width: 250px; height: 250px"
+                                        <div class="slim" id="slim-{{$single_sponsor_media->id}}" style="width: 250px; height: 250px"
                                             data-ratio="1:1"
                                             data-label="Drop your image here or click to choose"
                                             data-size="300,500"
                                             data-min-size="200,200">
-                                            <img src="{{ asset('storage/images/event_sponsors/'.$single_sponsor_media->media_url) }}" alt="sponsor image">
+                                            {{-- <img src="{{ asset('storage/images/event_sponsors/'.$single_sponsor_media->media_url) }}" alt="sponsor image"> --}}
                                             
                                             <input id="sponsor_image_input" type="file" name="event_sponsor_image[]"/>
                                         </div>  
+                                        <script>
+                                            var cropper = new Slim(document.getElementById('slim-{{$single_sponsor_media->id}}'));
+                                            cropper.load("{{ asset('storage/images/event_sponsors/'.$single_sponsor_media->media_url) }}");
+                                        </script>
                                         @if ($errors->has('event_image'))
                                             <span class="help-block">
                                                 <strong>{{ $errors->first('event_image') }}</strong>
@@ -262,6 +270,13 @@
                             <button class="btn btn-primary" style="text-align: center" type="button" onclick="event_sponsor_image();"><i class="fa fa-plus"></i></button>
                             <small class="form-text text-muted" id="ticket_type_help">To add more event sponsor images click the plus button.</small> 
                         </div>
+                        <div class="col-md-10">
+                            <div class="animated-checkbox">
+                                <label>
+                                    <input type="checkbox" name="update_ticket_template_checkbox"><span class="label-text">I need to update the ticket template too</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                   
                   <input type="hidden" name="id" value="{{$event->id}}">  
@@ -283,9 +298,6 @@
 <script src="{{ asset('js/plugins/jquery.placepicker.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="{{ asset('js/plugins/summernote-bs4.min.js') }}"></script>
-<script src="{{ asset('js/plugins/slim.amd.js') }}"></script>
-<script src="{{ asset('js/plugins/slim.commonjs.js') }}"></script>
-<script src="{{ asset('js/plugins/slim.global.min.js') }}"></script>
 <script src="{{ asset('js/plugins/slim.jquery.min.js') }}"></script>
 <script src="{{ asset('js/plugins/slim.kickstart.min.js') }}"></script>
 <script>
@@ -298,9 +310,12 @@
         var divtest = document.createElement("div");
         divtest.setAttribute("class", "form-group removeclass" + room);
         var rdiv = 'removeclass' + room;
-        divtest.innerHTML = '<div class="row"> <div class="col-md-10"> <div class="row"> <div class="col-md-4"> <label class="control-label">Event Start</label> <div class="form-group"> <div class="input-group" date> <input class="form-control datetimepicker" type="text" name="dates['+room+'][start]" placeholder="Select start date" required> </div> </div> </div> <div class="col-md-3"></div> <div class="col-md-4"> <div class="form-group"> <label class="control-label">Event Stop</label> <input class="form-control datetimepicker" type="text" name="dates['+room+'][stop]" placeholder="Select stop date" required> </div> </div> <div class="col-sm-1 pt-4"> <div class="form-group"> <button class="btn btn-success" type="button" onclick="remove_date_fields(' + room + ');"><i class="fa fa-minus"></i></button> </div> </div> </div> </div> </div>';
+        divtest.innerHTML = '<div class="row" id="date-row'+room+'"> <div class="col-md-10"> <div class="row"> <div class="col-md-4"> <label class="control-label">Event Start</label> <div class="form-group"> <div class="input-group" date> <input class="form-control datetimepicker" type="text" name="dates['+room+'][start]" placeholder="Select start date" required> </div> </div> </div> <div class="col-md-3"></div> <div class="col-md-4"> <div class="form-group"> <label class="control-label">Event Stop</label> <input class="form-control datetimepicker" type="text" name="dates['+room+'][stop]" placeholder="Select stop date" required> </div> </div> <div class="col-sm-1 pt-4"> <div class="form-group"> <button class="btn btn-success" type="button" onclick="remove_date_fields(' + room + ');"><i class="fa fa-minus"></i></button> </div> </div> </div> </div> </div>';
 
-        objTo.appendChild(divtest)
+        objTo.appendChild(divtest);
+
+        $("#date-row"+room).hide();
+        $("#date-row"+room).slideDown("slow");
 
         $(".datetimepicker").flatpickr({
             enableTime: true,
@@ -310,7 +325,7 @@
         });
     }
     function remove_date_fields(rid) {
-        $('.removeclass' + rid).remove();
+        $('.removeclass' + rid).slideUp("normal", function() { $(this).remove(); } );
     }
 </script>
 
@@ -325,12 +340,13 @@
     </script>
     @endif
 <script>
+    var maximum = 2;
     function event_sponsor_image(){
-        if(event_sponsor_images>2){
+        if(event_sponsor_images>maximum){
             $("#event_sponsor_image_error").text('You can upload a maximum of four images');   
         }else{            
             event_sponsor_images++;
-            var content = '<div class="col-md-3"><label>.</label> <div class="form-group"> <div class="slim" id="slim-'+event_sponsor_images+'" style="width: 250px; height: 250px" data-ratio="1:1" data-label="Drop your image here or click to choose" data-size="300,500" data-min-size="200,300"> <input type="file" name="event_sponsor_image[]"/> </div> </div> </div>';
+            var content = '<div class="col-md-3" id="slim-div-'+event_sponsor_images+'"><label style="display: flex; justify-content: flex-end;"><i class="fa fa-remove" style="color: red; font-size:20px; cursor:pointer; margin-right: 20px;" data-toogle="tooltip" title="delete" onclick="deleteSponsorDiv('+event_sponsor_images+')"></i></label> <div class="form-group"> <div class="slim" id="slim-'+event_sponsor_images+'" style="width: 250px; height: 250px" data-ratio="1:1" data-label="Drop your image here or click to choose" data-size="300,500" data-min-size="200,300"> <input type="file" name="event_sponsor_image[]" required/> </div> </div> </div>';
             $("#append_event_sponsor_image").append(content);
             $('#slim-'+event_sponsor_images).slim({
                 ratio: '1:1',
@@ -349,6 +365,11 @@
             });
             // $('#slim-'+event_sponsor_images).slim('parse');
         }
+    }
+    function deleteSponsorDiv(id){
+        maximum++;
+        $('#slim-div-'+id).remove();
+
     }
     $('.summernote').summernote({
         height: 350, // set editor height
@@ -379,7 +400,7 @@
             $("#category-row").slideDown("slow");
             $("#append-row").slideDown("slow");
             $("#ticket_sale_end_date_container").slideDown("slow");
-            $('#ticket_sale_end_date').val('{{$event->getTicketSaleEndDate()->first()->ticket_sale_end_date}}');
+            $('#ticket_sale_end_date').val('{{$event->ticket_sale_end_date}}');
             $('#ticket_sale_end_date').attr('required', 'required');
         });
 
@@ -463,13 +484,14 @@
     });
 
     $('input[type=radio][name=type]').change(function() {
-        $("#sponsor_images_checkbox_row").slideDown("slow");
         if (this.value == '2') {
             $("#category-row").slideDown("slow");
+            $("#sponsor_images_checkbox_row").slideDown("slow");
         }else {            
             $("#append-row").empty().slideUp("slow");  
             $("#category-row").slideUp("slow");
             $("#ticket_sale_end_date_container").slideUp("slow");
+            $("#sponsor_images_checkbox_row").slideUp("slow");
             $('#ticket_sale_end_date').attr('required', false);
         }
     });
@@ -480,6 +502,7 @@
             $('#sponsor_image_input').attr('required', 'required');
         }else{
             $("#event_sponsor_image_row").slideUp("slow");
+            $('#sponsor_image_input').attr('required', false);
         }        
 
     });
@@ -497,13 +520,17 @@
       $("#ticket_sale_end_date_container").slideDown("slow");
       $('#ticket_sale_end_date').attr('required', 'required');
   }
+  $("form").submit(function(e){
+    if($('#paid').is(':checked') && $('.ticket_type_checkbox:checkbox:checked').length < 1){
+        e.preventDefault();            
+        $('#event_type_error').text('For paid event, you have to select at least one ticket type')
+    } else{
+        $('form').unbind('submit').submit();
+    }        
+  });
 
 </script>
 @if (!empty($event->getEventSponsorMedia()->first()))
-@foreach ($event->getEventSponsorMedia()->get() as $single_event_sponsor_media)
-
-    
-@endforeach
 
 <script>
     $('#sponsor_images_checkox').attr('checked', 'checked');
@@ -513,6 +540,7 @@
 @else
 <script>    
     $("#event_sponsor_image_row").hide();
+    $("#sponsor_images_checkbox_row").hide();
 </script>
 @endif
 

@@ -15,7 +15,6 @@ use App\Classes\Slim;
 use App\Scanner;
 use App\EventScanner;
 use App\TicketCategory;
-use App\TicketSaleEndDate;
 use App\TicketCategoryDetail;
 
 class EventsController extends Controller
@@ -36,13 +35,58 @@ class EventsController extends Controller
 
     }
 
+    public function showAddTicketTemplate($slug){
+        $event = Event::where('slug',$slug)->first();
+        //make sure the event is not yet verified by admin or is not a free event
+        if($event->status==1 || $event->type==1){
+            return redirect($this->EventOrganizerVerifiedPaidredirectPath);            
+        }
+        $event_dates = EventDate::select('id','start','end')->where('event_id',$event->id)->get();
+        $ticket_category_details = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.category_id','ticket_categories.slug','ticket_categories.name')
+                                    ->join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
+                                    ->where('event_id', $event->id)
+                                    ->get();
+        $data = array(
+            'event'=>$event,
+            'event_dates'=>$event_dates,
+            'ticket_category_details'=>$ticket_category_details
+        );   
+        return view('event_organizer.pages.select_ticket_template')->with($data);
+
+    }
+
+    public function saveTicketTemplate(Request $request){
+        $this->validate($request, [
+            'ticket_template'=>'required|numeric',
+            'event_id'=>'required|numeric'
+        ]); 
+        $event = Event::find($request->event_id);
+        $event->ticket_template = $request->ticket_template;
+        //we update the staus to unverified onl if it was draft
+        if($event->status==3){
+            $event->status = 0;
+        }
+        $event->save();
+
+        //Give message after successfull operation
+        $request->session()->flash('status', 'Ticket template updated successfully');
+
+        return redirect($this->EventOrganizerUnverifiedredirectPath);
+        
+
+    }
+
     public function showEditForm($slug){
         $ticket_categories = TicketCategory::all();
         
-        $event = Event::select('events.id','events.name','events.slug','events.description','events.location','events.latitude','events.longitude','events.type','events.slug','events.media_url')
+        $event = Event::select('events.id','events.name','events.slug','events.description','events.status','events.location','events.latitude','events.longitude','events.type','events.slug','events.media_url','events.ticket_sale_end_date')
                     ->where('events.slug',$slug)
                     ->orderBy('id','desc')
                     ->first();
+        //make sure the event is not yet verified by admin
+        if($event->status==1){
+            return redirect($this->EventOrganizerVerifiedPaidredirectPath);            
+        }
         $event_dates = EventDate::select('id','start','end')->where('event_id',$event->id)->get();
         $ticket_category_details = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.category_id','ticket_categories.slug','ticket_categories.name')
                                     ->join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
@@ -55,7 +99,6 @@ class EventsController extends Controller
             'ticket_categories'=>$ticket_categories,
             'ticket_category_details'=>$ticket_category_details
         );   
-        //dd($data);
 
         return view('event_organizer.pages.edit_event')->with($data);
 
@@ -63,6 +106,7 @@ class EventsController extends Controller
 
     public function store(Request $request){
                         
+        try{
         $this->validate($request, [
             'name'=>'required',
             'description'=>'required',            
@@ -73,7 +117,10 @@ class EventsController extends Controller
             'event_sponsor_image'=>'nullable|array'
         ]); 
 
+        
         $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
+
+        // dd(Auth::guard('web_event_organizer')->user()->id,$event_organizer_id);
 
         $event = new Event();
         $event->name = $request->name;
@@ -82,10 +129,15 @@ class EventsController extends Controller
         $event->longitude = $request->longitude;
         $event->latitude = $request->latitude;
         $event->description = $request->description;
+        //if it is paid event we insert ticket_sale_end_date and set status to draft
+        if($request->type==2 && $request->has('ticket_sale_end_date')){
+            $event->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->ticket_sale_end_date));
+            $event->status = 3;
+        }
         $event->media_url = $this->uploadImage('event_image','/public/storage/images/events',0);
         $event->type = $request->type;
         //if its a free event we set to verified
-        if($event->type==1){
+        if($request->type==1){
             $event->status = 1;
         }
         $event->save();
@@ -102,21 +154,20 @@ class EventsController extends Controller
         //insert price and category if it's a paid event
         if($request->type==2){
             $this->insertTicketCategoryDetails($request,$event->id);
-
-            $ticket_sale_end_date = new TicketSaleEndDate();
-            $ticket_sale_end_date->event_id = $event->id;
-            $ticket_sale_end_date->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->ticket_sale_end_date));
-            $ticket_sale_end_date->save();
         }
 
-        //Give message after successfull operation
-        $request->session()->flash('status', 'Event added successfully');
         if($request->type==1){
             //if free event
+            $request->session()->flash('status', 'Event added successfully');
             return redirect($this->EventOrganizerFreeredirectPath);
         }else{
-            return redirect($this->EventOrganizerUnverifiedredirectPath);
+            //for paid event redirect to choose ticket template            
+            $request->session()->flash('status', 'Event added successfully. Choose the ticket template');
+            return redirect('event_organizer/events/add/ticket-template/'.$event->slug);
         }
+    }catch(Exception $exception){
+        logger("event creation failed: "+$exception->getMessage());
+    }
 
     }
 
@@ -140,11 +191,19 @@ class EventsController extends Controller
         $event->longitude = $request->longitude;
         $event->latitude = $request->latitude;
         $event->description = $request->description;
+        //if its a free event we set to verified
+        if($request->type==1){
+            $event->status = 1;
+        }
+        //if it is paid event we insert ticket_sale_end_date
+        if($request->type==2&&$request->has('ticket_sale_end_date')){
+            $event->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->ticket_sale_end_date));
+        }
         // check if image was updated
         if($request->event_image['0']!=null){
             $event->media_url = $this->uploadImage('event_image','/public/storage/images/events',0);
             //delete the previous image
-            Storage::delete('images/events/'.$event->previous_image_url);
+            unlink(public_path('storage/images/events/'.$event->previous_image_url));
             // unlink(public_path('storage/images/events/'.$request->previous_image_url));
         }
         $event->type = $request->type;
@@ -182,15 +241,18 @@ class EventsController extends Controller
             $ticket_category_details = TicketCategoryDetail::where('event_id',$request->id);
             $ticket_category_details->delete();            
             $this->insertTicketCategoryDetails($request,$event_id);
-
-            $ticket_sale_end_date = TicketSaleEndDate::where('event_id',$request->id)->first();
-            $ticket_sale_end_date->event_id = $event->id;
-            $ticket_sale_end_date->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->ticket_sale_end_date));  
-            $ticket_sale_end_date->save();  
         }
 
         //Give message after successfull operation
         $request->session()->flash('status', 'Event updated successfully');
+
+        //if the user checked that he needs to update ticket template. But first we ensure the sponsor images are there
+        if($request->has('sponsor_images_checkbox')) {
+            if($request->has('update_ticket_template_checkbox')) {
+                return redirect('event_organizer/events/add/ticket-template/'.$event->slug);
+            }
+            
+        }
 
         //redirect event organizer to approproate place
         $event_status = $event->status;
@@ -240,10 +302,12 @@ class EventsController extends Controller
 
     public function insertEventSponsorImages($images,$event_id){
         for ($i=0; $i < count($images); $i++) { 
-            $event_sponsor_media = new EventSponsorMedia();
-            $event_sponsor_media->event_id = $event_id;
-            $event_sponsor_media->media_url = $this->uploadImage('event_sponsor_image','/public/storage/images/event_sponsors',$i);
-            $event_sponsor_media->save();
+            if($images[$i]!=null){                
+                $event_sponsor_media = new EventSponsorMedia();
+                $event_sponsor_media->event_id = $event_id;
+                $event_sponsor_media->media_url = $this->uploadImage('event_sponsor_image','/public/storage/images/event_sponsors',$i);
+                $event_sponsor_media->save();
+            }
         }
         return;
     }
@@ -539,16 +603,15 @@ class EventsController extends Controller
             $ticket_category_details->delete();
         }
 
-        //delete event_sponsor_media table
-        $event_sponsor_media = EventSponsorMedia::where('event_id',$request->id);
-        $event_sponsor_media->delete();
+        //delete event_sponsor_media 
+        $this->deleteSponsorImages($request->id);
 
         //delete event_dates table
         $event_dates = EventDate::where('event_id',$request->id);
         $event_dates->delete();
 
         //delete image
-        Storage::delete('images/events/'.$event->image_url);
+        unlink(public_path('storage/images/events/'.$event->media_url));
 
         //finally delete events table
         $event->delete();
@@ -562,9 +625,9 @@ class EventsController extends Controller
         //check if record exist first
         if(EventSponsorMedia::where('event_id',$event_id)->count()>0){
             $sponsor_images = EventSponsorMedia::where('event_id',$event_id)->get();
-            foreach($sponsor_image as $single_sponser_image){
+            foreach($sponsor_images as $single_sponser_image){
                 //delete image
-                Storage::delete('images/event_sponsors/'.$single_sponser_image->media_url);
+                unlink(public_path('storage/images/event_sponsors/'.$single_sponser_image->media_url));
                 $single_sponser_image->delete();                
             }
 

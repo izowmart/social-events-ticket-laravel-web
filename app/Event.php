@@ -9,6 +9,10 @@ class Event extends Model
 {
      use Sluggable;
 
+    public static function join(string $string, string $string1, string $string2, string $string3)
+    {
+    }
+
     /**
      * Return the sluggable configuration array for this model.
      *
@@ -41,11 +45,11 @@ class Event extends Model
         return $this->hasMany('App\EventTicketCategory','event_id');
     }
 
-    public function getTicketSaleEndDate() {
-        return TicketSaleEndDate::where('event_id',$this->id);
+    public function sponsor_media(){
+        return $this->hasMany('App\EventSponsorMedia','event_id')->orderBy('id', 'asc');
     }
 
     public function getEventSponsorMedia() {
-        return EventSponsorMedia::where('event_id',$this->id);
+        return EventSponsorMedia::where('event_id',$this->id)->orderBy('id', 'asc');
     }
 }

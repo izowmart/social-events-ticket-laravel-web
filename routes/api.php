@@ -66,6 +66,8 @@ Route::group(['prefix' => 'user', 'middleware' => 'auth:api'], function () use (
     Route::post('report_abuse', $base_url . 'Api\PostController@report_abuse');
     Route::get('{id}/relations', $base_url . 'Api\AuthController@user_relations');
     Route::post('follow', $base_url . 'Api\AuthController@follow');
+    //my tickets route
+    Route::post('my_tickets/{user_id}', $base_url . 'Api\EventController@my_tickets');
 
 
     Route::post('search','Api\SearchController@index');
