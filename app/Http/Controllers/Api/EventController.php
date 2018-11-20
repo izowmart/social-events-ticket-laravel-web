@@ -18,7 +18,7 @@ class EventController extends Controller
         try {
             $events = Event::join('event_dates','event_dates.event_id','=','events.id')
                 ->where('events.status', 1)//approved by admin
-                ->whereDate('event_dates.end','>=',now()) //upcoming events
+                ->whereDate('event_dates.end','>=',now()) //upcoming events //TODO::what happens when the event dates are two or more??
                 ->get();
 
 
