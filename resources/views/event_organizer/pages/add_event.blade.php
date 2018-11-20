@@ -202,7 +202,7 @@
                                 </div>
                             </div>
                         </div>                    
-                    </div>    
+                    </div> 
                     <div class="row" id="sponsor_images_checkbox_row">
                         <div class="col-md-10">
                             <div class="animated-checkbox">
@@ -402,13 +402,14 @@
     });
 
     $('input[type=radio][name=type]').change(function() {
-        $("#sponsor_images_checkbox_row").slideDown("slow");
         if (this.value == '2') {
             $("#category-row").slideDown("slow");
+            $("#sponsor_images_checkbox_row").slideDown("slow");
         }else {            
             $("#append-row").empty().slideUp("slow");  
             $("#category-row").slideUp("slow");
             $("#ticket_sale_end_date_container").slideUp("slow");
+            $("#sponsor_images_checkbox_row").slideUp("slow");
             $('#ticket_sale_end_date').attr('required', false);
         }
     });

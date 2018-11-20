@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\EventOrganizerPages;
 
+use App\Http\Traits\UniversalMethods;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use App\Http\Controllers\Controller;
@@ -80,7 +81,7 @@ class ScannersController extends Controller
 
         $event_id = $request->event_id;
         $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-        $password = substr(md5(microtime()),rand(0,26),8);
+        $password = UniversalMethods::passwordGenerator();
 
         $scanner = new Scanner();
         $scanner->event_organizer_id = $event_organizer_id;

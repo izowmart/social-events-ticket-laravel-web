@@ -37,8 +37,8 @@ class EventsController extends Controller
 
     public function showAddTicketTemplate($slug){
         $event = Event::where('slug',$slug)->first();
-        //make sure the event is not yet verified by admin
-        if($event->status==1){
+        //make sure the event is not yet verified by admin or is not a free event
+        if($event->status==1 || $event->type==1){
             return redirect($this->EventOrganizerVerifiedPaidredirectPath);            
         }
         $event_dates = EventDate::select('id','start','end')->where('event_id',$event->id)->get();
@@ -83,8 +83,8 @@ class EventsController extends Controller
                     ->where('events.slug',$slug)
                     ->orderBy('id','desc')
                     ->first();
-        //make sure the event is not yet verified by admin
-        if($event->status==1){
+        //allow edit for free events and paid events that are not verified only
+        if($event->status==1 && $event->type!=1){
             return redirect($this->EventOrganizerVerifiedPaidredirectPath);            
         }
         $event_dates = EventDate::select('id','start','end')->where('event_id',$event->id)->get();
@@ -105,7 +105,8 @@ class EventsController extends Controller
     }
 
     public function store(Request $request){
-                            
+                        
+        try{
         $this->validate($request, [
             'name'=>'required',
             'description'=>'required',            
@@ -116,7 +117,10 @@ class EventsController extends Controller
             'event_sponsor_image'=>'nullable|array'
         ]); 
 
+        
         $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
+
+        // dd(Auth::guard('web_event_organizer')->user()->id,$event_organizer_id);
 
         $event = new Event();
         $event->name = $request->name;
@@ -161,6 +165,9 @@ class EventsController extends Controller
             $request->session()->flash('status', 'Event added successfully. Choose the ticket template');
             return redirect('event_organizer/events/add/ticket-template/'.$event->slug);
         }
+    }catch(Exception $exception){
+        logger("event creation failed: "+$exception->getMessage());
+    }
 
     }
 

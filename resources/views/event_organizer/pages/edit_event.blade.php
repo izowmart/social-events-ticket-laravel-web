@@ -484,13 +484,14 @@
     });
 
     $('input[type=radio][name=type]').change(function() {
-        $("#sponsor_images_checkbox_row").slideDown("slow");
         if (this.value == '2') {
             $("#category-row").slideDown("slow");
+            $("#sponsor_images_checkbox_row").slideDown("slow");
         }else {            
             $("#append-row").empty().slideUp("slow");  
             $("#category-row").slideUp("slow");
             $("#ticket_sale_end_date_container").slideUp("slow");
+            $("#sponsor_images_checkbox_row").slideUp("slow");
             $('#ticket_sale_end_date').attr('required', false);
         }
     });
@@ -530,10 +531,6 @@
 
 </script>
 @if (!empty($event->getEventSponsorMedia()->first()))
-@foreach ($event->getEventSponsorMedia()->get() as $single_event_sponsor_media)
-
-    
-@endforeach
 
 <script>
     $('#sponsor_images_checkox').attr('checked', 'checked');
@@ -543,6 +540,7 @@
 @else
 <script>    
     $("#event_sponsor_image_row").hide();
+    $("#sponsor_images_checkbox_row").hide();
 </script>
 @endif
 

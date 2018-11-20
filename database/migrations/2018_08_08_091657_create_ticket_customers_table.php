@@ -19,8 +19,13 @@ class CreateTicketCustomersTable extends Migration
             $table->string('last_name');
             $table->string('email');
             $table->string('phone_number');
+<<<<<<< HEAD
             $table->integer('user_id')->nullable();
 //            $table->foreign('user_id')->references('id')->on('users');
+=======
+            $table->integer('user_id')->nullable()->unsigned();
+            $table->foreign('user_id')->references('id')->on('users');
+>>>>>>> 892563fda052f492228ccdb9897aeae52dd2f502
             $table->integer('source')->comment('1: web; 2: app;');;
             $table->timestamps();
         });
