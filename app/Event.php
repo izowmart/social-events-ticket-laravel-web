@@ -9,9 +9,6 @@ class Event extends Model
 {
      use Sluggable;
 
-    public static function join(string $string, string $string1, string $string2, string $string3)
-    {
-    }
 
     /**
      * Return the sluggable configuration array for this model.

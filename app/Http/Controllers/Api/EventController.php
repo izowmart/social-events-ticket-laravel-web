@@ -38,40 +38,20 @@ class EventController extends Controller
         }
     }
     //my_tickets
-    public function my_tickets(Resquest $request){
+    public function my_tickets(Request $request){
 
         $user = $request->user();
 
         $event = Event::join('tickets','tickets.event_id', '=','events.id')
-                ->join('ticket_category_details','ticket_category_details.event_id','=','events.id')
-                ->where('ticket_customers.user_id','=','user.id');
-
-        try{
-            if ($event= Event::where('id',$request->event_id)->first()){
-
-                if ($event->user_id !=$request->user()){
-                    return \response()->json([
-                        'message'=>''
-                    ],401);
-                }
-
-                return \response()->json([
-                    'message'=>'found events',
-                    'data'=>$event
-                ],200);
+                ->join('ticket_customers','ticket_customers.id','=','tickets.ticket_customer_id')
+                ->join('users','users.id','=','ticket_customers.user_id')
+                ->where('ticket_customers.user_id','=',$user->id)
+                ->get();
 
 
-            }
+        dd($event);
 
 
-        }catch (\Exception $exception){
-            return Response::json([
-               "success" => "false",
-               "message" => "error fetching my_tickets!" . $exception,
-            ]
-            );
-
-        }
     }
 
     public function scanner_events($scanner_id)
