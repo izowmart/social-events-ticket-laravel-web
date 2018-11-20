@@ -10,8 +10,10 @@ namespace App\Http\Traits;
 
 
 use App\PaymentRequest;
+use App\Ticket;
 use App\TicketCategoryDetail;
 use App\TicketPurchaseRequest;
+use App\TicketScan;
 
 trait UniversalMethods
 {
@@ -144,5 +146,43 @@ trait UniversalMethods
 
         return [$payload, $encryptedPayload];
 
+    }
+    /**
+     * the remaining = available - sold
+     * @param $event_id
+     * @param $ticket_category_id
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public static function getRemainingCategoryTickets($event_id,$ticket_category_id)
+    {
+        //available tickets
+         $ticket_category_details = TicketCategoryDetail::where('event_id', $event_id)
+            ->where('category_id', $ticket_category_id)
+            ->first();
+
+        $total_available_tickets = (int) $ticket_category_details->no_of_tickets;
+
+        //sold tickets
+        $sold_tickets = Ticket::where('event_id', '=', $event_id)
+            ->where('ticket_category_id','=', $ticket_category_id)
+            ->count();
+
+        //remaining tickets
+        $remaining_tickets = $total_available_tickets - $sold_tickets;
+        $data = [$total_available_tickets, $sold_tickets, $remaining_tickets];
+        //TODO::optimize this to one query
+        //FIXME:: there's a bug with how to get the count of the rows
+//        $data = Ticket::join('ticket_categories','tickets.ticket_category_id','=','ticket_categories.id')
+//            ->join('ticket_category_details','ticket_category_details.category_id','=','ticket_categories.id')
+//            ->where('tickets.event_id','=',$event_id)
+//            ->where('tickets.ticket_category_id','=',$ticket_category_id)
+//            ->selectRaw('COUNT(tickets.event_id) as remaining_tickets')
+//            ->first();
+
+
+        return response()->json(
+            $data
+        );
     }
 }
