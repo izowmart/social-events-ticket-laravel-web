@@ -9,10 +9,6 @@ class Event extends Model
 {
      use Sluggable;
 
-    public static function join(string $string, string $string1, string $string2, string $string3)
-    {
-    }
-
     /**
      * Return the sluggable configuration array for this model.
      *
@@ -35,14 +31,14 @@ class Event extends Model
     public function scanners(){
         return $this->hasMany('App\EventScanner','event_id');
     }
-    public function events_dates()
+    public function event_dates()
     {
         return $this->hasMany('App\EventDate', 'event_id');
     }
 
-    public function tickets()
+    public function ticket_categories()
     {
-        return $this->hasMany('App\EventTicketCategory','event_id');
+        return $this->hasMany('App\TicketCategoryDetail','event_id');
     }
 
     public function sponsor_media(){
@@ -51,5 +47,10 @@ class Event extends Model
 
     public function getEventSponsorMedia() {
         return EventSponsorMedia::where('event_id',$this->id)->orderBy('id', 'asc');
+    }
+
+    public function tickets($ticket_customer_id)
+    {
+        return $this->hasMany('App\Ticket', 'event_id')->where('ticket_customer_id','=',$ticket_customer_id);
     }
 }
