@@ -20,6 +20,7 @@ class CreateTicketsTable extends Migration
             $table->integer('event_id')->unsigned();
             $table->foreign('event_id')->references('id')->on('events');
             $table->text('validation_token');
+            $table->integer('unique_ID', true, true);
             $table->text('qr_code_image_url');
             $table->string('pdf_format_url');
             $table->integer('ticket_category_id')->unsigned();

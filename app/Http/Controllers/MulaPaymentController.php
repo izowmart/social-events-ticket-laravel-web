@@ -305,7 +305,7 @@ class MulaPaymentController extends Controller
 
         $event = Event::find($event_id);
 
-        $event_dates = $event->events_dates;
+        $event_dates = $event->event_dates;
 
         /*
          * generate qr code for each ticket and save it as image
