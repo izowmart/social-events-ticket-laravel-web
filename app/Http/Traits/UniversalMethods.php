@@ -185,4 +185,20 @@ trait UniversalMethods
             $data
         );
     }
+
+    /* generate a password that matches the criterion:
+    * at least 6 character, with an upper and lower case letter and
+    * a number
+    *
+    * @return string
+    */
+    public static function passwordGenerator()
+    {
+        $uppercaseLetters = ['P', 'X', 'A', 'N'];
+        $lowercaseWord = substr(str_shuffle("qwertyuiopasdfghjklzxcvbnm"),0,4);
+        $password = $uppercaseLetters[ array_rand($uppercaseLetters, 1) ] .  mt_rand(1,
+                9) . $lowercaseWord;
+
+        return $password;
+    }
 }
