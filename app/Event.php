@@ -48,4 +48,9 @@ class Event extends Model
     public function getEventSponsorMedia() {
         return EventSponsorMedia::where('event_id',$this->id)->orderBy('id', 'asc');
     }
+
+    public function tickets($ticket_customer_id)
+    {
+        return $this->hasMany('App\Ticket', 'event_id')->where('ticket_customer_id','=',$ticket_customer_id);
+    }
 }
