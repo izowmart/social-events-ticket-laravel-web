@@ -158,7 +158,7 @@
                         @endauth
 
                         @auth('web_event_organizer')
-                            <a @if ($event->status==1) onclick="vefirifiedEvent();" @else href="{{ route('edit_event', ['slug'=>$event->slug]) }}" @endif class="btn btn-sm btn-outline-primary">Edit</a>
+                            <a @if ($event->status==1 && $event->type!=1) onclick="vefirifiedEvent();" @else href="{{ route('edit_event', ['slug'=>$event->slug]) }}" @endif class="btn btn-sm btn-outline-primary">Edit</a>
                             
                             <button onClick="deleteBtn({{$event->id}})" class="btn btn-sm btn-outline-danger">Delete</button>
                             <form id="delete_form_{{$event->id}}" action="{{ route('delete_event') }}" method="POST" style="display: none;">
@@ -220,8 +220,8 @@
   function vefirifiedEvent() {    
     swal({
       		title: "Not edditable",
-      		text: "You can not edit this event because is alredy verified and visible to users on website",
-      		type: "warning",
+      		text: "You can not edit this event because is alredy verified and visible to users on website.",
+      		type: "error",
       		showCancelButton: false,
       		confirmButtonText: "Ok",
       		closeOnConfirm: false,
