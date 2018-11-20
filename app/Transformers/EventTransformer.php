@@ -16,6 +16,7 @@ class EventTransformer extends TransformerAbstract
      */
     public function transform(Event $event)
 
+
     {
         return [
                 'id' => $event->id,
@@ -23,8 +24,8 @@ class EventTransformer extends TransformerAbstract
                 'description' => $event->description,
                 'location' =>$event->location,
                 'type' => $event->type,
-                'image_url' => null,
-                'start_date_time' => $event->events_dates != null ? ($event->events_dates->first() != null ? $event->events_dates->first()->start : null ) : null
+                'image_url' => $event->media_url,
+                'dates'=> fractal($event->event_dates,EventDateTransformer::class)->withResourceName('dates')
             ];
     }
 }
