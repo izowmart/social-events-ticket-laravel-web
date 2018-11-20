@@ -36,9 +36,9 @@ class Event extends Model
         return $this->hasMany('App\EventDate', 'event_id');
     }
 
-    public function tickets()
+    public function ticket_categories()
     {
-        return $this->hasMany('App\EventTicketCategory','event_id');
+        return $this->hasMany('App\TicketCategoryDetail','event_id');
     }
 
     public function sponsor_media(){
