@@ -83,8 +83,8 @@ class EventsController extends Controller
                     ->where('events.slug',$slug)
                     ->orderBy('id','desc')
                     ->first();
-        //make sure the event is not yet verified by admin
-        if($event->status==1){
+        //allow edit for free events and paid events that are not verified only
+        if($event->status==1 && $event->type!=1){
             return redirect($this->EventOrganizerVerifiedPaidredirectPath);            
         }
         $event_dates = EventDate::select('id','start','end')->where('event_id',$event->id)->get();
