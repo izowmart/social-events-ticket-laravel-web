@@ -9,10 +9,6 @@ class Event extends Model
 {
      use Sluggable;
 
-    public static function join(string $string, string $string1, string $string2, string $string3)
-    {
-    }
-
     /**
      * Return the sluggable configuration array for this model.
      *
@@ -35,7 +31,7 @@ class Event extends Model
     public function scanners(){
         return $this->hasMany('App\EventScanner','event_id');
     }
-    public function events_dates()
+    public function event_dates()
     {
         return $this->hasMany('App\EventDate', 'event_id');
     }
