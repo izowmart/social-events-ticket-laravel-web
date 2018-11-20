@@ -402,9 +402,9 @@ class MulaPaymentController extends Controller
      */
     public function declinePendingPaymentRequest(Request $request): void
     {
-        $pending_payment_request = PaymentRequest::where('merchantTransactionID', $request->merchantTransactionID)
+        $pending_payment_request = PaymentRequest::where('merchantTransactionID', $request->merchantTransactionID) //FIXME::index the merchantTransacationID for faster querying???
 //                ->where('MSISDN', UniversalMethods::formatPhoneNumber($payload->MSISDN))
-            ->where('amount', '=', $request->amountPaid)
+//            ->where('amount', '=', $request->amountPaid) //FIXME::accept excess payments?? checkout the MULA refunds API...
             ->where('payment_request_status', '=', 0)
             ->first();
 
