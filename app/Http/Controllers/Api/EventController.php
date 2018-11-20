@@ -3,11 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Event;
-use App\Http\Resources\EventResource;
 use App\Scanner;
 use App\Transformers\EventTransformer;
-use App\User;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Response;
 
@@ -19,6 +16,7 @@ class EventController extends Controller
             $events = Event::join('event_dates','event_dates.event_id','=','events.id')
                 ->where('events.status', 1)//approved by admin
                 ->whereDate('event_dates.end','>=',now()) //upcoming events //TODO::what happens when the event dates are two or more??
+                ->groupBy('events.id')
                 ->get();
 
 
