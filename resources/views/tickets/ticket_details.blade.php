@@ -95,10 +95,11 @@
                                                         @foreach ($ticket_categories as $ticket_category)
                                                         <tr>
                                                             <td>{{$ticket_category->name}}</td>
+
                                                             <td id="{{$ticket_category->slug}}_price">{{$ticket_category->price}}</td>
                                                             <td>
                                                                 <div class="form-group">
-                                                                <input type="number" class="form-control" style="width: 60px" min="0" name="{{$ticket_category->slug}}_quantity" value="0" id="{{$ticket_category->slug}}_quantity">
+                                                                <input type="number" class="form-control quantity" style="width: 60px" min="1" max="{{App\Http\Traits\UniversalMethods::getRemainingCategoryTickets($event->id,$ticket_category->category_id)}}" name="{{$ticket_category->slug}}_quantity" value="0" id="{{$ticket_category->slug}}_quantity">
                                                                 </div>
                                                             </td>
                                                             <td class="total" id="{{$ticket_category->slug}}_total">0</td>
@@ -170,11 +171,13 @@
 
 @section('scripts')
 <!-- Include jQuery Validator plugin -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
- <script id="mula-checkout-library" type="text/javascript" src="https://beep2.cellulant.com:9212/checkout/v2/mula-checkout.js"></script>
+{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
+ <script id="mula-checkout-library" type="text/javascript" src="https://beep2.cellulant.com:9212/checkout/v2/mula-checkout.js"></script> --}}
 <script src="{{ asset('js/plugins/jquery.smartWizard.min.js') }}"></script>
 <script>
  var main_total = 0;
+ // Select your input element.
+
  </script>
 @foreach ($ticket_categories as $ticket_category)
     <script>
@@ -182,6 +185,16 @@
             var quantity = "{{$ticket_category->slug}}_quantity";
             var price = "{{$ticket_category->slug}}_price";
             var total = "{{$ticket_category->slug}}_total";
+
+            var number = document.getElementById(quantity);
+            // no negative numbers
+            number.onkeydown = function(e) {
+                if(!((e.keyCode > 95 && e.keyCode < 106)
+                || (e.keyCode > 47 && e.keyCode < 58) 
+                || e.keyCode == 8)) {
+                    return false;
+                }
+            }
           
             $("#"+quantity).on("change paste keyup",function() {
                  $("#subtotal").val(0);
@@ -350,5 +363,5 @@
         infowindow.open(map,marker);
         }
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBO5Else2rW4UNyXiCMp3y20JV7BseTMys&callback=myMap"></script>  
+{{-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBO5Else2rW4UNyXiCMp3y20JV7BseTMys&callback=myMap"></script>   --}}
 @endsection

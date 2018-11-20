@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Event;
 use App\PaidEventCategory;
 use App\EventSponsorMedia;
+use App\Http\Traits\UniversalMethods;
 use App\EventDate;
 use App\TicketCategoryDetail;
 use App\TicketCustomer;
@@ -36,35 +37,15 @@ class TicketsController extends Controller
                     ->where('slug',$slug)
                     ->orderBy('id','desc')
                     ->first();
-        $ticket_categories = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_categories.name','ticket_categories.slug')
+        $ticket_categories = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.category_id','ticket_category_details.no_of_tickets','ticket_categories.name','ticket_categories.slug')
                                 ->where('ticket_category_details.event_id',$event->id)
                                 ->join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
-                                ->get();
+                                ->get();                   
         $data = array(
             'event'=>$event,
             'ticket_categories'=>$ticket_categories
         );
         return view('tickets.ticket_details')->with($data);        
-
-    }
-
-    public function save(Request $request){
-    
-        $ticket_customer = new TicketCustomer;
-        $ticket_customer->first_name = $request->first_name;
-        $ticket_customer->last_name = $request->last_name;        
-        $ticket_customer->email = $request->email;
-        $ticket_customer->phone_number = $request->phone;
-        if(User::where('email',$request->email)->first()!==null){
-            $ticket_customer->user_id = $user->id;
-        }
-        $ticket_customer->save();
-        $request2 = new Request();
-        $request2->setMethod('POST');
-        $request2->add(['event_id'=>$request->event_id,'customer_id'=>$ticket_customer->id]);
-        
-        return redirect()->route('encryption_url',['request'=>$request2]);
-
 
     }
 

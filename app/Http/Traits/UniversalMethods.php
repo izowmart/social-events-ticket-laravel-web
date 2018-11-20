@@ -153,6 +153,7 @@ trait UniversalMethods
      * @param $ticket_category_id
      *
      * @return \Illuminate\Http\JsonResponse
+     * to call me: UniversalMethods::getRemainingCategoryTickets(1,1)
      */
     public static function getRemainingCategoryTickets($event_id,$ticket_category_id)
     {
@@ -170,7 +171,7 @@ trait UniversalMethods
 
         //remaining tickets
         $remaining_tickets = $total_available_tickets - $sold_tickets;
-        $data = [$total_available_tickets, $sold_tickets, $remaining_tickets];
+        // $data = [$total_available_tickets, $sold_tickets, $remaining_tickets];
         //TODO::optimize this to one query
         //FIXME:: there's a bug with how to get the count of the rows
 //        $data = Ticket::join('ticket_categories','tickets.ticket_category_id','=','ticket_categories.id')
@@ -181,9 +182,10 @@ trait UniversalMethods
 //            ->first();
 
 
-        return response()->json(
-            $data
-        );
+        return 
+        // response()->json(
+            $remaining_tickets;
+        // );
     }
 
     /* generate a password that matches the criterion:
