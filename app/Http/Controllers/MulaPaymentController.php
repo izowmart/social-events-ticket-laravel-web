@@ -32,22 +32,22 @@ class MulaPaymentController extends Controller
 
     }
 
-    public function index()
-    {
-        return view('payments.button');
-    }
+    /*************************************
+     **************** START WEB ONLY ENDPOINTS ***************
+     **************************************
+     **/
 
     /**
-     * encrypt the data for sending to the mula endpoint to initiate the payment
-     * for the client
+     * encrypt the data for sending to the mula endpoint to initiate the payment for the client
      *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
-
     public function encryptData(Request $request)
     {
         try {
             $data_array = [];
-
 
             parse_str($request->getContent(), $data_array);
 
@@ -88,6 +88,7 @@ class MulaPaymentController extends Controller
                 $event, $event_id);
 
             DB::commit();
+
             return response()->json([
                 'params'      => $encryptedPayload,
                 'accessKey'   => $payload['accessKey'],
@@ -96,6 +97,7 @@ class MulaPaymentController extends Controller
 
         } catch ( \Exception $exception ) {
             DB::rollBack();
+
             return response()->json([
                 'params'      => null,
                 'accessKey'   => "",
@@ -104,20 +106,100 @@ class MulaPaymentController extends Controller
         }
     }
 
-    /*
+    /**
+     * process successful web payment
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function success(Request $request)
+    {
+        try {
+            $payload = $this->processSuccessfulPaymentRequest($request);
+
+            $pending_payment_request = $this->fetchPendingPaymentRequest($payload);
+
+            //TODO:: push this to a queue as a job?
+            if ($pending_payment_request != null) {
+                $result = $this->processSuccessfulPayment($payload);
+
+                if ($result) {
+                    //display a success message to the user
+                    return view('payments.success');
+                }
+            }
+
+            //FIXME:: else show an error message
+            return view('payments.failure');
+
+        } catch ( \Exception $exception ) {
+            logger("PAYMENT SUCCESS error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
+
+            return view('payments.failure');
+        }
+    }
+
+    /**
+     * process failed web payment
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function failure(Request $request)
+    {
+        try {
+            $payload = $request->getContent();
+            //save the response to the db
+            PaymentResponse::create([
+                'type'     => 'failure',
+                'response' => $payload
+            ]);
+            //log the payment
+            logger("PAYMENT FAILURE::  " . $payload);
+
+            //update the pending payment request record with failed status
+            $this->declinePendingPaymentRequest($request);
+
+
+            //display a success message to the user
+            return view('payments.failure');
+
+        } catch ( \Exception $exception ) {
+            logger("PAYMENT FAILURE error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
+        }
+    }
+
+    /*************************************
+     **************** END WEB ONLY ENDPOINTS ***************
+     **************************************
+     */
+
+
+
+    /*************************************
+     **************** START WEB & MOBILE ENDPOINTS ***************
+     **************************************
+     **/
+
+    /**
      * this is the webhook that pinged by the MULA
      * system after receiving the payment from the client
      * --------------------    ------------------------
      *  we validate the payment and either accept or reject it
      *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
      */
-
     public function processPayment(Request $request)
     {
-        $payload = $request->getContent();
-        $result = json_decode($payload);
+        $payloadInitial = $request->getContent();
+        $resultInitial = json_decode($payloadInitial);
         try {
-
+            $payload = $payloadInitial;
+            $result = $resultInitial;
 
             //save the response to the db
             PaymentResponse::create([
@@ -126,7 +208,7 @@ class MulaPaymentController extends Controller
             ]);
 
             //log the response
-            logger("PROCESS PAYMENT::  " . $payload);
+            logger("PROCESS PAYMENT::\n payload type is" . gettype($payload) . "\npayload" . $payload . "\n result type is " . gettype($result));
 
 
             //confirm whether the payment should be accepted or not
@@ -164,33 +246,49 @@ class MulaPaymentController extends Controller
 
             //reject the payment
             return response()->json([
-                'checkoutRequestID'     => $result->checkoutRequestID,
-                'merchantTransactionID' => $result->merchantTransactionID,
+                'checkoutRequestID'     => $resultInitial->checkoutRequestID,
+                'merchantTransactionID' => $resultInitial->merchantTransactionID,
                 'statusCode'            => 180,
                 'statusDescription'     => "Payment declined",
-                'receiptNumber'         => $result->merchantTransactionID,
+                'receiptNumber'         => $resultInitial->merchantTransactionID,
             ]);
         }
     }
 
-    public function success(Request $request)
+    /*************************************
+     **************** END WEB & MOBILE ENDPOINTS  ***************
+     **************************************
+     **/
+
+
+
+    /**
+     **START MOBILE ONLY ENDPOINTS**
+     **/
+
+    /**
+     * handle successful mobile payment
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function mobile_success(Request $request)
     {
         try {
+            $payload = $request->getContent();
             //save the response to the db
             PaymentResponse::create([
-                'type'     => 'success',
-                'response' => $request->getContent()
+                'type'     => 'mobile_success',
+                'response' => $payload
             ]);
-
             //log the payment
-            logger("PAYMENT SUCCESS::  " . $request->getContent());
+            logger("PAYMENT SUCCESS::  " . $payload);
 
             //process the successful payment
-            //TODO:: push this to a queue as a job?
-            $this->processSuccessfulPayment($request);
+            $this->processPayment($request);
 
             //display a success message to the user
-            return view('payments.success');
+            return view('payments.mobile_success');
 
         } catch ( \Exception $exception ) {
             logger("PAYMENT SUCCESS error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
@@ -198,57 +296,98 @@ class MulaPaymentController extends Controller
     }
 
     /**
+     * handle failed mobile payment
      * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function processSuccessfulPayment(Request $request): void
+    public function mobile_failure(Request $request)
     {
-//update the pending payment request record
-        $approved_payment_request = $this->approvePendingPaymentRequest($request);
+        try {
+            $payload = $request->getContent();
+            //save the response to the db
+            PaymentResponse::create([
+                'type'     => 'mobile_failure',
+                'response' => $payload
+            ]);
+            //log the payment
+            logger("PAYMENT FAILURE::  " . $payload);
 
-        //get the pending ticket purchase requests records
-        //given the approved payment request
-        $ticket_purchase_requests = TicketPurchaseRequest::join('ticket_category_details',
-            'ticket_purchase_requests.ticket_category_detail_id', '=', 'ticket_category_details.id')
-            ->join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
-            ->where('payment_request_id', $approved_payment_request->id)
-            ->select('ticket_category_details.category_id', 'ticket_categories.name',
-                'ticket_purchase_requests.tickets_count')
-            ->get();
+            //update the pending payment request record with failed status
+            $this->declinePendingPaymentRequest($request);
 
-        $event_id = $approved_payment_request->event_id;
-
-        $ticket_customer_id = $approved_payment_request->ticket_customer_id;
-        $approved_payment_request_id = $approved_payment_request->id;
-
-        $tickets_array = [];
-        $pdfs_array = [];
-
-        foreach ($ticket_purchase_requests as $ticket_purchase_request) {
-            /*
-             * for each ticket type, based on the number of tickets purchased
-             * create tickets records--> this is for each of the ticket generated by the system
-             *              a. generate the qr code & convert it so an image for android
-             *              b. generate a pdf ticket with the qr code embedded for emailing
-             *
-             */
-
-            $ticket_type_count = $ticket_purchase_request->tickets_count;
-
-            //loop through given the number of tickets per category
-            for ($i = 0; $i < $ticket_type_count; $i++) {
-                $ticket_array = $this->createTickets($ticket_purchase_request->name, $event_id,
-                    $ticket_purchase_request->category_id, $ticket_customer_id,
-                    $approved_payment_request_id);
-
-
-                $pdf_array = $ticket_array['pdf_format_url'];
-
-                $tickets_array[] = $ticket_array;
-                $pdfs_array[] = url('bought_tickets/pdfs') . '/' . $pdf_array;
-            }
+            //display a success message to the user
+            return view('payments.mobile_failure');
+        } catch ( \Exception $exception ) {
+            logger("PAYMENT FAILURE error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
         }
+    }
 
-        if (count($tickets_array) > 0) {
+    /*************************************
+     **************** END MOBILE ONLY ENDPOINTS ***************
+     **************************************
+     **/
+
+
+    /**
+     * START HELPER FUNCTIONS
+     */
+
+    /**
+     * @param $pending_payment_request
+     *
+     * @return bool
+     */
+    public function processSuccessfulPayment($pending_payment_request): bool
+    {
+        try {
+            //update the pending payment request record
+            $approved_payment_request = $this->approvePendingPaymentRequest($pending_payment_request);
+
+            //get the pending ticket purchase requests records
+            //given the approved payment request
+            $ticket_purchase_requests = TicketPurchaseRequest::join('ticket_category_details',
+                'ticket_purchase_requests.ticket_category_detail_id', '=', 'ticket_category_details.id')
+                ->join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
+                ->where('payment_request_id', $approved_payment_request->id)
+                ->select('ticket_category_details.category_id', 'ticket_categories.name',
+                    'ticket_purchase_requests.tickets_count')
+                ->get();
+
+            $event_id = $approved_payment_request->event_id;
+
+            $ticket_customer_id = $approved_payment_request->ticket_customer_id;
+            $approved_payment_request_id = $approved_payment_request->id;
+
+            $tickets_array = [];
+            $pdfs_array = [];
+
+            foreach ($ticket_purchase_requests as $ticket_purchase_request) {
+                /*
+                 * for each ticket type, based on the number of tickets purchased
+                 * create tickets records--> this is for each of the ticket generated by the system
+                 *              a. generate the qr code & convert it so an image for android
+                 *              b. generate a pdf ticket with the qr code embedded for emailing
+                 *
+                 */
+
+                $ticket_type_count = $ticket_purchase_request->tickets_count;
+
+                //loop through given the number of tickets per category
+                for ($i = 0; $i < $ticket_type_count; $i++) {
+                    $ticket_array = $this->createTickets($ticket_purchase_request->name, $event_id,
+                        $ticket_purchase_request->category_id, $ticket_customer_id,
+                        $approved_payment_request_id);
+
+
+                    $pdf_array = $ticket_array['pdf_format_url'];
+
+                    $tickets_array[] = $ticket_array;
+                    $pdfs_array[] = url('bought_tickets/pdfs') . '/' . $pdf_array;
+                }
+            }
+
+//            if (count($tickets_array) > 0) {
             //then we send the email with the relevant pdfs
             $ticket_customer = TicketCustomer::find($ticket_customer_id);
             $email_data = [
@@ -258,7 +397,27 @@ class MulaPaymentController extends Controller
             ];
 
             Mail::to($ticket_customer)->queue(new TicketsBought($email_data));
+
+            return true;
+//            }
+        } catch ( \Exception $exception ) {
+            logger("processSuccessfulPayment: \nmessage: " . $exception->getMessage() . "\ntrace: " . $exception->getTraceAsString());
+
+            return false;
         }
+    }
+
+    /**
+     * @param $pending_payment_request
+     *
+     * @return mixed
+     */
+    public function approvePendingPaymentRequest($pending_payment_request)
+    {
+        $pending_payment_request->payment_request_status = 1;
+        $pending_payment_request->save();
+
+        return $pending_payment_request;
     }
 
     /**
@@ -266,24 +425,39 @@ class MulaPaymentController extends Controller
      *
      * @return mixed
      */
-    public function approvePendingPaymentRequest(Request $request)
+    public function processSuccessfulPaymentRequest(Request $request)
     {
-        $pending_payment_request = PaymentRequest::where('merchantTransactionID', $request->merchantTransactionID)
+        $result = $request->getContent();
+        $payload = json_decode($result);
+
+        //save the response to the db
+        PaymentResponse::create([
+            'type'     => 'success',
+            'response' => $result
+        ]);
+
+        //log the payment
+        logger("PAYMENT SUCCESS::  " . $result);
+
+        return $payload;
+    }
+
+    /**
+     * @param $payload
+     *
+     * @return mixed
+     */
+    public function fetchPendingPaymentRequest($payload)
+    {
+//fetch the pending  payment
+        $pending_payment_request = PaymentRequest::where('merchantTransactionID', $payload->merchantTransactionID)
 //                ->where('MSISDN', UniversalMethods::formatPhoneNumber($payload->MSISDN))
 //            ->where('amount', '=', $request->amountPaid)
             ->where('payment_request_status', '=', 0)
             ->first();
 
-        $pending_payment_request->payment_request_status = 1;
-        $pending_payment_request->save();
-
         return $pending_payment_request;
     }
-
-    /*
-     * Mobile METHODS
-     */
-
     /**
      * @param $ticket_type
      * @param $event_id
@@ -368,186 +542,26 @@ class MulaPaymentController extends Controller
         return $data;
     }
 
-    public function failure(Request $request)
-    {
-        try {
-            $payload = $request->getContent();
-            //save the response to the db
-            PaymentResponse::create([
-                'type'     => 'failure',
-                'response' => $payload
-            ]);
-            //log the payment
-            logger("PAYMENT FAILURE::  " . $payload);
-
-            //update the pending payment request record with failed status
-            $this->declinePendingPaymentRequest($request);
-
-
-            //display a success message to the user
-            return view('payments.failure');
-
-        } catch ( \Exception $exception ) {
-            logger("PAYMENT FAILURE error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
-        }
-    }
-    /* end mobile methods*/
-
-    /**
-     * Helper methods
-     */
 
     /**
      * @param \Illuminate\Http\Request $request
      */
     public function declinePendingPaymentRequest(Request $request): void
     {
-        $pending_payment_request = PaymentRequest::where('merchantTransactionID', $request->merchantTransactionID) //FIXME::index the merchantTransacationID for faster querying???
+        $pending_payment_request = PaymentRequest::where('merchantTransactionID',
+            $request->merchantTransactionID)//FIXME::index the merchantTransacationID for faster querying???
 //                ->where('MSISDN', UniversalMethods::formatPhoneNumber($payload->MSISDN))
 //            ->where('amount', '=', $request->amountPaid) //FIXME::accept excess payments?? checkout the MULA refunds API...
-            ->where('payment_request_status', '=', 0)
+        ->where('payment_request_status', '=', 0)
             ->first();
 
         $pending_payment_request->payment_request_status = 2;
         $pending_payment_request->save();
     }
 
-    public function mobile_success(Request $request)
-    {
-        try {
-            $payload = $request->getContent();
-            //save the response to the db
-            PaymentResponse::create([
-                'type'     => 'mobile_success',
-                'response' => $payload
-            ]);
-            //log the payment
-            logger("PAYMENT SUCCESS::  " . $payload);
+    /*************************************
+     **************** END HELPER FUNCTIONS ***************
+     **************************************
+     **/
 
-            //process the successful payment
-            $this->processPayment($request);
-
-            //display a success message to the user
-            return view('payments.mobile_success');
-
-        } catch ( \Exception $exception ) {
-            logger("PAYMENT SUCCESS error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
-        }
-    }
-
-
-
-    public function mobile_failure(Request $request)
-    {
-        try {
-            $payload = $request->getContent();
-            //save the response to the db
-            PaymentResponse::create([
-                'type'     => 'mobile_failure',
-                'response' => $payload
-            ]);
-            //log the payment
-            logger("PAYMENT FAILURE::  " . $payload);
-
-            //update the pending payment request record with failed status
-            $this->declinePendingPaymentRequest($request);
-
-            //display a success message to the user
-            return view('payments.mobile_failure');
-        } catch ( \Exception $exception ) {
-            logger("PAYMENT FAILURE error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
-        }
-    }
-//
-//    /**
-//     * @param $ticket_customer
-//     * @param $data_array
-//     * @param $event
-//     * @param $event_id
-//     *
-//     * @return array
-//     */
-//    public static function process_mula_payment($ticket_customer, $data_array, $event, $event_id): array
-//    {
-//        $merchantTransactionID = now()->timestamp . "" . uniqid();
-//        $payload = [
-//            "merchantTransactionID" => $merchantTransactionID,
-//            "customerFirstName"     => $ticket_customer->first_name,
-//            "customerLastName"      => $ticket_customer->last_name,
-//            "MSISDN"                => UniversalMethods::formatPhoneNumber($ticket_customer->phone_number),
-//            "customerEmail"         => $ticket_customer->email,
-//            "amount"                => $data_array['subtotal'],
-//            //get the amount for the type of ticket the customer has decided to purchase
-//            "currencyCode"          => "KES",
-//            "accountNumber"         => "123456",
-//            "serviceCode"           => "FIKDEV8910",
-//            "dueDate"               => $data_array['ticket_sale_end_date_time'],
-//            //TODO::this is to be replaced by the ticket_sale_end_date_time
-//            "serviceDescription"    => "Payment for " . $event->name,
-//            "accessKey"             => '$2a$08$FIRIU0JS9GESx6ePn/wsUuX4aq2HAsJ16qmz/bTYbT4j7lZ9R6r1W',
-//            "countryCode"           => "KE",
-//            "languageCode"          => "en",
-//            "successRedirectUrl"    => route("success_url"),
-//            "failRedirectUrl"       => route("failure_url"),
-//            "paymentWebhookUrl"     => route("process_payment"),
-//        ];
-//
-//        //create a pending payment request
-//        $payment_request = PaymentRequest::create([
-//            'merchantTransactionID' => $payload['merchantTransactionID'],
-//            'amount'                => $payload['amount'],
-//            'ticket_customer_id'    => $ticket_customer->id,
-//            'event_id'              => $event_id
-//        ]);
-//
-//        //keep a record of the tickets quantities to be bought and their prices
-//        foreach ($data_array as $index => $item) {
-//            if (stristr($index, "quantity") === false) {
-//                continue;
-//            } else {
-//                //get the slug
-//                $ticket_category_slug = substr($index, 0, strpos($index, '_'));
-//
-//                //get the ticket category
-////                $ticket_category = TicketCategory::where('slug', $ticket_category_slug)->first();
-//
-//                //get the ticket category details record
-//                $ticket_category_details = TicketCategoryDetail::join('ticket_categories', 'ticket_categories.id', '=',
-//                    'ticket_category_details.category_id')
-//                    ->where('event_id', $event_id)
-//                    ->where('slug', $ticket_category_slug)
-//                    ->select('ticket_category_details.id')
-//                    ->first();
-//
-//
-//                $record_to_save = [
-//                    'payment_request_id'        => $payment_request->id,
-//                    'ticket_category_detail_id' => $ticket_category_details->id,
-//                    'tickets_count'             => (int)$item
-//                ];
-//
-//                //save the ticket categories to be purchased with their counts
-//                TicketPurchaseRequest::create($record_to_save);
-//            }
-//        }
-//
-//        //The encryption method to be used
-//        $encrypt_method = "AES-256-CBC";
-//
-//        // Hash the secret key
-//        $key = hash('sha256', $this->secretKey);
-//
-//        // Hash the iv - encrypt method AES-256-CBC expects 16 bytes
-//        $iv = substr(hash('sha256', $this->ivKey), 0, 16);
-//        $encrypted = openssl_encrypt(
-//            json_encode($payload, true), $encrypt_method, $key, 0, $iv
-//        );
-//
-//        //Base 64 Encode the encrypted payload
-//        $encryptedPayload = base64_encode($encrypted);
-//
-//        return [$payload, $encryptedPayload];
-//    }
-
-    /* end helper methods */
 }
