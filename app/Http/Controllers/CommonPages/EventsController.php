@@ -478,14 +478,13 @@ class EventsController extends Controller
 
     public function verify(Request $request)
     {
-        $id = $request->id;
-        $type = $request->type;
-        $event = Event::find($id);
-        
+        $id = Crypt::decrypt($request->id);
+
+        $event = Event::find($id);        
         $event->status=1;
         $event->save();
-        $request->session()->flash('status', 'Verified successfully');
-           
+
+        $request->session()->flash('status', 'Verified successfully');           
         return redirect($this->UnverifiedredirectPath);
         
         
@@ -494,7 +493,7 @@ class EventsController extends Controller
 
     public function activate(Request $request)
     {        
-        $id = $request->id;
+        $id = Crypt::decrypt($request->id);
         $type = $request->type;
         $event = Event::find($id);
         
@@ -513,7 +512,7 @@ class EventsController extends Controller
 
     public function deactivate(Request $request)
     {        
-        $id = $request->id;
+        $id = Crypt::decrypt($request->id);
         $type = $request->type;
         $event = Event::find($id);
         
@@ -543,7 +542,7 @@ class EventsController extends Controller
             $message = 'removed';
         }
 
-        $event = Event::find($request->id);
+        $event = Event::find(Crypt::decrypt($request->id));
         $event->featured_event = $status;
         $event->save();
 
@@ -569,7 +568,8 @@ class EventsController extends Controller
     }
 
     public function destroy(Request $request){
-        $event = Event::find($request->id);
+        $event_id = Crypt::decrypt($request->id);
+        $event = Event::find($event_id);
         $event_status = $event->status;
         if($request->type==1 && $event_status!=0){
             //if free event and not unverified
@@ -587,7 +587,7 @@ class EventsController extends Controller
 
         //first delete scanners if they exist
         if($event->scanners->count()>0){
-            $event_scanners = EventScanner::where('event_id',$request->id)->get();
+            $event_scanners = EventScanner::where('event_id',$event_id)->get();
             foreach($event_scanners as $event_scanner){                
                 $scanner = Scanner::find($event_scanner->scanner_id);                
                 $scanner->delete();
@@ -599,15 +599,15 @@ class EventsController extends Controller
         //check if its paid event
         if($event->type==2){
             //delete ticket_category_details table
-            $ticket_category_details = TicketCategoryDetail::where('event_id',$request->id);
+            $ticket_category_details = TicketCategoryDetail::where('event_id',$event_id);
             $ticket_category_details->delete();
         }
 
         //delete event_sponsor_media 
-        $this->deleteSponsorImages($request->id);
+        $this->deleteSponsorImages($event_id);
 
         //delete event_dates table
-        $event_dates = EventDate::where('event_id',$request->id);
+        $event_dates = EventDate::where('event_id',$event_id);
         $event_dates->delete();
 
         //delete image

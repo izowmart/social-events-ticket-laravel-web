@@ -114,7 +114,7 @@
                             </div>
                             <form id="update_featured_event_{{$event->id}}" action="{{ route('admin_update_featured_event') }}" method="POST" style="display: none;">
                             {{ csrf_field() }}
-                            <input type="hidden" name="id" value="{{$event->id}}">
+                            <input type="hidden" name="id" value="{{Crypt::encrypt($event->id)}}">
                             <input id="featured_event_to_input_{{$event->id}}" type="hidden" name="featured_event_to" value="">
                             </form>
                         </td>                           
@@ -135,7 +135,7 @@
                                 <a href="{{ route('admin_verify_event_post') }}" onclick="event.preventDefault(); document.getElementById('verify_form_{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">Verify</a>
                                 <form id="verify_form_{{$event->id}}" action="{{ route('admin_verify_event_post') }}" method="POST" style="display: none;">
                                     {{ csrf_field() }}
-                                    <input type="hidden" name="id" value="{{$event->id}}">
+                                    <input type="hidden" name="id" value="{{Crypt::encrypt($event->id)}}">
                                     <input type="hidden" name="type" value="{{$type}}">
                                 </form>
                             @endif 
@@ -143,7 +143,7 @@
                                 <a href="{{ route('admin_deactivate_event_post') }}" onclick="event.preventDefault(); document.getElementById('deactivate_form_{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">Deactivate</a>
                                 <form id="deactivate_form_{{$event->id}}" action="{{ route('admin_deactivate_event_post') }}" method="POST" style="display: none;">
                                     {{ csrf_field() }}
-                                    <input type="hidden" name="id" value="{{$event->id}}">
+                                    <input type="hidden" name="id" value="{{Crypt::encrypt($event->id)}}">
                                     <input type="hidden" name="type" value="{{$type}}">
                                 </form>
                             @endif 
@@ -151,7 +151,7 @@
                                 <a href="{{ route('admin_activate_event_post') }}" onclick="event.preventDefault(); document.getElementById('activate_form_{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">Activate</a>
                                 <form id="activate_form_{{$event->id}}" action="{{ route('admin_activate_event_post') }}" method="POST" style="display: none;">
                                     {{ csrf_field() }}
-                                    <input type="hidden" name="id" value="{{$event->id}}">
+                                    <input type="hidden" name="id" value="{{Crypt::encrypt($event->id)}}">
                                     <input type="hidden" name="type" value="{{$type}}">
                                 </form>
                             @endif
@@ -163,7 +163,7 @@
                             <button onClick="deleteBtn({{$event->id}})" class="btn btn-sm btn-outline-danger">Delete</button>
                             <form id="delete_form_{{$event->id}}" action="{{ route('delete_event') }}" method="POST" style="display: none;">
                                 {{ csrf_field() }}
-                                <input type="hidden" name="id" value="{{$event->id}}">
+                                <input type="hidden" name="id" value="{{Crypt::encrypt($event->id)}}">
                             </form>
                         @endauth
                         
