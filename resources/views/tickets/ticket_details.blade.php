@@ -3,7 +3,75 @@
 @section('styles')
     <link rel="stylesheet" type="text/css" href="{{ asset('css/smart_wizard_theme_arrows.min.css') }}">
     <style>
-    
+    .quantity {
+  position: relative;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button
+{
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number]
+{
+  -moz-appearance: textfield;
+}
+
+.quantity input {
+  width: 45px;
+  height: 42px;
+  line-height: 1.65;
+  float: left;
+  display: block;
+  padding: 0;
+  margin: 0;
+  padding-left: 20px;
+  border: 1px solid #eee;
+}
+
+.quantity input:focus {
+  outline: 0;
+}
+
+.quantity-nav {
+  float: left;
+  position: relative;
+  height: 42px;
+}
+
+.quantity-button {
+  position: relative;
+  cursor: pointer;
+  border-left: 1px solid #eee;
+  width: 20px;
+  text-align: center;
+  color: #333;
+  font-size: 13px;
+  font-family: "Trebuchet MS", Helvetica, sans-serif !important;
+  line-height: 1.7;
+  -webkit-transform: translateX(-100%);
+  transform: translateX(-100%);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.quantity-button.quantity-up {
+  position: absolute;
+  height: 50%;
+  top: 0;
+  border-bottom: 1px solid #eee;
+}
+
+.quantity-button.quantity-down {
+  position: absolute;
+  bottom: -1px;
+  height: 50%;
+}
     </style>
 @endsection
 
@@ -98,8 +166,8 @@
 
                                                             <td id="{{$ticket_category->slug}}_price">{{$ticket_category->price}}</td>
                                                             <td>
-                                                                <div class="form-group">
-                                                                <input type="number" class="form-control quantity" style="width: 60px" min="1" max="{{App\Http\Traits\UniversalMethods::getRemainingCategoryTickets($event->id,$ticket_category->category_id)}}" name="{{$ticket_category->slug}}_quantity" value="0" id="{{$ticket_category->slug}}_quantity">
+                                                                <div class="form-group quantity">
+                                                                <input type="number" class="form-control quantity" style="width: 60px" min="0" max="{{App\Http\Traits\UniversalMethods::getRemainingCategoryTickets($event->id,$ticket_category->category_id)}}" name="{{$ticket_category->slug}}_quantity" value="0" id="{{$ticket_category->slug}}_quantity">
                                                                 </div>
                                                             </td>
                                                             <td class="total" id="{{$ticket_category->slug}}_total">0</td>
@@ -176,7 +244,38 @@
 <script src="{{ asset('js/plugins/jquery.smartWizard.min.js') }}"></script>
 <script>
  var main_total = 0;
- // Select your input element.
+ jQuery('<div class="quantity-nav"><div class="quantity-button quantity-up">+</div><div class="quantity-button quantity-down">-</div></div>').insertAfter('.quantity input');
+    jQuery('.quantity').each(function() {
+      var spinner = jQuery(this),
+        input = spinner.find('input[type="number"]'),
+        btnUp = spinner.find('.quantity-up'),
+        btnDown = spinner.find('.quantity-down'),
+        min = input.attr('min'),
+        max = input.attr('max');
+
+      btnUp.click(function() {
+        var oldValue = parseFloat(input.val());
+        if (oldValue >= max) {
+          var newVal = oldValue;
+        } else {
+          var newVal = oldValue + 1;
+        }
+        spinner.find("input").val(newVal);
+        spinner.find("input").trigger("change");
+      });
+
+      btnDown.click(function() {
+        var oldValue = parseFloat(input.val());
+        if (oldValue <= min) {
+          var newVal = oldValue;
+        } else {
+          var newVal = oldValue - 1;
+        }
+        spinner.find("input").val(newVal);
+        spinner.find("input").trigger("change");
+      });
+
+    });
 
  </script>
 @foreach ($ticket_categories as $ticket_category)
