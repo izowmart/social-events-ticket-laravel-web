@@ -46,7 +46,7 @@ class ScannersController extends Controller
      */
     public function showAddForm($event_slug)
     {
-        $event = Event::select('id','slug')->where('slug',$event_slug)->first();
+        $event = Event::select('id','slug','name')->where('slug',$event_slug)->first();
         return view('event_organizer.pages.add_scanner')->with('event',$event);
     }
 
@@ -79,7 +79,7 @@ class ScannersController extends Controller
             'email'=>'required|email|max:255|unique:scanners'
         ]); 
 
-        $event_id = $request->event_id;
+        $event_id = Crypt::decrypt($request->event_id);
         $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
         $password = UniversalMethods::passwordGenerator();
 
@@ -101,10 +101,13 @@ class ScannersController extends Controller
         $event_name = $request->event_name;
 
         $data = array('name'=>$request->first_name,'email'=>$request->email,'password'=>$password,'event_name'=>$event_name);
-        Mail::send('event_organizer.scanner_mail', $data, function($message) use ($email) {
-            $message->to($email)->subject
-                ('Added as scanner');
-            $message->from('noreply@fikaplaces.com','FIKA');
+        $beautymail = app()->make(\Snowfire\Beautymail\Beautymail::class);
+        $beautymail->send('event_organizer.scanner_mail', $data, function($message) use ($email,$first_name)
+        {
+            $message
+                ->from('noreply@fikaplaces.com','Fika Places')
+                ->to($email, $first_name)
+                ->subject('Registered as scanner');
         });
 
         //Give message after successfull operation
