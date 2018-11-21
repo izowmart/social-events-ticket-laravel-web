@@ -261,11 +261,13 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.1/dist/sweetalert2.all.min.js"></script>
 <script>
  var main_total = 0;
+ @if ($event->type==2)
  var total_categories = {{$total_categories}};
  if($('.sold-out').length==total_categories){
      $('#purchase-btn').remove();
 
  }
+ @endif
 //  custom spinner script start
  jQuery('<div class="quantity-nav"><div class="quantity-button quantity-up">+</div><div class="quantity-button quantity-down">-</div></div>').insertAfter('.quantity input');
     jQuery('.quantity').each(function() {
