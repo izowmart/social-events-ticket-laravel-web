@@ -137,7 +137,7 @@
                             @endforeach 
                             </tbody>
                         </table>
-                        <button class="btn btn-info" data-toggle="modal" data-target="#exampleModal">Purchase Now</button>
+                        <button class="btn btn-info" id="purchase-btn" data-toggle="modal" data-target="#exampleModal">Purchase Now</button>
                         <!-- Modal -->
                         <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -173,7 +173,9 @@
                                                         </tr>
                                                         </thead>
                                                         <tbody>
+                                                        <?php $total_categories=0; ?>
                                                         @foreach ($ticket_categories as $ticket_category)
+                                                        <?php $total_categories++ ?>
                                                         @if (App\Http\Traits\UniversalMethods::getRemainingCategoryTickets($event->id,$ticket_category->category_id)>0)
                                                         <tr>
                                                             <td>{{$ticket_category->name}}</td>
@@ -259,6 +261,11 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.1/dist/sweetalert2.all.min.js"></script>
 <script>
  var main_total = 0;
+ var total_categories = {{$total_categories}};
+ if($('.sold-out').length==total_categories){
+     $('#purchase-btn').remove();
+
+ }
 //  custom spinner script start
  jQuery('<div class="quantity-nav"><div class="quantity-button quantity-up">+</div><div class="quantity-button quantity-down">-</div></div>').insertAfter('.quantity input');
     jQuery('.quantity').each(function() {
