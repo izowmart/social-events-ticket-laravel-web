@@ -11,12 +11,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Event;
 use App\Http\Traits\UniversalMethods;
-use App\PaymentRequest;
-use App\PaymentResponse;
+use App\TicketCategoryDetail;
 use App\TicketCustomer;
 use App\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 
 class MulaPaymentController
@@ -27,17 +26,18 @@ class MulaPaymentController
 
             $validator = Validator::make($request->all(),
                 [
-                    'event_id' => 'required|integer|exists:events,id',
-                    'user_id'  => 'required|integer|exists:users,id',
+                    'tickets'                               => 'required|array',
+                    'tickets.*.ticket_category_detail_id'   => 'required|integer|exists:ticket_category_details,id',
+                    'tickets.*.no_of_tickets'               => 'required|integer',
                 ],
                 [
-                    'event_id.required'    => 'invalid value',
-                    'event_id.integer'     => 'invalid value',
-                    'event_id.exists'      => 'invalid value',
-                    'customer_id.required' => 'login',
-                    'customer_id.integer'  => 'invalid request',
-                    'customer_id.exists'   => 'invalid value',
-
+                    'tickets.required'                              => 'invalid request',
+                    'tickets.array'                                 => 'invalid value',
+                    'tickets.*.ticket_category_detail_id.required'  => 'invalid value',
+                    'tickets.*.ticket_category_detail_id.integer'   => 'invalid value',
+                    'tickets.*.ticket_category_detail_id.exists'    => 'ticket details are incorrect',
+                    'tickets.*.no_of_tickets.required'              => 'invalid request',
+                    'tickets.*.no_of_tickets.integer'               => 'correctly enter the number of tickets'
                 ]);
 
             if ($validator->fails()) {
@@ -46,15 +46,33 @@ class MulaPaymentController
                 ]);
             }
 
-            $user_id = $request->user_id;
-            $event_id = $request->event_id;
+            $user = $request->user();
+           //process the information for the tickets purchase request
+            $tickets = $request->tickets;
+            $data_array=[];
+            $event_id = 0;
+            $event = new Event();
+            $total = 0;
+            foreach ($tickets as $ticket)  {
+                //get the ticket_category_detail_id & the no_of_tickets the client would want to purchase
+                $ticket_category_detail_id = $ticket['ticket_category_detail_id'];
+                $no_of_tickets = $ticket['no_of_tickets'];
 
-            $user = User::find($user_id);
+                $ticket_category_detail = TicketCategoryDetail::find($ticket_category_detail_id);
 
-            $event = Event::find($event_id);
+                $event_id = $ticket_category_detail->event_id;
+                $event = Event::find($event_id);
+                $category_slug = $ticket_category_detail->category->slug;
 
-            $data_array = $request->all();
-            $data_array['ticket_sale_end_date_time'] = $event->ticket_sale_end_date_time;
+                $ticket_sale_end_date_time = $event->ticket_sale_end_date;
+                $total += $no_of_tickets*(int)$ticket_category_detail->price;
+
+                $data_array['ticket_sale_end_date_time'] = $ticket_sale_end_date_time;
+                $data_array[$category_slug.'_quantity'] = $no_of_tickets;
+            }
+
+            $data_array['subtotal'] = $total;
+
 
             $ticket_customer = TicketCustomer::updateOrCreate(
                 [
@@ -90,7 +108,7 @@ class MulaPaymentController
 
             return response()->json([
                     'success' => false,
-                    'message' => 'params fetch failed',
+                    'message' => 'params fetch failed: '.$exception->getMessage().'\n'.$exception->getTraceAsString(),
                     'datum'   => [
                         'params'      => null,
                         'accessKey'   => '',
