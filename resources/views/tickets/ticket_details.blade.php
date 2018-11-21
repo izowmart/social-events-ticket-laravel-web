@@ -4,74 +4,82 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('css/smart_wizard_theme_arrows.min.css') }}">
     <style>
     .quantity {
-  position: relative;
-}
+    position: relative;
+    }
 
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button
-{
-  -webkit-appearance: none;
-  margin: 0;
-}
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button
+    {
+    -webkit-appearance: none;
+    margin: 0;
+    }
 
-input[type=number]
-{
-  -moz-appearance: textfield;
-}
+    input[type=number]
+    {
+    -moz-appearance: textfield;
+    }
 
-.quantity input {
-  width: 45px;
-  height: 42px;
-  line-height: 1.65;
-  float: left;
-  display: block;
-  padding: 0;
-  margin: 0;
-  padding-left: 20px;
-  border: 1px solid #eee;
-}
+    .quantity input {
+    width: 45px;
+    height: 42px;
+    line-height: 1.65;
+    float: left;
+    display: block;
+    padding: 0;
+    margin: 0;
+    padding-left: 20px;
+    border: 1px solid #eee;
+    }
 
-.quantity input:focus {
-  outline: 0;
-}
+    .quantity input:focus {
+    outline: 0;
+    }
 
-.quantity-nav {
-  float: left;
-  position: relative;
-  height: 42px;
-}
+    .quantity-nav {
+    float: left;
+    position: relative;
+    height: 42px;
+    }
 
-.quantity-button {
-  position: relative;
-  cursor: pointer;
-  border-left: 1px solid #eee;
-  width: 20px;
-  text-align: center;
-  color: #333;
-  font-size: 13px;
-  font-family: "Trebuchet MS", Helvetica, sans-serif !important;
-  line-height: 1.7;
-  -webkit-transform: translateX(-100%);
-  transform: translateX(-100%);
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
-}
+    .quantity-button {
+    position: relative;
+    cursor: pointer;
+    border-left: 1px solid #eee;
+    width: 20px;
+    text-align: center;
+    color: #333;
+    font-size: 13px;
+    font-family: "Trebuchet MS", Helvetica, sans-serif !important;
+    line-height: 1.7;
+    -webkit-transform: translateX(-100%);
+    transform: translateX(-100%);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    }
 
-.quantity-button.quantity-up {
-  position: absolute;
-  height: 50%;
-  top: 0;
-  border-bottom: 1px solid #eee;
-}
+    .quantity-button.quantity-up {
+    position: absolute;
+    height: 50%;
+    top: 0;
+    border-bottom: 1px solid #eee;
+    }
 
-.quantity-button.quantity-down {
-  position: absolute;
-  bottom: -1px;
-  height: 50%;
-}
+    .quantity-button.quantity-down {
+    position: absolute;
+    bottom: -1px;
+    height: 50%;
+    }
+
+    .sold-out{
+        background-color: red;
+        color: #fff;
+        position: absolute;
+        padding: 0px 3px;
+        margin-left: 5px;
+    }
     </style>
 @endsection
 
@@ -89,25 +97,25 @@ input[type=number]
             <p class="details-location"><i style="font-size: 18px;" class="fa fa-map-marker"></i> {{$event->location}}</p><br>
             <div class="container mt-3">
                 <ul class="nav nav-tabs">
-                    <li class="nav-item">
-                    <a class="nav-link active" data-toggle="tab" href="#event_info">Event Info</a>
-                    </li>
                     @if ($event->type==2)
                     <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#purchase">Purchase Info</a>
+                    <a class="nav-link active" data-toggle="tab" href="#purchase">Purchase Info</a>
                     </li>                        
                     @endif
+                    <li class="nav-item">
+                    <a class="nav-link @if ($event->type!=2)active @endif" data-toggle="tab" href="#event_info">Event Info</a>
+                    </li>                    
                 </ul>
 
                 <!-- Tab panes -->
                 <div class="tab-content">
-                    <div id="event_info" class="container tab-pane active"><br>
+                    <div id="event_info" class="container tab-pane @if ($event->type!=2)active @else fade @endif"><br>
                         <p class="details-description">
                             {!!$event->description!!}
                         </p>
                     </div>
                     @if ($event->type==2)
-                    <div id="purchase" class="container tab-pane fade"><br>
+                    <div id="purchase" class="container tab-pane @if ($event->type==2)active @else fade @endif"><br>
                         <table class="table responsive table-borderless">
                             <thead>
                             <tr>
@@ -119,7 +127,12 @@ input[type=number]
                             @foreach ($ticket_categories as $ticket_category)
                             <tr>
                                 <td>{{$ticket_category->name}}</td>
-                                <td>{{$ticket_category->price}}</td>
+                                <td>                                    
+                                    Ksh {{$ticket_category->price}}
+                                    @if (App\Http\Traits\UniversalMethods::getRemainingCategoryTickets($event->id,$ticket_category->category_id)<1)
+                                    <span class="sold-out"> sold out</span>
+                                    @endif
+                                </td>
                             </tr>    
                             @endforeach 
                             </tbody>
@@ -161,6 +174,7 @@ input[type=number]
                                                         </thead>
                                                         <tbody>
                                                         @foreach ($ticket_categories as $ticket_category)
+                                                        @if (App\Http\Traits\UniversalMethods::getRemainingCategoryTickets($event->id,$ticket_category->category_id)>0)
                                                         <tr>
                                                             <td>{{$ticket_category->name}}</td>
 
@@ -171,7 +185,8 @@ input[type=number]
                                                                 </div>
                                                             </td>
                                                             <td class="total" id="{{$ticket_category->slug}}_total">0</td>
-                                                        </tr>    
+                                                        </tr>  
+                                                        @endif                                                           
                                                         @endforeach                                                        
                                                         </tbody>
                                                     </table>
