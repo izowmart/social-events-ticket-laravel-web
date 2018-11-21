@@ -18,6 +18,8 @@ class EventTransformer extends TransformerAbstract
      */
     public function transform(Event $event)
     {
+        $ticket_category_transformer = new TicketCategoryTransformer();
+        $ticket_category_transformer->setEventId($event->id);
         return [
                 'id'                    => $event->id,
                 'name'                  => $event->name,
@@ -26,7 +28,7 @@ class EventTransformer extends TransformerAbstract
                 'type'                  => $event->type,
                 'image_url'             => $event->media_url,
                 'dates'                 => fractal($event->event_dates,EventDateTransformer::class)->withResourceName('dates'),
-                'ticket_categories'     => fractal($event->ticket_categories, TicketCategoryTransformer::class)->withResourceName('ticket_categories'),
+                'ticket_categories'     => fractal($event->ticket_categories, $ticket_category_transformer)->withResourceName('ticket_categories'),
                 'tickets'               => fractal($event->tickets($this->ticket_customer_id)->get(),TicketTransformer::class)->withResourceName('tickets')
             ];
     }
