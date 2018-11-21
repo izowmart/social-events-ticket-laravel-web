@@ -47,21 +47,21 @@ class EventController extends Controller
         }
     }
     //my_tickets
-    public function my_tickets(Request $request){
-
-        $user = $request->user();
-
-        $event = Event::join('tickets','tickets.event_id', '=','events.id')
-                ->join('ticket_customers','ticket_customers.id','=','tickets.ticket_customer_id')
-                ->join('users','users.id','=','ticket_customers.user_id')
-                ->where('ticket_customers.user_id','=',$user->id)
-                ->get();
-
-
-        dd($event);
-
-
-    }
+//    public function my_tickets(Request $request){
+//
+//        $user = $request->user();
+//
+//        $event = Event::join('tickets','tickets.event_id', '=','events.id')
+//                ->join('ticket_customers','ticket_customers.id','=','tickets.ticket_customer_id')
+//                ->join('users','users.id','=','ticket_customers.user_id')
+//                ->where('ticket_customers.user_id','=',$user->id)
+//                ->get();
+//
+//
+//        dd($event);
+//
+//
+//    }
 
     public function scanner_events($scanner_id)
     {
