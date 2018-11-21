@@ -1,4 +1,4 @@
-@extends('event_organizer.layouts')
+@extends('common_pages.layouts')
 
 @section('title')
     <title>Admin Reset Password - Fika</title>

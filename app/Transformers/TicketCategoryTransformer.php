@@ -10,6 +10,7 @@ use League\Fractal\TransformerAbstract;
 
 class TicketCategoryTransformer extends TransformerAbstract
 {
+    private $event_id;
     /**
      * A Fractal transformer.
      *
@@ -23,7 +24,7 @@ class TicketCategoryTransformer extends TransformerAbstract
             'id'                    => $ticketCategoryDetail->id,
             'event_id'              => $ticketCategoryDetail->event_id,
             'category_name'         => $ticketCategoryDetail->category->name,
-            'remaining_tickets'     => UniversalMethods::getRemainingCategoryTickets($this->event_id,$ticketCategoryeventTicketCategory->id),//remaining = available - sold
+            'remaining_tickets'     => UniversalMethods::getRemainingCategoryTickets($this->event_id,$ticketCategoryDetail->category_id),//remaining = available - sold
             'price'                  => (int) $ticketCategoryDetail->price
         ];
     }

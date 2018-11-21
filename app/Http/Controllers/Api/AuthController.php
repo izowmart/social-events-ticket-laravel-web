@@ -44,7 +44,7 @@ class AuthController extends Controller
     {
             $validator = Validator::make($request->all(),
                 [
-                    'username' => 'required|alpha_dash',
+                    'username' => 'required|alpha_dash|unique:users,username',
                     'first_name' => 'required|string',
                     'last_name' => 'required|string',
                     'email' => 'bail|required|email|unique:users,email',

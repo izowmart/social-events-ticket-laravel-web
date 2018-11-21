@@ -7,6 +7,7 @@ use App\Scanner;
 use App\TicketCustomer;
 use App\Transformers\EventTransformer;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 
 class EventController extends Controller

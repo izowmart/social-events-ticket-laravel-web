@@ -37,6 +37,9 @@ class TicketsController extends Controller
                     ->where('slug',$slug)
                     ->orderBy('id','desc')
                     ->first();
+        if($event==null){
+            return abort(404);
+        }
         $ticket_categories = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.category_id','ticket_category_details.no_of_tickets','ticket_categories.name','ticket_categories.slug')
                                 ->where('ticket_category_details.event_id',$event->id)
                                 ->join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
