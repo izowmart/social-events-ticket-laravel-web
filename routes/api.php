@@ -52,7 +52,7 @@ Route::group(['prefix' => 'user', 'middleware' => 'auth:api'], function () use (
     Route::get('adverts', $base_url . 'Api\AdvertController@index');
     Route::post('adverts_view', $base_url . 'Api\AdvertController@advert_view');
     Route::get('countries', $base_url . 'Api\CountryController@index');
-    Route::get('events/{user_id}', $base_url . 'Api\EventController@index');
+    Route::get('events', $base_url . 'Api\EventController@index');
     Route::get('notifications/{user_id}', $base_url . 'Api\NotificationController@index');
     Route::post('notifications', $base_url . 'Api\NotificationController@markSeen');
     Route::get('venues', $base_url . 'Api\VenueController@index');
@@ -72,6 +72,8 @@ Route::group(['prefix' => 'user', 'middleware' => 'auth:api'], function () use (
 
     Route::post('search','Api\SearchController@index');
     Route::post('venues/near', 'Api\VenueController@venues_near_me');
+
+    Route::post('nunua_tickets', $base_url . 'Api\MulaPaymentController@initiate_payment');
 });
 
 Route::group(['prefix' => 'scanner', 'middleware' => 'api'], function () use ($base_url) {
@@ -79,6 +81,6 @@ Route::group(['prefix' => 'scanner', 'middleware' => 'api'], function () use ($b
 
 });
 
-Route::get('payments/{user_id}/{event_id}', $base_url . 'Api\MulaPaymentController@initiate_payment');
+
 
 
