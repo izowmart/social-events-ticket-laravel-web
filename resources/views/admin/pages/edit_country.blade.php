@@ -1,7 +1,7 @@
 @extends('common_pages.layouts')
 
-<link rel="stylesheet" type="text/css" href="//github.com/downloads/lafeber/world-flags-sprite/flags16.css" />
-    
+@section('styles')
+<link rel="stylesheet" type="text/css" href="//github.com/downloads/lafeber/world-flags-sprite/flags16.css" />    
 @endsection
 
 @section('content')
