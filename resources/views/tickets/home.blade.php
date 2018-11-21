@@ -17,16 +17,6 @@
                     <div class="col-md-6">
                         <p class="dates"><i class="fa fa-calendar-check-o"></i> {{date("jS M Y", strtotime($event->start))}}</p>
                     </div>
-                    <div class="col-md-6">
-                        <p class="price"><i style="font-size: 18px;" class="fa fa-money"></i> 
-                        @if ($event->price==null)
-                            {{'Free'}}
-                        @else
-                            Ksh {{$event->price}}
-                        @endif 
-                        </p>
-
-                    </div>
                 </div>
                 <p class="location"><i style="font-size: 18px;" class="fa fa-map-marker"></i> {{$event->location}}</p>
                 <p class="description">{{str_limit(strip_tags($event->description), $limit = 75, $end = '...')}}</p>
