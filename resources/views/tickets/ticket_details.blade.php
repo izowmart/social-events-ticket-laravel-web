@@ -238,12 +238,13 @@ input[type=number]
 @endsection
 
 @section('scripts')
-<!-- Include jQuery Validator plugin -->
-{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
- <script id="mula-checkout-library" type="text/javascript" src="https://beep2.cellulant.com:9212/checkout/v2/mula-checkout.js"></script> --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
+<script id="mula-checkout-library" type="text/javascript" src="https://beep2.cellulant.com:9212/checkout/v2/mula-checkout.js"></script>
 <script src="{{ asset('js/plugins/jquery.smartWizard.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.1/dist/sweetalert2.all.min.js"></script>
 <script>
  var main_total = 0;
+//  custom spinner script start
  jQuery('<div class="quantity-nav"><div class="quantity-button quantity-up">+</div><div class="quantity-button quantity-down">-</div></div>').insertAfter('.quantity input');
     jQuery('.quantity').each(function() {
       var spinner = jQuery(this),
@@ -276,7 +277,7 @@ input[type=number]
       });
 
     });
-
+//  custom spinner script end
  </script>
 @foreach ($ticket_categories as $ticket_category)
     <script>
@@ -343,7 +344,13 @@ input[type=number]
                                                             elmForm.validator('validate');
                                                             var elmErr = elmForm.find('.has-error');
                                                             if(elmErr && elmErr.length > 0){
-                                                                alert('Oops we still have error in the form');
+                                                                swal({
+                                                                    title: "Error!",
+                                                                    text: "Please fill all the fields before proceeding",
+                                                                    type: "warning",
+                                                                    confirmButtonText: "Okay",
+                                                                    closeOnCancel: true
+                                                                });
                                                                 return false;
                                                             }else{
                                                             // alert('Great! we are ready to submit form');
@@ -408,29 +415,35 @@ input[type=number]
                  });
 
             $("#smartwizard").on("leaveStep", function(e, anchorObject, stepNumber, stepDirection) {
-                console.log("leaveStep: \t"+"Step number: "+stepNumber+"\tStep direction: "+stepDirection+"\n")
+                // console.log("leaveStep: \t"+"Step number: "+stepNumber+"\tStep direction: "+stepDirection+"\n")
                
                                 
                 var elmForm = $("#form-step-" + stepNumber);
                 // stepDirection === 'forward' :- this condition allows to do the form validation
                 // only on forward navigation, that makes easy navigation on backwards still do the validation when going next
                 if(stepDirection === 'forward' && elmForm){
-                    elmForm.validator('validate');
-                    var elmErr = elmForm.children('.has-error');
-                    if(elmErr && elmErr.length > 0){
-                        // Form validation failed
+                    if($("#subtotal").val()<1){
+                        swal({
+                            title: "Quantity required!",
+                            text: "Please select quantity of ticket type",
+                            type: "info",
+                            confirmButtonText: "Okay",
+                            closeOnCancel: true
+                        });
                         return false;
-                    }
+                    }                        
+                }else{
+                    $('.mula-checkout-button').remove();	
+                    $('.mula-logo').remove();
                 }
                 return true;
             });
 
             $("#smartwizard").on("showStep", function(e, anchorObject, stepNumber, stepDirection) {
-                console.log("showStep: \t"+"Step number: "+stepNumber+"\tStep direction: "+stepDirection+"\n")
                 // Enable finish button only on last step
                 if($('button.sw-btn-next').hasClass('disabled')){
                     $('.sw-btn-group-extra').show(); // show the button extra only in the last page and hide next button
- MulaCheckout.addPayWithMulaButton({className: 'checkout-button', checkoutType: 'modal'});
+                    MulaCheckout.addPayWithMulaButton({className: 'checkout-button', checkoutType: 'modal'});
                     $('.sw-btn-next').hide();
                 }else{
                     $('.sw-btn-group-extra').hide();	
@@ -462,5 +475,5 @@ input[type=number]
         infowindow.open(map,marker);
         }
 </script>
-{{-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBO5Else2rW4UNyXiCMp3y20JV7BseTMys&callback=myMap"></script>   --}}
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBO5Else2rW4UNyXiCMp3y20JV7BseTMys&callback=myMap"></script>  
 @endsection
