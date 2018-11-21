@@ -46,10 +46,13 @@ class RegisterController extends Controller
         $admin_password = $password;
 
         $data = array('name'=>$admin_first_name,'email'=>$admin_email,'password'=>$admin_password);
-        Mail::send('admin.mail', $data, function($message) use ($admin_email, $admin_first_name) {
-            $message->to($admin_email, 'Added as admin')->subject
-                ('Added as an admin');
-            $message->from('xyz@gmail.com','FIKA');
+        $beautymail = app()->make(\Snowfire\Beautymail\Beautymail::class);
+        $beautymail->send('admin.registration_mail', $data, function($message) use ($admin_email, $admin_first_name)
+        {
+            $message
+                ->from('noreply@fikaplaces.com','Fika Places')
+                ->to($admin_email, $admin_first_name)
+                ->subject('Registered as admin');
         });
 
         //Give message to admin after successfull registration
