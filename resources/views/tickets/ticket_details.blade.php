@@ -3,7 +3,83 @@
 @section('styles')
     <link rel="stylesheet" type="text/css" href="{{ asset('css/smart_wizard_theme_arrows.min.css') }}">
     <style>
-    
+    .quantity {
+    position: relative;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button
+    {
+    -webkit-appearance: none;
+    margin: 0;
+    }
+
+    input[type=number]
+    {
+    -moz-appearance: textfield;
+    }
+
+    .quantity input {
+    width: 45px;
+    height: 42px;
+    line-height: 1.65;
+    float: left;
+    display: block;
+    padding: 0;
+    margin: 0;
+    padding-left: 20px;
+    border: 1px solid #eee;
+    }
+
+    .quantity input:focus {
+    outline: 0;
+    }
+
+    .quantity-nav {
+    float: left;
+    position: relative;
+    height: 42px;
+    }
+
+    .quantity-button {
+    position: relative;
+    cursor: pointer;
+    border-left: 1px solid #eee;
+    width: 20px;
+    text-align: center;
+    color: #333;
+    font-size: 13px;
+    font-family: "Trebuchet MS", Helvetica, sans-serif !important;
+    line-height: 1.7;
+    -webkit-transform: translateX(-100%);
+    transform: translateX(-100%);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    }
+
+    .quantity-button.quantity-up {
+    position: absolute;
+    height: 50%;
+    top: 0;
+    border-bottom: 1px solid #eee;
+    }
+
+    .quantity-button.quantity-down {
+    position: absolute;
+    bottom: -1px;
+    height: 50%;
+    }
+
+    .sold-out{
+        background-color: red;
+        color: #fff;
+        position: absolute;
+        padding: 0px 3px;
+        margin-left: 5px;
+    }
     </style>
 @endsection
 
@@ -21,25 +97,25 @@
             <p class="details-location"><i style="font-size: 18px;" class="fa fa-map-marker"></i> {{$event->location}}</p><br>
             <div class="container mt-3">
                 <ul class="nav nav-tabs">
-                    <li class="nav-item">
-                    <a class="nav-link active" data-toggle="tab" href="#event_info">Event Info</a>
-                    </li>
                     @if ($event->type==2)
                     <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#purchase">Purchase Info</a>
+                    <a class="nav-link active" data-toggle="tab" href="#purchase">Purchase Info</a>
                     </li>                        
                     @endif
+                    <li class="nav-item">
+                    <a class="nav-link @if ($event->type!=2)active @endif" data-toggle="tab" href="#event_info">Event Info</a>
+                    </li>                    
                 </ul>
 
                 <!-- Tab panes -->
                 <div class="tab-content">
-                    <div id="event_info" class="container tab-pane active"><br>
+                    <div id="event_info" class="container tab-pane @if ($event->type!=2)active @else fade @endif"><br>
                         <p class="details-description">
                             {!!$event->description!!}
                         </p>
                     </div>
                     @if ($event->type==2)
-                    <div id="purchase" class="container tab-pane fade"><br>
+                    <div id="purchase" class="container tab-pane @if ($event->type==2)active @else fade @endif"><br>
                         <table class="table responsive table-borderless">
                             <thead>
                             <tr>
@@ -51,12 +127,17 @@
                             @foreach ($ticket_categories as $ticket_category)
                             <tr>
                                 <td>{{$ticket_category->name}}</td>
-                                <td>{{$ticket_category->price}}</td>
+                                <td>                                    
+                                    Ksh {{$ticket_category->price}}
+                                    @if (App\Http\Traits\UniversalMethods::getRemainingCategoryTickets($event->id,$ticket_category->category_id)<1)
+                                    <span class="sold-out"> sold out</span>
+                                    @endif
+                                </td>
                             </tr>    
                             @endforeach 
                             </tbody>
                         </table>
-                        <button class="btn btn-info" data-toggle="modal" data-target="#exampleModal">Purchase Now</button>
+                        <button class="btn btn-info" id="purchase-btn" data-toggle="modal" data-target="#exampleModal">Purchase Now</button>
                         <!-- Modal -->
                         <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -92,18 +173,22 @@
                                                         </tr>
                                                         </thead>
                                                         <tbody>
+                                                        <?php $total_categories=0; ?>
                                                         @foreach ($ticket_categories as $ticket_category)
+                                                        <?php $total_categories++ ?>
+                                                        @if (App\Http\Traits\UniversalMethods::getRemainingCategoryTickets($event->id,$ticket_category->category_id)>0)
                                                         <tr>
                                                             <td>{{$ticket_category->name}}</td>
 
                                                             <td id="{{$ticket_category->slug}}_price">{{$ticket_category->price}}</td>
                                                             <td>
-                                                                <div class="form-group">
-                                                                <input type="number" class="form-control quantity" style="width: 60px" min="1" max="{{App\Http\Traits\UniversalMethods::getRemainingCategoryTickets($event->id,$ticket_category->category_id)}}" name="{{$ticket_category->slug}}_quantity" value="0" id="{{$ticket_category->slug}}_quantity">
+                                                                <div class="form-group quantity">
+                                                                <input type="number" class="form-control quantity" style="width: 60px" min="0" max="{{App\Http\Traits\UniversalMethods::getRemainingCategoryTickets($event->id,$ticket_category->category_id)}}" name="{{$ticket_category->slug}}_quantity" value="0" id="{{$ticket_category->slug}}_quantity">
                                                                 </div>
                                                             </td>
                                                             <td class="total" id="{{$ticket_category->slug}}_total">0</td>
-                                                        </tr>    
+                                                        </tr>  
+                                                        @endif                                                           
                                                         @endforeach                                                        
                                                         </tbody>
                                                     </table>
@@ -170,14 +255,53 @@
 @endsection
 
 @section('scripts')
-<!-- Include jQuery Validator plugin -->
-{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
- <script id="mula-checkout-library" type="text/javascript" src="https://beep2.cellulant.com:9212/checkout/v2/mula-checkout.js"></script> --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
+<script id="mula-checkout-library" type="text/javascript" src="https://beep2.cellulant.com:9212/checkout/v2/mula-checkout.js"></script>
 <script src="{{ asset('js/plugins/jquery.smartWizard.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.1/dist/sweetalert2.all.min.js"></script>
 <script>
  var main_total = 0;
- // Select your input element.
+ @if ($event->type==2)
+ var total_categories = {{$total_categories}};
+ if($('.sold-out').length==total_categories){
+     $('#purchase-btn').remove();
 
+ }
+ @endif
+//  custom spinner script start
+ jQuery('<div class="quantity-nav"><div class="quantity-button quantity-up">+</div><div class="quantity-button quantity-down">-</div></div>').insertAfter('.quantity input');
+    jQuery('.quantity').each(function() {
+      var spinner = jQuery(this),
+        input = spinner.find('input[type="number"]'),
+        btnUp = spinner.find('.quantity-up'),
+        btnDown = spinner.find('.quantity-down'),
+        min = input.attr('min'),
+        max = input.attr('max');
+
+      btnUp.click(function() {
+        var oldValue = parseFloat(input.val());
+        if (oldValue >= max) {
+          var newVal = oldValue;
+        } else {
+          var newVal = oldValue + 1;
+        }
+        spinner.find("input").val(newVal);
+        spinner.find("input").trigger("change");
+      });
+
+      btnDown.click(function() {
+        var oldValue = parseFloat(input.val());
+        if (oldValue <= min) {
+          var newVal = oldValue;
+        } else {
+          var newVal = oldValue - 1;
+        }
+        spinner.find("input").val(newVal);
+        spinner.find("input").trigger("change");
+      });
+
+    });
+//  custom spinner script end
  </script>
 @foreach ($ticket_categories as $ticket_category)
     <script>
@@ -244,7 +368,13 @@
                                                             elmForm.validator('validate');
                                                             var elmErr = elmForm.find('.has-error');
                                                             if(elmErr && elmErr.length > 0){
-                                                                alert('Oops we still have error in the form');
+                                                                swal({
+                                                                    title: "Error!",
+                                                                    text: "Please fill all the fields before proceeding",
+                                                                    type: "warning",
+                                                                    confirmButtonText: "Okay",
+                                                                    closeOnCancel: true
+                                                                });
                                                                 return false;
                                                             }else{
                                                             // alert('Great! we are ready to submit form');
@@ -309,29 +439,35 @@
                  });
 
             $("#smartwizard").on("leaveStep", function(e, anchorObject, stepNumber, stepDirection) {
-                console.log("leaveStep: \t"+"Step number: "+stepNumber+"\tStep direction: "+stepDirection+"\n")
+                // console.log("leaveStep: \t"+"Step number: "+stepNumber+"\tStep direction: "+stepDirection+"\n")
                
                                 
                 var elmForm = $("#form-step-" + stepNumber);
                 // stepDirection === 'forward' :- this condition allows to do the form validation
                 // only on forward navigation, that makes easy navigation on backwards still do the validation when going next
                 if(stepDirection === 'forward' && elmForm){
-                    elmForm.validator('validate');
-                    var elmErr = elmForm.children('.has-error');
-                    if(elmErr && elmErr.length > 0){
-                        // Form validation failed
+                    if($("#subtotal").val()<1){
+                        swal({
+                            title: "Quantity required!",
+                            text: "Please select quantity of ticket type",
+                            type: "info",
+                            confirmButtonText: "Okay",
+                            closeOnCancel: true
+                        });
                         return false;
-                    }
+                    }                        
+                }else{
+                    $('.mula-checkout-button').remove();	
+                    $('.mula-logo').remove();
                 }
                 return true;
             });
 
             $("#smartwizard").on("showStep", function(e, anchorObject, stepNumber, stepDirection) {
-                console.log("showStep: \t"+"Step number: "+stepNumber+"\tStep direction: "+stepDirection+"\n")
                 // Enable finish button only on last step
                 if($('button.sw-btn-next').hasClass('disabled')){
                     $('.sw-btn-group-extra').show(); // show the button extra only in the last page and hide next button
- MulaCheckout.addPayWithMulaButton({className: 'checkout-button', checkoutType: 'modal'});
+                    MulaCheckout.addPayWithMulaButton({className: 'checkout-button', checkoutType: 'modal'});
                     $('.sw-btn-next').hide();
                 }else{
                     $('.sw-btn-group-extra').hide();	
@@ -363,5 +499,5 @@
         infowindow.open(map,marker);
         }
 </script>
-{{-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBO5Else2rW4UNyXiCMp3y20JV7BseTMys&callback=myMap"></script>   --}}
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBO5Else2rW4UNyXiCMp3y20JV7BseTMys&callback=myMap"></script>  
 @endsection
