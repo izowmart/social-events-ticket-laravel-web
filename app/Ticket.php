@@ -25,6 +25,12 @@ class Ticket extends Model
         return $this->hasOne('App\TicketScan', 'ticket_id');
     }
 
+    public function ticket_customer()
+    {
+        return $this->belongsTo('App\TicketCustomer', 'ticket_customer_id');
+    }
+
+
     /**
      * check whether this ticket has been scanned yet
      * @return bool

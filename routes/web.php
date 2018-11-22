@@ -206,6 +206,7 @@ Route::group(['middleware' => 'event_organizer_auth','prefix'=>'event_organizer'
         Route::get('edit/{slug}', 'CommonPages\EventsController@showEditForm')->name('edit_event');   
         Route::post('edit', 'CommonPages\EventsController@update')->name('edit_event_post');   
         Route::post('delete', 'CommonPages\EventsController@destroy')->name('delete_event');
+        Route::get('view/{slug}', 'CommonPages\EventsController@showSingleEvent')->name('event_organizer_single_event');
 
         Route::group(['prefix'=>'{event_slug}/scanners'], function () {
             Route::get('/', 'EventOrganizerPages\ScannersController@index')->name('scanners');
@@ -217,6 +218,11 @@ Route::group(['middleware' => 'event_organizer_auth','prefix'=>'event_organizer'
 
         });
 
+
+    });
+
+    Route::group(['prefix'=>'reports'], function () {
+        Route::get('tickets', 'CommonPages\EventsController@ticketsReport')->name('tickets_report');          
 
     });
 });

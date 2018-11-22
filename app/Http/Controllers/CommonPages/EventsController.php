@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Event;
+use App\Ticket;
 use App\EventSponsorMedia;
 use App\EventDate;
 use App\EventPrice;
@@ -349,6 +350,19 @@ class EventsController extends Controller
 
     }
 
+    public function showSingleEvent($slug){
+        $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','events.media_url','events.featured_event','event_organizers.id as event_organizer_id','event_organizers.first_name','event_organizers.last_name')
+                    ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
+                    ->where('slug',$slug)
+                    ->get();
+        $data=array(
+            'type'=>'single',
+            'events'=>$events
+            );
+        return view('common_pages.events')->with($data);
+
+    }
+
     public function Unverifiedindex(){
         $user = $this->CheckUserType();
         if($user=="Admin"){
@@ -637,6 +651,23 @@ class EventsController extends Controller
 
         }
         return;
+    }
+
+    public function ticketsReport(){
+        $tickets = Ticket::all(); 
+        $callback = function($query){
+            $query->where('ticket_customers.source','=',1);
+        };
+
+        $tickets_from_web = Ticket::whereHas('ticket_customer',$callback)
+        ->with(['ticket_customer'=>$callback])
+        ->get();
+
+        $data = [
+            'tickets'=>$tickets,
+            'tickets_from_web'=>$tickets_from_web
+        ];
+        return view('event_organizer.pages.tickets_report')->with($data);
     }
 
     public function CheckUserType(){
