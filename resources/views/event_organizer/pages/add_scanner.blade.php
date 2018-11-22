@@ -28,7 +28,8 @@
                       <div class="form-group">
                         <label>First name</label>
                         <input type="text" class="form-control" placeholder="The scanner's first name" name="first_name" required/>  
-                        <input type="hidden" name="event_id" value="{{$event->id}}"> 
+                        <input type="hidden" name="event_id" value="{{Crypt::encrypt($event->id)}}"> 
+                        <input type="hidden" name="event_name" value="{{$event->name}}">
                         <input type="hidden" name="event_slug" value="{{$event->slug}}">
                         @if ($errors->has('first_name'))
                             <span class="help-block">

@@ -16,7 +16,9 @@
         "laravel/passport": "^7.0",
         "laravel/tinker": "^1.0",
         "simplesoftwareio/simple-qrcode": "~2",
-        "spatie/laravel-fractal": "^5.4"
+        "snowfire/beautymail": "dev-master",
+        "spatie/laravel-fractal": "^5.4",
+        "ext-json": "*"
     },
     "require-dev": {
         "filp/whoops": "^2.0",
