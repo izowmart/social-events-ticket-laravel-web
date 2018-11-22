@@ -31,6 +31,9 @@ class Ticket extends Model
      */
     public function scanned()
     {
-        return $this->ticket_scan->count() == 1 ? true : false;
+        if ($this->ticket_scan == null) {return false;}
+        else {
+            return $this->ticket_scan->count() == 1 ? true : false;
+        }
     }
 }
