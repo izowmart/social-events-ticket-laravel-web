@@ -3,7 +3,6 @@
 @section('title')
     <title>Venues - Admin Fika Places</title>
 @endsection
-@endsection
 
 @section('content')
     @include('includes.header')
