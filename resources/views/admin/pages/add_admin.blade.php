@@ -1,7 +1,7 @@
 @extends('common_pages.layouts')
 
-@section('testing-styles')
-    
+@section('title')
+    <title>Add Admin - Admin Fika Places</title>
 @endsection
 
 @section('content')

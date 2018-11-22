@@ -1,5 +1,9 @@
 @extends('common_pages.layouts')
 
+@section('title')
+    <title>Users - Admin Fika Places</title>
+@endsection
+
 @section('testing-styles')
 <link rel="stylesheet" href="{{ asset('css/buttons.bootstrap4.min.css') }}">
 <link rel="stylesheet" href="{{ asset('css/buttons.dataTables.min.css') }}">
