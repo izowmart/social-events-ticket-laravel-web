@@ -1,5 +1,9 @@
 @extends('common_pages.layouts')
 
+@section('title')
+    <title>Add Country - Admin Fika Places</title>
+@endsection
+
 @section('other-styles')
 <style>
 <link rel="stylesheet" type="text/css" href="//github.com/downloads/lafeber/world-flags-sprite/flags16.css" />

@@ -1,5 +1,9 @@
 @extends('common_pages.layouts')
 
+@section('title')
+    <title>Add Event - Event Organizer Fika Places</title>
+@endsection
+
 @section('styles')
 <link rel="stylesheet" type="text/css" href="{{ asset('css/summernote-bs4.css') }}" />   
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">

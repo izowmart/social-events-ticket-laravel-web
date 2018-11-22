@@ -1,5 +1,9 @@
 @extends('common_pages.layouts')
 
+@section('title')
+    <title>{{ucwords(trans($type))}} Events - @auth('web_admin') Admin @endauth @auth('web_event_organizer') Event Organizer @endauth Fika Places</title>
+@endsection
+
 @section('styles')    
 <link type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css" rel="stylesheet">
 @endsection

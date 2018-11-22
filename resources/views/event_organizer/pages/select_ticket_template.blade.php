@@ -1,5 +1,9 @@
 @extends('common_pages.layouts')
 
+@section('title')
+    <title>{{ucfirst($event->name)}} Ticket Template - Event Organizer Fika Places</title>
+@endsection
+
 @section('styles')
 <link rel="stylesheet" type="text/css" href="{{ asset('css/image-picker.css') }}" />  
 <link rel="stylesheet" href="{{ asset('css/ticket-templates.css') }}">

@@ -233,6 +233,10 @@ class EventsController extends Controller
             $ticket_category_details = TicketCategoryDetail::where('event_id',$request->id);
             $ticket_category_details->delete();
             
+        }else{
+            //else if it was a free and change to paid, we set event status to unverified
+            $event->status = 0;
+            $event->save();
         }
 
         //update price and category if it's a paid event
