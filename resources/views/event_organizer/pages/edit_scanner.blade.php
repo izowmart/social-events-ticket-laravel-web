@@ -1,5 +1,9 @@
 @extends('common_pages.layouts')
 
+@section('title')
+    <title>Edit Scanner - Event Organizer Fika Places</title>
+@endsection
+
 @section('content')
     @include('includes.header')
     @include('includes.side-menu')

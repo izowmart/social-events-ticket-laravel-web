@@ -1,10 +1,7 @@
 @extends('common_pages.layouts')
 
-@section('testing-styles')
-<style>
-
-</style>
-    
+@section('title')
+    <title>{{ucfirst($event->name)}} Scanners - Event Organizer Fika Places</title>
 @endsection
 
 @section('content')

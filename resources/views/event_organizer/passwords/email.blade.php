@@ -1,7 +1,7 @@
 @extends('common_pages.layouts')
 
 @section('title')
-    <title>Admin Reset Password - Fika</title>
+    <title>Event Organizer Reset Password - Fika Places</title>
 @endsection
 
 @section('content')
