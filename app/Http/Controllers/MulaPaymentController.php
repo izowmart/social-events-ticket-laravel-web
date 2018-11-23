@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Event;
 use App\Http\Traits\UniversalMethods;
 use App\Mail\TicketsBought;
+use App\Payment;
 use App\PaymentRequest;
 use App\PaymentResponse;
 use App\Ticket;
-use App\TicketCategoryDetail;
 use App\TicketCustomer;
 use App\TicketPurchaseRequest;
 use App\User;
@@ -74,7 +74,7 @@ class MulaPaymentController extends Controller
                     'phone_number' => UniversalMethods::formatPhoneNumber($data_array['phone']),
                     'first_name'   => $data_array['first_name'],
                     'last_name'    => $data_array['last_name'],
-                    'user_id'      => $user != null ? $user->id : 0,
+                    'user_id'      => $user != null ? $user->id : null,
                 ]
             );
 
@@ -96,6 +96,7 @@ class MulaPaymentController extends Controller
             ]);
 
         } catch ( \Exception $exception ) {
+            logger("Encrypt data error: message: ".$exception->getMessage()."\ntrace: ".$exception->getTraceAsString());
             DB::rollBack();
 
             return response()->json([
@@ -116,13 +117,33 @@ class MulaPaymentController extends Controller
     public function success(Request $request)
     {
         try {
-            $payload = $this->processSuccessfulPaymentRequest($request);
+//            $payload = $this->processSuccessfulPaymentRequest($request);
+            $result = $request->getContent();
+//            $payload = json_decode($result);
+            parse_str($result, $payload);
 
-            $pending_payment_request = $this->fetchPendingPaymentRequest($payload);
+            //save the response to the db
+            PaymentResponse::create([
+                'type'     => 'success',
+                'response' => $result
+            ]);
+
+            //log the payment
+//            logger("PAYMENT SUCCESS:: type: ".gettype($result). "\ncontent:" . $result." payload type: ".gettype($payload));
+
+//            logger("success payload: type: " . gettype($payload) . " content: " . json_encode($payload));
+//            $pending_payment_request = $this->fetchPendingPaymentRequest($payload);
+
+            //fetch the pending  payment
+            $pending_payment_request = PaymentRequest::where('merchantTransactionID', $payload['merchantTransactionID'])
+//                ->where('MSISDN', UniversalMethods::formatPhoneNumber($payload->MSISDN))
+//            ->where('amount', '=', $request->amountPaid)
+                ->where('payment_request_status', '=', 0)
+                ->first();
 
             //TODO:: push this to a queue as a job?
             if ($pending_payment_request != null) {
-                $result = $this->processSuccessfulPayment($payload);
+                $result = $this->processSuccessfulPayment($pending_payment_request,$payload);
 
                 if ($result) {
                     //display a success message to the user
@@ -208,7 +229,7 @@ class MulaPaymentController extends Controller
             ]);
 
             //log the response
-            logger("PROCESS PAYMENT::\n payload type is" . gettype($payload) . "\npayload" . $payload . "\n result type is " . gettype($result));
+//            logger("PROCESS PAYMENT::\n payload type is" . gettype($payload) . "\npayload" . $payload . "\n result type is " . gettype($result));
 
 
             //confirm whether the payment should be accepted or not
@@ -336,13 +357,26 @@ class MulaPaymentController extends Controller
     /**
      * @param $pending_payment_request
      *
+     * @param $payload
+     *
      * @return bool
      */
-    public function processSuccessfulPayment($pending_payment_request): bool
+    public function processSuccessfulPayment($pending_payment_request,$payload): bool
     {
         try {
             //update the pending payment request record
             $approved_payment_request = $this->approvePendingPaymentRequest($pending_payment_request);
+
+            //capture the payment details as given from MULA and tie to the approved pending payment request
+            $mula_payload_payments = json_decode($payload['payments'],true);
+
+            logger("mula payload count: " . count($mula_payload_payments)." content: ".json_encode($mula_payload_payments));
+
+            //save each payment record
+            foreach ($mula_payload_payments as $index => $mula_payload_payment) {
+                $mula_payload_payment['payment_request_id'] = $approved_payment_request->id;
+                Payment::create($mula_payload_payment);  ;
+            }
 
             //get the pending ticket purchase requests records
             //given the approved payment request
@@ -425,7 +459,7 @@ class MulaPaymentController extends Controller
      *
      * @return mixed
      */
-    public function processSuccessfulPaymentRequest(Request $request)
+    public function processSuccessfulPaymentRequest($request)
     {
         $result = $request->getContent();
         $payload = json_decode($result);
@@ -437,7 +471,7 @@ class MulaPaymentController extends Controller
         ]);
 
         //log the payment
-        logger("PAYMENT SUCCESS::  " . $result);
+        logger("PAYMENT SUCCESS::  " . $result." payload type: ".gettype($payload));
 
         return $payload;
     }
@@ -449,8 +483,8 @@ class MulaPaymentController extends Controller
      */
     public function fetchPendingPaymentRequest($payload)
     {
-//fetch the pending  payment
-        $pending_payment_request = PaymentRequest::where('merchantTransactionID', $payload->merchantTransactionID)
+        //fetch the pending  payment
+        $pending_payment_request = PaymentRequest::where('merchantTransactionID', $payload['merchantTransactionID'])
 //                ->where('MSISDN', UniversalMethods::formatPhoneNumber($payload->MSISDN))
 //            ->where('amount', '=', $request->amountPaid)
             ->where('payment_request_status', '=', 0)

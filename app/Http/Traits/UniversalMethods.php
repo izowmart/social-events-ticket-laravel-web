@@ -90,7 +90,7 @@ trait UniversalMethods
             "paymentWebhookUrl"     => route("process_payment"),
         ];
 
-        logger("payload before encryption: " . $payload);
+        logger("payload before encryption: " . json_encode($payload));
 
         //create a pending payment request
         $payment_request = PaymentRequest::create([
