@@ -3,8 +3,16 @@
   <aside class="app-sidebar">
     <div class="app-sidebar__user">
       <div>
-        <p class="app-sidebar__user-name">John Doe</p>
-        {{--<p class="app-sidebar__user-designation"></p>TODO:: show the user role here..--}}
+        @auth('web_admin')
+          <p class="app-sidebar__user-name">{{\Auth::guard('web_admin')->user()->name}}</p>
+          <p class="app-sidebar__user-designation">Admin</p>
+          @elseauth('web_event_organizer')
+            <p class="app-sidebar__user-name">{{\Auth::guard('web_event_organizer')->user()->name}}</p>
+          <p class="app-sidebar__user-designation">Event organizer</p>
+          @else
+          <p class="app-sidebar__user-name">John Doe</p>
+          <p class="app-sidebar__user-designation">User</p>
+          @endauth
       </div>
     </div>
     <ul class="app-menu">
