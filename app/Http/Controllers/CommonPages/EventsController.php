@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\CommonPages;
 
+use Exception;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
@@ -166,7 +167,9 @@ class EventsController extends Controller
             return redirect('event_organizer/events/add/ticket-template/'.$event->slug);
         }
     }catch(Exception $exception){
-        logger("event creation failed: "+$exception->getMessage());
+        logger("event creation failed: ".$exception->getMessage());
+
+            return redirect()->back()->withInput();
     }
 
     }
