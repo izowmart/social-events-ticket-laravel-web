@@ -37,8 +37,12 @@ class TicketsBought extends Mailable
             ->with($this->data)
         ;
 
-        foreach ($this->data['files'] as $file) {
-            $message->attach($file); // attach each file
+        foreach ($this->data['files'] as $index => $file) {
+            $message->attach($file,
+                [
+                    'as' => 'Ticket'.($index+1).'.pdf',
+                    'mime' => 'application/pdf',
+                ]); // attach each file
         }
 
         return $message; //Send mail
