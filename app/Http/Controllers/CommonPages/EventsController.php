@@ -8,7 +8,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+
 use App\Event;
+use App\Ticket;
 use App\EventSponsorMedia;
 use App\EventDate;
 use App\EventPrice;
@@ -17,6 +19,7 @@ use App\Scanner;
 use App\EventScanner;
 use App\TicketCategory;
 use App\TicketCategoryDetail;
+use DB;
 
 class EventsController extends Controller
 {
@@ -352,6 +355,19 @@ class EventsController extends Controller
 
     }
 
+    public function showSingleEvent($slug){
+        $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','events.media_url','events.featured_event','event_organizers.id as event_organizer_id','event_organizers.first_name','event_organizers.last_name')
+                    ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
+                    ->where('slug',$slug)
+                    ->get();
+        $data=array(
+            'type'=>'single',
+            'events'=>$events
+            );
+        return view('common_pages.events')->with($data);
+
+    }
+
     public function Unverifiedindex(){
         $user = $this->CheckUserType();
         if($user=="Admin"){
@@ -640,6 +656,68 @@ class EventsController extends Controller
 
         }
         return;
+    }
+
+    public function ticketsReport(){
+        $tickets = Ticket::all(); 
+
+        $data = [
+            'filter'=>'all',
+            'tickets'=>$tickets,
+            'tickets_from_web'=>$this->getTicketsFromSource(1),
+            'tickets_from_mobile'=>$this->getTicketsFromSource(2)
+        ];
+        return view('event_organizer.pages.tickets_report')->with($data);
+    }
+
+    public function ticketsSource($source_name){
+        if($source_name=='website'){
+            $source = 1;
+        }else{
+            $source = 2;
+        }
+
+        $tickets_source = $this->getTicketsFromSource($source);
+        $data = [
+            'filter'=>$source_name,
+            'tickets'=>$tickets_source,
+            'tickets_from_web'=>$this->getTicketsFromSource(1),
+            'tickets_from_mobile'=>$this->getTicketsFromSource(2)
+        ];
+        return view('event_organizer.pages.tickets_report')->with($data);
+    }
+
+    public function getTicketsFromSource($source){
+        $callback = function($query) use($source){
+            $query->where('ticket_customers.source',$source);
+        };
+
+        $tickets = Ticket::whereHas('ticket_customer',$callback)
+        ->with(['ticket_customer'=>$callback])
+        ->get();
+
+        return $tickets;
+    }
+
+    public function paidEventsReports(){
+        // FIX ME:
+        $paid_events = Event::join('tickets','tickets.event_id','=','events.id')
+                ->join('ticket_category_details','ticket_category_details.category_id','=','tickets.ticket_category_id')
+                ->selectRaw("events.*,tickets.ticket_category_id, count(DISTINCT tickets.ticket_customer_id) as customers, sum(ticket_category_details.price) as total_price")
+                // ->whereNotNull('tickets.ticket_category_id')
+                ->groupBy(['events.id','tickets.ticket_category_id'])->get(); 
+        $data = [
+            'filter'=>'all',
+            'paid_events'=>$paid_events,
+            'paid_events_from_web'=>$this->getTicketsFromSource(1),
+            'paid_events_from_mobile'=>$this->getTicketsFromSource(2)
+        ];
+        dd($data);
+        return view('admin.pages.paid_events_reports')->with($data);
+    }
+
+    public function paidEventsSource($source_name){
+
     }
 
     public function CheckUserType(){

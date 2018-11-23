@@ -1,7 +1,7 @@
 @extends('common_pages.layouts')
 
 @section('title')
-    <title>{{ucwords(trans($type))}} Events - @auth('web_admin') Admin @endauth @auth('web_event_organizer') Event Organizer @endauth Fika Places</title>
+    <title>{{ucwords(trans($type))}} @if($type!='single') Events @else Event @endif - @auth('web_admin') Admin @endauth @auth('web_event_organizer') Event Organizer @endauth Fika Places</title>
 @endsection
 
 @section('styles')    
@@ -26,7 +26,11 @@
               <li class="breadcrumb-item"><a href="{{ route('admin_'.str_replace(' ', '_', $type).'_events') }}">{{ucfirst(trans($type))}} Events</a></li>
           @endauth
           @auth('web_event_organizer')
-              <li class="breadcrumb-item"><a href="{{ route('event_organizer_'.str_replace(' ', '_', $type).'_events') }}">{{ucfirst(trans($type))}} Events</a></li>
+          @if ($type!='single')
+          <li class="breadcrumb-item"><a href="{{ route('event_organizer_'.str_replace(' ', '_', $type).'_events') }}">{{ucfirst(trans($type))}} Events</a></li> 
+          @else
+          <li class="breadcrumb-item"><a href="{{ route('event_organizer_'.str_replace(' ', '_', $type).'_event',['slug'=>$events->first()->slug]) }}">{{ucfirst(trans($type))}} Events</a></li>    
+          @endif              
           @endauth
           
         </ul>

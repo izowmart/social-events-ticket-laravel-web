@@ -39,6 +39,11 @@
           <li><a class="treeview-item {{ Route::currentRouteNamed('admin_verified_paid_events') ? 'active' : '' }}" href="{{ route('admin_verified_paid_events') }}"><i class="icon fa fa-check"></i> Verified</a></li>
         </ul>
       </li>
+      <li class="treeview {{ Route::currentRouteNamed('paid_events_report') || Route::currentRouteNamed('paid_events_source', ['source_name'=>'website']) || Route::currentRouteNamed('paid_events_source', ['source_name'=>'app']) ? 'is-expanded' : '' }}"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="app-menu__icon fa fa-briefcase"></i><span class="app-menu__label">Reports</span><i class="treeview-indicator fa fa-angle-right"></i></a>
+        <ul class="treeview-menu">
+          <li><a class="treeview-item {{ Route::currentRouteNamed('paid_events_report') || Route::currentRouteNamed('paid_events_source', ['source_name'=>'website']) || Route::currentRouteNamed('paid_events_source', ['source_name'=>'app']) ? 'active' : '' }}" href="{{ route('paid_events_report') }}"><i class="icon fa fa-money"></i> Paid Events</a></li>
+        </ul>
+      </li> 
       @endauth
       @auth('web_event_organizer')
       <li><a class="app-menu__item {{ Route::currentRouteNamed('event_organizer_home') ? 'active' : '' }}" href="{{ route('event_organizer_home') }}"><i class="app-menu__icon fa fa-home"></i><span class="app-menu__label">Home</span></a></li> 
@@ -49,7 +54,12 @@
           <li><a class="treeview-item {{ Route::currentRouteNamed('event_organizer_unverified_paid_events') ? 'active' : '' }}" href="{{ route('event_organizer_unverified_paid_events') }}"><i class="icon fa fa-chain-broken"></i> Unverified</a></li>
           <li><a class="treeview-item {{ Route::currentRouteNamed('event_organizer_verified_paid_events') ? 'active' : '' }}" href="{{ route('event_organizer_verified_paid_events') }}"><i class="icon fa fa-check"></i> Verified</a></li>
         </ul>
-      </li>   
+      </li>  
+      <li class="treeview {{ Route::currentRouteNamed('tickets_report') || Route::currentRouteNamed('tickets_source', ['source_name'=>'website']) || Route::currentRouteNamed('tickets_source', ['source_name'=>'mobile']) ? 'is-expanded' : '' }}"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="app-menu__icon fa fa-briefcase"></i><span class="app-menu__label">Reports</span><i class="treeview-indicator fa fa-angle-right"></i></a>
+        <ul class="treeview-menu">
+          <li><a class="treeview-item {{ Route::currentRouteNamed('tickets_report') || Route::currentRouteNamed('tickets_source', ['source_name'=>'website']) || Route::currentRouteNamed('tickets_source', ['source_name'=>'mobile']) ? 'active' : '' }}" href="{{ route('tickets_report') }}"><i class="icon fa fa-money"></i> Tickets</a></li>
+        </ul>
+      </li>  
       @endauth
     </ul>
   </aside>

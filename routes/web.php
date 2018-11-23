@@ -181,6 +181,15 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
         Route::post('activate', 'CommonPages\EventsController@activate')->name('admin_activate_event_post');
         Route::post('update/featured_event', 'CommonPages\EventsController@updateFeaturedEvent')->name('admin_update_featured_event');
     });
+
+    Route::group(['prefix'=>'reports'], function () {
+        Route::group(['prefix'=>'paid events'], function () {
+            Route::get('/', 'CommonPages\EventsController@paidEventsReports')->name('paid_events_report'); 
+            Route::get('source/{source_name}', 'CommonPages\EventsController@paidEventsSource')->name('paid_events_source');
+
+         });         
+
+    });
     
 });
 
@@ -206,6 +215,7 @@ Route::group(['middleware' => 'event_organizer_auth','prefix'=>'event_organizer'
         Route::get('edit/{slug}', 'CommonPages\EventsController@showEditForm')->name('edit_event');   
         Route::post('edit', 'CommonPages\EventsController@update')->name('edit_event_post');   
         Route::post('delete', 'CommonPages\EventsController@destroy')->name('delete_event');
+        Route::get('view/{slug}', 'CommonPages\EventsController@showSingleEvent')->name('event_organizer_single_event');
 
         Route::group(['prefix'=>'{event_slug}/scanners'], function () {
             Route::get('/', 'EventOrganizerPages\ScannersController@index')->name('scanners');
@@ -217,6 +227,15 @@ Route::group(['middleware' => 'event_organizer_auth','prefix'=>'event_organizer'
 
         });
 
+
+    });
+
+    Route::group(['prefix'=>'reports'], function () {
+        Route::group(['prefix'=>'tickets'], function () {
+            Route::get('/', 'CommonPages\EventsController@ticketsReport')->name('tickets_report'); 
+            Route::get('source/{source_name}', 'CommonPages\EventsController@ticketsSource')->name('tickets_source');
+
+         });         
 
     });
 });
