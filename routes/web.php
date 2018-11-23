@@ -181,6 +181,15 @@ Route::group(['middleware' => 'admin_auth', 'prefix' => 'admin'], function () {
         Route::post('activate', 'CommonPages\EventsController@activate')->name('admin_activate_event_post');
         Route::post('update/featured_event', 'CommonPages\EventsController@updateFeaturedEvent')->name('admin_update_featured_event');
     });
+
+    Route::group(['prefix'=>'reports'], function () {
+        Route::group(['prefix'=>'paid events'], function () {
+            Route::get('/', 'CommonPages\EventsController@paidEventsReports')->name('paid_events_report'); 
+            Route::get('source/{source_name}', 'CommonPages\EventsController@paidEventsSource')->name('paid_events_source');
+
+         });         
+
+    });
     
 });
 

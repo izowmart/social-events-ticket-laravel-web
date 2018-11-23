@@ -43,11 +43,11 @@
             </a>
           </div>  
           <div class="col-md-6 col-lg-3 home-widget">
-            <a href="{{ route('tickets_source', ['source_name'=>'app']) }}">
+            <a href="{{ route('tickets_source', ['source_name'=>'mobile']) }}">
               <div class="widget-small warning coloured-icon"><i class="icon fa fa-calendar-check-o fa-3x"></i>
                 <div class="info">
-                  <h4>Bought from app</h4>
-                  <p><b>{{$tickets_from_app->count()}}</b></p>
+                  <h4>Bought from mobile</h4>
+                  <p><b>{{$tickets_from_mobile->count()}}</b></p>
                 </div>
               </div>
             </a>

@@ -22,5 +22,27 @@ class TicketCustomersSeeder extends Seeder
             'updated_at' => now()
         ]
         );
+
+        TicketCustomer::create([
+            'first_name'  => 'Peter',
+            'last_name'  => 'test',
+            'email'  => 'pettertest@gmail.com',
+            'phone_number'  => '0715977451',
+            'source'  => '1',
+            'created_at'    =>now(),
+            'updated_at' => now()
+        ]
+        );
+
+        TicketCustomer::create([
+            'first_name'  => 'Allan',
+            'last_name'  => 'test',
+            'email'  => 'allantest@gmail.com',
+            'phone_number'  => '07067851421',
+            'source'  => '2',
+            'created_at'    =>now(),
+            'updated_at' => now()
+        ]
+        );
     }
 }
