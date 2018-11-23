@@ -82,7 +82,8 @@ class MulaPaymentController
                     'phone_number' => UniversalMethods::formatPhoneNumber($user->phone_number),
                     'first_name'   => $user->first_name,
                     'last_name'    => $user->last_name,
-                    'user_id'      => $user != null ? $user->id : 0,
+                    'user_id'      => $user != null ? $user->id : null,
+                    'source'       => TicketCustomer::SOURCE_APP,
                 ]
             );
 

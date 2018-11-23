@@ -75,6 +75,7 @@ class MulaPaymentController extends Controller
                     'first_name'   => $data_array['first_name'],
                     'last_name'    => $data_array['last_name'],
                     'user_id'      => $user != null ? $user->id : null,
+                    'source'       => TicketCustomer::SOURCE_WEB,
                 ]
             );
 
