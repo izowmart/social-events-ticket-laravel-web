@@ -655,19 +655,45 @@ class EventsController extends Controller
 
     public function ticketsReport(){
         $tickets = Ticket::all(); 
+
+        $data = [
+            'filter'=>'all',
+            'tickets'=>$tickets,
+            'tickets_from_web'=>$this->getTicketsFromSource(1),
+            'tickets_from_app'=>$this->getTicketsFromSource(2)
+        ];
+        return view('event_organizer.pages.tickets_report')->with($data);
+    }
+
+    public function ticketsSource($source_name){
+        if($source_name=='website'){
+            $source = 1;
+        }else{
+            $source = 2;
+        }
+
+        $tickets_source = $this->getTicketsFromSource($source);
+        $data = [
+            'filter'=>$source_name,
+            'tickets'=>$tickets_source,
+            'tickets_from_web'=>$this->getTicketsFromSource(1),
+            'tickets_from_app'=>$this->getTicketsFromSource(2)
+        ];
+        return view('event_organizer.pages.tickets_report')->with($data);
+    }
+
+    public function getTicketsFromSource($source){
+        $GLOBALS['source'] = $source;
+
         $callback = function($query){
-            $query->where('ticket_customers.source','=',1);
+            $query->where('ticket_customers.source','=',$GLOBALS['source']);
         };
 
-        $tickets_from_web = Ticket::whereHas('ticket_customer',$callback)
+        $tickets = Ticket::whereHas('ticket_customer',$callback)
         ->with(['ticket_customer'=>$callback])
         ->get();
 
-        $data = [
-            'tickets'=>$tickets,
-            'tickets_from_web'=>$tickets_from_web
-        ];
-        return view('event_organizer.pages.tickets_report')->with($data);
+        return $tickets;
     }
 
     public function CheckUserType(){

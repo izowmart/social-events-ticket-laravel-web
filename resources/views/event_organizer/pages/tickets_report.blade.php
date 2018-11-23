@@ -11,8 +11,7 @@
     <main class="app-content">
       <div class="app-title">
         <div>
-          <h1><i class="fa fa-map-marker"></i> Tickets Report</h1>
-          <p>List of all tickets</p>
+          <h1><i class="fa fa-briefcase"></i> Tickets Report</h1>
         </div>
         <ul class="app-breadcrumb breadcrumb">
           <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
@@ -22,17 +21,41 @@
       </div>
       <div class="row">
         <div class="col-md-12">
+          <div class="row">
           <div class="col-md-6 col-lg-3 home-widget">
+            <a href="{{ route('tickets_report') }}">
               <div class="widget-small warning coloured-icon"><i class="icon fa fa-calendar-check-o fa-3x"></i>
                 <div class="info">
-                  <h4>Bought on website</h4>
+                  <h4>Total tickets sold</h4>
+                  <p><b>{{$tickets->count()}}</b></p>
+                </div>
+              </div>
+            </a>
+          </div> 
+          <div class="col-md-6 col-lg-3 home-widget">
+            <a href="{{ route('tickets_source', ['source_name'=>'website']) }}">
+              <div class="widget-small warning coloured-icon"><i class="icon fa fa-calendar-check-o fa-3x"></i>
+                <div class="info">
+                  <h4>Bought from website</h4>
                   <p><b>{{$tickets_from_web->count()}}</b></p>
                 </div>
               </div>
             </a>
           </div>  
+          <div class="col-md-6 col-lg-3 home-widget">
+            <a href="{{ route('tickets_source', ['source_name'=>'app']) }}">
+              <div class="widget-small warning coloured-icon"><i class="icon fa fa-calendar-check-o fa-3x"></i>
+                <div class="info">
+                  <h4>Bought from app</h4>
+                  <p><b>{{$tickets_from_app->count()}}</b></p>
+                </div>
+              </div>
+            </a>
+          </div> 
+          </div>
           <div class="tile">  
             <div class="tile-body">
+              <p>List of all tickets @if ($filter=='website' || $filter=='app') sold from {{$filter}} @endif</p>
               <table class="table table-hover table-bordered" id="adminsTable">
                 <thead>
                   <tr>
@@ -41,6 +64,7 @@
                     <th>Email</th>
                     <th>Phone number</th>
                     <th>Bought from</th>
+                    <th>Bought on</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -57,6 +81,7 @@
                             App                              
                           @endif
                         </td>
+                        <td>{{date("jS M Y, g:i a", strtotime($ticket->ticket_customer->created_at))}}</td>
                     </tr>                        
                     @endforeach                
                 </tbody>

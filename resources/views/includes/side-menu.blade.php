@@ -42,10 +42,10 @@
           <li><a class="treeview-item {{ Route::currentRouteNamed('event_organizer_verified_paid_events') ? 'active' : '' }}" href="{{ route('event_organizer_verified_paid_events') }}"><i class="icon fa fa-check"></i> Verified</a></li>
         </ul>
       </li>  
-      <li class="treeview {{ Route::currentRouteNamed('event_organizer_verified_paid_events') || Route::currentRouteNamed('event_organizer_unverified_paid_events') || Route::currentRouteNamed('event_organizer_verified_paid_events') ? 'is-expanded' : '' }}"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="app-menu__icon fa fa-briefcase"></i><span class="app-menu__label">Reports</span><i class="treeview-indicator fa fa-angle-right"></i></a>
+      <li class="treeview {{ Route::currentRouteNamed('tickets_report') || Route::currentRouteNamed('tickets_source', ['source_name'=>'website']) || Route::currentRouteNamed('tickets_source', ['source_name'=>'app']) ? 'is-expanded' : '' }}"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="app-menu__icon fa fa-briefcase"></i><span class="app-menu__label">Reports</span><i class="treeview-indicator fa fa-angle-right"></i></a>
         <ul class="treeview-menu">
           <li><a class="treeview-item {{ Route::currentRouteNamed('event_organizer_unverified_paid_events') ? 'active' : '' }}" href="{{ route('event_organizer_unverified_paid_events') }}"><i class="icon fa fa-calendar"></i> Events</a></li>
-          <li><a class="treeview-item {{ Route::currentRouteNamed('tickets_report') ? 'active' : '' }}" href="{{ route('tickets_report') }}"><i class="icon fa fa-money"></i> Tickets</a></li>
+          <li><a class="treeview-item {{ Route::currentRouteNamed('tickets_report') || Route::currentRouteNamed('tickets_source', ['source_name'=>'website']) || Route::currentRouteNamed('tickets_source', ['source_name'=>'app']) ? 'active' : '' }}" href="{{ route('tickets_report') }}"><i class="icon fa fa-money"></i> Tickets</a></li>
         </ul>
       </li>  
       @endauth
