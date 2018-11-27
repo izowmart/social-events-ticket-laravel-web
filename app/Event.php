@@ -54,8 +54,8 @@ class Event extends Model
         return $this->tickets()->where('ticket_customer_id','=',$ticket_customer_id);
     }
 
-//    public function tickets()
-//    {
-//        return $this->ticket_category_details()-
-//    }
+    public function tickets()
+    {
+        return $this->hasMany('App\Ticket', 'event_id');
+    }
 }

@@ -28,7 +28,7 @@ class EventTransformer extends TransformerAbstract
                 'type'                  => $event->type,
                 'image_url'             => $event->media_url,
                 'dates'                 => fractal($event->event_dates,EventDateTransformer::class)->withResourceName('dates'),
-                'ticket_categories'     => fractal($event->ticket_categories, $ticket_category_transformer)->withResourceName('ticket_categories'),
+                'ticket_categories'     => fractal($event->ticket_category_details, $ticket_category_transformer)->withResourceName('ticket_categories'),
                 'tickets'               => fractal($event->user_tickets($this->ticket_customer_id)->get(),TicketTransformer::class)->withResourceName('tickets')
             ];
     }
