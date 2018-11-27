@@ -70,11 +70,11 @@
                 <tbody>
                     @foreach ($paid_events as $paid_event)
                     <tr class="item">
-                        <td><a href="{{ route('event_organizer_single_event', ['slug'=>$paid_event->event->slug]) }}">{{$paid_event->event->name}}</a></td>
-                        <td>{{$paid_events_from_web->count()}}</td>
-                        <td>{{$paid_events_from_mobile->count()}}</td>
-                        <td>{{$paid_events_from_web->count()+$paid_events_from_mobile->count()}}</td>
-                        <td>{{$paid_event->price_sum}}</td>
+                        <td><a href="{{ route('event_organizer_single_event', ['slug'=>$paid_event->slug]) }}">{{$paid_event->name}}</a></td>
+                        <td>{{$paid_events_from_web }}</td>
+                        <td>{{$paid_events_from_mobile }}</td>
+                        <td>{{$paid_events_from_web + $paid_events_from_mobile }}</td>
+                        <td>{{$paid_event->total_price}}</td>
                         <td>{{$paid_event->customers}}</td>
                     </tr>                        
                     @endforeach                

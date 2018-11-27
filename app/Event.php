@@ -36,7 +36,7 @@ class Event extends Model
         return $this->hasMany('App\EventDate', 'event_id');
     }
 
-    public function ticket_categories()
+    public function ticket_category_details()
     {
         return $this->hasMany('App\TicketCategoryDetail','event_id');
     }
@@ -49,8 +49,13 @@ class Event extends Model
         return EventSponsorMedia::where('event_id',$this->id)->orderBy('id', 'asc');
     }
 
-    public function tickets($ticket_customer_id)
+    public function user_tickets($ticket_customer_id)
     {
-        return $this->hasMany('App\Ticket', 'event_id')->where('ticket_customer_id','=',$ticket_customer_id);
+        return $this->tickets()->where('ticket_customer_id','=',$ticket_customer_id);
     }
+
+//    public function tickets()
+//    {
+//        return $this->ticket_category_details()-
+//    }
 }

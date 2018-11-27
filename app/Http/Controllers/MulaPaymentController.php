@@ -9,6 +9,7 @@ use App\Payment;
 use App\PaymentRequest;
 use App\PaymentResponse;
 use App\Ticket;
+use App\TicketCategoryDetail;
 use App\TicketCustomer;
 use App\TicketPurchaseRequest;
 use App\User;
@@ -561,14 +562,17 @@ class MulaPaymentController extends Controller
 //        return PDF::loadView( 'tickets.display-tickets', $ticket_template_data)->save( $pdf_dir.'/'.$pdf_name )->stream($pdf_name);
         $pdf = PDF::loadView('tickets.display-tickets', $ticket_template_data)->save($ticket_pdf_path);
 
+        $ticket_category_detail = TicketCategoryDetail::where('event_id', $event_id)
+            ->where('category_id', $ticket_category_id)
+            ->first();
 
         $data = [
-            'event_id'           => $event_id,
-            'ticket_customer_id' => $ticket_customer_id,
-            'validation_token'   => $unique_ticket_identifier,
-            'qr_code_image_url'  => $qr_code_image_name,
-            'pdf_format_url'     => $pdf_name,
-            'ticket_category_id' => $ticket_category_id
+            'event_id'                  => $event_id,
+            'ticket_customer_id'        => $ticket_customer_id,
+            'validation_token'          => $unique_ticket_identifier,
+            'qr_code_image_url'         => $qr_code_image_name,
+            'pdf_format_url'            => $pdf_name,
+            'ticket_category_detail_id' => $ticket_category_detail->id
         ];
 
         //save the tickets records

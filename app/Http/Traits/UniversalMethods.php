@@ -167,8 +167,7 @@ trait UniversalMethods
         $total_available_tickets = (int) $ticket_category_details->no_of_tickets;
 
         //sold tickets
-        $sold_tickets = Ticket::where('event_id', '=', $event_id)
-            ->where('ticket_category_id','=', $ticket_category_id)
+        $sold_tickets = Ticket::where('ticket_category_detail_id','=', $ticket_category_details->id)
             ->count();
 
         //remaining tickets

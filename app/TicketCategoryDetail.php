@@ -12,4 +12,9 @@ class TicketCategoryDetail extends Model
     {
         return $this->belongsTo('App\TicketCategory', 'category_id');
     }
+
+    public function tickets()
+    {
+        return $this->hasMany('App\Ticket','ticket_category_detail_id');
+    }
 }

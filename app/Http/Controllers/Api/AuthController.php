@@ -42,40 +42,43 @@ class AuthController extends Controller
      */
     public function register_user(Request $request)
     {
+        try {
             $validator = Validator::make($request->all(),
                 [
-                    'username' => 'required|alpha_dash|unique:users,username',
+                    'username'   => 'required|alpha_dash|unique:users,username',
                     'first_name' => 'required|string',
-                    'last_name' => 'required|string',
-                    'email' => 'bail|required|email|unique:users,email',
-                    'password' => ['required', new ValidUserScannerPassword()],
+                    'last_name'  => 'required|string',
+                    'email'      => 'bail|required|email|unique:users,email',
+                    'password'   => ['required', new ValidUserScannerPassword()],
                 ],
                 [
-                    'username.required' => 'Please provide a username',
+                    'username.required'   => 'Please provide a username',
                     'first_name.required' => 'Please provide your first name',
-                    'last_name.required' => 'Please provide your last name',
-                    'email.required' => 'Please provide your email',
-                    'email.email' => 'Email address is invalid',
-                    'email.unique' => 'The email address is already in use',
-                    'password.required' => 'Please provide a password',
+                    'last_name.required'  => 'Please provide your last name',
+                    'email.required'      => 'Please provide your email',
+                    'email.email'         => 'Email address is invalid',
+                    'email.unique'        => 'The email address is already in use',
+                    'password.required'   => 'Please provide a password',
                     //                'password.regex'      => 'Password must be at least 6 characters with lowercase and uppercase letters and a number',
                 ]
             );
 
             if ($validator->fails()) {
 
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
-                    'data'    => null
-                ], 200
-            );
-        } else {
-            $password = bcrypt($request->password);
-            $data = $request->except('password');
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
+                        'data'    => null
+                    ], 200
+                );
+            } else {
+                $password = bcrypt($request->password);
+                $data = $request->except('password');
 
                 $data['password'] = $password;
+
+                DB::beginTransaction();
 
                 $user = User::create($data);
 
@@ -90,27 +93,43 @@ class AuthController extends Controller
                     $userTransformer = new UserTransformer();
                     $userTransformer->setUserId($user->id);
 
+                    $data = fractal($user, $userTransformer);
+                    $accessToken = $tokenResult->accessToken;
+                    $expires_at = Carbon::parse(
+                        $tokenResult->token->expires_at
+                    )->toDateTimeString();
+
+                    DB::commit();
                     return response()->json(
                         [
-                            'success' => true,
-                            'message' => 'User Account Created Successfully. Welcome!',
-                            'data' => fractal($user, $userTransformer),
-                            'access_token' => $tokenResult->accessToken,
-                            'expires_at' => Carbon::parse(
-                                $tokenResult->token->expires_at
-                            )->toDateTimeString()
+                            'success'      => true,
+                            'message'      => 'User Account Created Successfully. Welcome!',
+                            'data'         => $data,
+                            'access_token' => $accessToken,
+                            'expires_at'   => $expires_at
                         ], 201
                     );
                 } else {
+                    DB::rollBack();
                     return response()->json(
                         [
                             'success' => false,
                             'message' => 'User Account Creation Failed!',
-                            'data' => [],
+                            'data'    => [],
                         ], 500
                     );
                 }
             }
+        } catch ( \Exception $exception ) {
+            DB::rollBack();
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'User Account Creation Failed!',
+                    'data'    => [],
+                ], 500
+            );
+        }
         }
 
     public function update_user_profile(Request $request)

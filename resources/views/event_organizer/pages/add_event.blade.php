@@ -38,7 +38,7 @@
           <div class="tile">              
             <div class="tile-body">
               <form method="POST" autocomplete="off" action="{{ route('add_event_post') }}" enctype="multipart/form-data">
-                {{ csrf_field() }}
+                  @csrf
                   <div class="row">
                     <div class="col-md-10">
                         <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
@@ -421,9 +421,9 @@
   }); 
 
   function appendRows(category_name) {
-      name = category_name.toLowerCase().split(' ').join('_');
-      id = name+"_category".split(' ').join('_');
-      label = category_name;
+       var name = category_name.toLowerCase().split(' ').join('_');
+      var id = name+"_category".split(' ').join('_');
+      var label = category_name;
       var content = "<div class='row' id='"+name+"_div'><div class='col-md-4'><div class='form-group'><label class='control-label'>"+label+" Amount</label><div class='form-group'><label class='sr-only' for='exampleInputAmount'>Amount (in shillings)</label><div class='input-group'><div class='input-group-prepend'><span class='input-group-text'>Ksh</span></div><input class='form-control' id='"+id+"_amount' value='' name='"+name+"_amount' type='number' min='1' placeholder='Amount to be paid' required><div class='input-group-append'><span class='input-group-text'>.00</span></div></div></div></div></div><div class='col-md-3'><div class='form-group'><label class='control-label'>"+label+" No. of tickets</label><input class='form-control' type='number' id='"+id+"_tickets' name='"+name+"_tickets' value='' placeholder='Maximum number of tickets' required></div></div></div></div>";     
       $("#append-row").append(content).slideDown("slow");
       $("#"+name+"_div").hide();
@@ -433,10 +433,13 @@
   }
   $("form").submit(function(e){
     if($('#paid').is(':checked') && $('.ticket_type_checkbox:checkbox:checked').length < 1){
+        console.log("here");
         e.preventDefault();            
         $('#event_type_error').text('For paid event, you have to select at least one ticket type')
     } else{
+        console.log("here");
         $('form').unbind('submit').submit();
+
     }        
   });
 

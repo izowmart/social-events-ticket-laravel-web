@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\CommonPages;
 
+use App\TicketCustomer;
 use Exception;
+use function foo\func;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
@@ -700,19 +702,34 @@ class EventsController extends Controller
     }
 
     public function paidEventsReports(){
-        // FIX ME:
-        $paid_events = Event::join('tickets','tickets.event_id','=','events.id')
-                ->join('ticket_category_details','ticket_category_details.category_id','=','tickets.ticket_category_id')
-                ->selectRaw("events.*,tickets.ticket_category_id, count(DISTINCT tickets.ticket_customer_id) as customers, sum(ticket_category_details.price) as total_price")
-                // ->whereNotNull('tickets.ticket_category_id')
-                ->groupBy(['events.id','tickets.ticket_category_id'])->get(); 
+        // FIXME:
+        $paid_events = Event::join('ticket_category_details','ticket_category_details.event_id','=','events.id')
+            ->join('tickets','tickets.ticket_category_detail_id','=','ticket_category_details.id')
+            ->join('ticket_customers','tickets.ticket_customer_id','=','ticket_customers.id')
+            ->selectRaw("events.*, tickets.ticket_category_detail_id ,count(DISTINCT tickets.ticket_customer_id) as customers, sum(ticket_category_details.price) as total_price")
+            ->groupBy(['events.id'])
+            ->get();
+
+
+
+//        foreach ($paid_events as  &$event){
+//            $event['from_web'] += $event->source == TicketCustomer::SOURCE_WEB ? 1 : 0;
+//            $event['from_app'] += $event->source == TicketCustomer::SOURCE_APP ? 1 : 0;
+//
+//        };
+//            ->mapToGroups(function ($event,$key){
+//            return $event;//[$event['status'] => $event];
+//        });
+
+//        dd($paid_events);
+
         $data = [
             'filter'=>'all',
             'paid_events'=>$paid_events,
-            'paid_events_from_web'=>$this->getTicketsFromSource(1),
-            'paid_events_from_mobile'=>$this->getTicketsFromSource(2)
+            'paid_events_from_web'=> 2,//$events->has(TicketCustomer::SOURCE_WEB) ? $events[TicketCustomer::SOURCE_WEB]->count() : 0,
+            'paid_events_from_mobile'=> 2, //$events->has(TicketCustomer::SOURCE_APP) ? $events[TicketCustomer::SOURCE_APP]->count() : 0,
         ];
-        dd($data);
+
         return view('admin.pages.paid_events_reports')->with($data);
     }
 
