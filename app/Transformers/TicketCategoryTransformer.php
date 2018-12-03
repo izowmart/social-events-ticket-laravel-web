@@ -2,9 +2,7 @@
 
 namespace App\Transformers;
 
-use App\EventTicketCategory;
 use App\Http\Traits\UniversalMethods;
-use App\TicketCategory;
 use App\TicketCategoryDetail;
 use League\Fractal\TransformerAbstract;
 
