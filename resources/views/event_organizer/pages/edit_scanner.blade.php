@@ -1,5 +1,9 @@
 @extends('common_pages.layouts')
 
+@section('title')
+    <title>Edit Scanner - Event Organizer Fika Places</title>
+@endsection
+
 @section('content')
     @include('includes.header')
     @include('includes.side-menu')
@@ -14,15 +18,15 @@
           <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
           <li class="breadcrumb-item"><a href="{{ route('admin_home') }}">Home</a></li>
           <li class="breadcrumb-item"><a href="{{ route('event_organizer_unverified_events') }}">Events</a></li>
-          <li class="breadcrumb-item"><a href="{{ route('scanners') }}">Scanners</a></li>
-          <li class="breadcrumb-item"><a href="{{ route('edit_scanner') }}">Edit</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('scanners',['event_slug',$event_slug]) }}">Scanners</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('edit_scanner',['event_slug',$event_slug,'scanner_id'=>Crypt::encrypt($scanner->id)]) }}">Edit</a></li>
         </ul>
       </div>
       <div class="row">
         <div class="col-md-12">
           <div class="tile">              
             <div class="tile-body">
-              <form method="POST" action="{{ route('edit_scanner_post') }}">
+              <form method="POST" action="{{ route('edit_scanner_post',['event_slug',$event_slug]) }}">
                 {{ csrf_field() }}
                   <div class="row">
                     <div class="col-md-6">
@@ -30,7 +34,7 @@
                         <label>First name</label>
                         <input type="text" class="form-control" value="{{$scanner->first_name}}" placeholder="The scanner's first name" name="first_name" required/>  
                         <input type="hidden" name="scanner_id" value="{{$scanner->id}}"> 
-                        <input type="hidden" name="event_status" value="{{$event_status}}">
+                        <input type="hidden" name="event_slug" value="{{$event_slug}}">
                         @if ($errors->has('first_name'))
                             <span class="help-block">
                                 <strong>{{ $errors->first('first_name') }}</strong>
@@ -66,7 +70,6 @@
                   <div class="tile-footer">
                     <button class="btn btn-primary" type="submit">Submit</button>
                   </div>
-
               </form>              
             </div>
           </div>

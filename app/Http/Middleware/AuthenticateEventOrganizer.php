@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 //Auth Facade
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class AuthenticateEventOrganizer
 {

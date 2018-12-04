@@ -1,10 +1,7 @@
 @extends('common_pages.layouts')
 
-@section('testing-styles')
-<style>
-
-</style>
-    
+@section('title')
+    <title>Venues - Admin Fika Places</title>
 @endsection
 
 @section('content')
@@ -36,6 +33,8 @@
                     <th>Contact person name</th>
                     <th>Contact person phone</th>
                     <th>Contact person email</th>
+                    <th>Image</th>
+                    <th>Featured</th>
                     <th>Location</th>
                     <th>Action</th>
                   </tr>
@@ -48,6 +47,18 @@
                         <td>{{$venue->contact_person_name}}</td>
                         <td>{{$venue->contact_person_phone}}</td>
                         <td>{{$venue->contact_person_email}}</td>
+                        <td><img height="100px" width="100px" src="{{asset('/venue_images/'.$venue->venue_image)}}"></td>
+                        <td>
+                          @if($venue->featured_status==0)
+                          <button onClick="featureBtn('{{$venue->id}}')" class="btn btn-sm btn-outline-primary">Feature</button>
+                          <form id="feature_venue_{{$venue->id}}" action="{{ route('feature_venue') }}" method="POST" style="display: none;">
+                              {{ csrf_field() }}
+                              <input type="hidden" name="id" value="{{$venue->id}}">
+                              <input type="hidden" name="featured_description" value="" id="featured_description_{{$venue->id}}">
+                          </form>
+                          @else
+                          <a class="btn btn-sm btn-outline-danger" href="{{route('unfeature_venue',['slug'=>$venue->slug])}}"> Unfeature</a>
+                          @endif
                         <td>
                             <a target="_blank" href="https://maps.google.com/maps?q={{$venue->latitude}},{{$venue->longitude}}" class="btn btn-sm btn-outline-primary">View</a>
                         </td>
@@ -98,6 +109,29 @@
       	});
   }
   
+</script>
+<script >
+  function featureBtn(id) {
+    swal({
+  title: "Feature this venue?",
+  text: "Add a catchy description of the venue:",
+  type: "input",
+  showCancelButton: true,
+  closeOnConfirm: false,
+  inputPlaceholder: "Venue's description"
+}, function (inputValue) {
+    if (inputValue === false) return false;
+    if (inputValue === " ") {
+      swal.showInputError("You need to write something!");
+      return false
+    }
+    $form = "feature_venue_"+id;
+    $featured = "featured_description_"+id;
+    document.getElementById($featured).value = inputValue;
+    document.getElementById($form).submit();
+  });
+
+}
 </script>
 @if (session('status'))
     <script type="text/javascript">

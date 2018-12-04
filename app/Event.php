@@ -31,13 +31,31 @@ class Event extends Model
     public function scanners(){
         return $this->hasMany('App\EventScanner','event_id');
     }
-    public function events_dates()
+    public function event_dates()
     {
-        return $this->belongsTo('App\EventDate', 'event_id');
+        return $this->hasMany('App\EventDate', 'event_id');
+    }
+
+    public function ticket_category_details()
+    {
+        return $this->hasMany('App\TicketCategoryDetail','event_id');
+    }
+
+    public function sponsor_media(){
+        return $this->hasMany('App\EventSponsorMedia','event_id')->orderBy('id', 'asc');
+    }
+
+    public function getEventSponsorMedia() {
+        return EventSponsorMedia::where('event_id',$this->id)->orderBy('id', 'asc');
+    }
+
+    public function user_tickets($ticket_customer_id)
+    {
+        return $this->tickets()->where('ticket_customer_id','=',$ticket_customer_id);
     }
 
     public function tickets()
     {
-        return $this->hasMany('App\EventTicketCategory','event_id');
+        return $this->hasMany('App\Ticket', 'event_id');
     }
 }

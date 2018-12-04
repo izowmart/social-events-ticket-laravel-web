@@ -1,5 +1,9 @@
 @extends('common_pages.layouts')
 
+@section('title')
+    <title>Edit Venue - Admin Fika Places</title>
+@endsection
+
 @section('other-styles')
 <style>
 <link rel="stylesheet" type="text/css" href="//github.com/downloads/lafeber/world-flags-sprite/flags16.css" />
@@ -28,7 +32,7 @@
         <div class="col-md-12">
           <div class="tile">              
             <div class="tile-body">
-              <form method="POST" action="{{ route('edit_venue_post') }}">
+              <form method="POST" action="{{ route('edit_venue_post') }}" enctype="multipart/form-data">
                 {{ csrf_field() }}
                   <div class="row">
                     <div class="col-md-10">
@@ -111,6 +115,14 @@
                       </div>
                     </div>
                   </div>
+                  <div class="row">
+                    <div class="col-md-10">
+                      <div class="form-group">
+                        <label>Image of the venue (optional)</label>
+                        <input type="file" class="form-control-file" name="venue_image" value="{{ $venue->venue_image}}" >
+                      </div>
+                    </div> 
+                  </div>
                   <div class="tile-footer">
                     <button class="btn btn-primary" type="submit">Submit</button>
                   </div>
@@ -124,7 +136,7 @@
 @endsection
 
 @section('other-scripts')
-<script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=true&libraries=places&key=AIzaSyBO5Else2rW4UNyXiCMp3y20JV7BseTMys"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=true&libraries=places&key=AIzaSyAWMiw7tAqWan2iOUqRzzM2BGQ9z6Pe8wI"></script>
 <script src="https://cdn.jsdelivr.net/npm/places.js@1.10.0"></script>
 <script src="{{ asset('js/plugins/jquery.placepicker.js') }}"></script>
 <script>

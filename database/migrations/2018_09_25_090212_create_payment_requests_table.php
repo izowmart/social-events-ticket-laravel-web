@@ -21,8 +21,8 @@ class CreatePaymentRequestsTable extends Migration
             $table->integer('ticket_customer_id')->unsigned();
             $table->foreign('ticket_customer_id')->references('id')->on('ticket_customers');
             $table->string('amount');
-            $table->integer('vip_quantity');
-            $table->integer('regular_quantity');
+//            $table->integer('vip_quantity');
+//            $table->integer('regular_quantity');
             $table->integer('payment_request_status')->default(0)->comment('0: pending, 1: accepted, 2: declined');
             $table->timestamps();
         });

@@ -1,5 +1,9 @@
 @extends('common_pages.layouts')
 
+@section('title')
+    <title>Home - Admin Fika Places</title>
+@endsection
+
 @section('content')
     @include('includes.header')
     @include('includes.side-menu')
@@ -63,7 +67,7 @@
               </div>
             </div>
           </a>
-        </div>  ` 
+        </div> 
         <div class="col-md-6 col-lg-3 home-widget">
           <a href="{{ route('posts') }}" @if ($abuses->count()>0)
             data-toggle="tooltip" title="{{$abuses->count()}} abuse(s) from {{$posts_with_abuse->count()}} post(s)"

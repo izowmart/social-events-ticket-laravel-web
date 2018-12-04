@@ -12,3 +12,5 @@ npm-debug.log
 yarn-error.log
 .env
 /public/uploads/
+/public/bought_tickets/
+/public/venue_images/

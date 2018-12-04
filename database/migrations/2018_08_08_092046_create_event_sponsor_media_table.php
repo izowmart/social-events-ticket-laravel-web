@@ -15,6 +15,7 @@ class CreateEventSponsorMediaTable extends Migration
     {
         Schema::create('event_sponsor_media', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('media_url');
             $table->integer('event_id')->unsigned();
             $table->foreign('event_id')->references('id')->on('events');
             $table->timestamps();

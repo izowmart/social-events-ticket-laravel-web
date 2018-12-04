@@ -23,7 +23,10 @@ class CreateVenuesTable extends Migration
             $table->string('contact_person_name');
             $table->string('contact_person_phone');
             $table->string('contact_person_email');
+            $table->string('venue_image');
             $table->integer('status')->default(1)->comment('0- inactive, 1 - active, 2 - deactivated');
+            $table->integer('featured_status')->default(0)->comment('0 - not featured, 1 - featured');
+            $table->string('featured_description')->nullable();
             $table->string('slug');
             $table->timestamps();
         });

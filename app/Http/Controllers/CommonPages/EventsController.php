@@ -2,30 +2,37 @@
 
 namespace App\Http\Controllers\CommonPages;
 
+use App\TicketCustomer;
+use Exception;
+use function foo\func;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+
 use App\Event;
+use App\Ticket;
 use App\EventSponsorMedia;
 use App\EventDate;
 use App\EventPrice;
+use App\Classes\Slim;
 use App\Scanner;
 use App\EventScanner;
 use App\TicketCategory;
 use App\TicketCategoryDetail;
+use DB;
 
 class EventsController extends Controller
 {
     //admin redirect path
     protected $VerifiedPaidredirectPath = 'admin/events/verified/paid';
-    protected $VerifiedFreeredirectPath = 'admin/events/verified/free';
+    protected $FreeredirectPath = 'admin/events/free';
     protected $UnverifiedredirectPath = 'admin/events/unverified';
 
     //event organizer redirect path
     protected $EventOrganizerVerifiedPaidredirectPath = 'event_organizer/events/verified/paid';
-    protected $EventOrganizerVerifiedFreeredirectPath = 'event_organizer/events/verified/free';
+    protected $EventOrganizerFreeredirectPath = 'event_organizer/events/free';
     protected $EventOrganizerUnverifiedredirectPath = 'event_organizer/events/unverified';
 
     public function showAddForm(){
@@ -34,16 +41,60 @@ class EventsController extends Controller
 
     }
 
+    public function showAddTicketTemplate($slug){
+        $event = Event::where('slug',$slug)->first();
+        //make sure the event is not yet verified by admin or is not a free event
+        if($event->status==1 || $event->type==1){
+            return redirect($this->EventOrganizerVerifiedPaidredirectPath);            
+        }
+        $event_dates = EventDate::select('id','start','end')->where('event_id',$event->id)->get();
+        $ticket_category_details = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.category_id','ticket_categories.slug','ticket_categories.name')
+                                    ->join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
+                                    ->where('event_id', $event->id)
+                                    ->get();
+        $data = array(
+            'event'=>$event,
+            'event_dates'=>$event_dates,
+            'ticket_category_details'=>$ticket_category_details
+        );   
+        return view('event_organizer.pages.select_ticket_template')->with($data);
+
+    }
+
+    public function saveTicketTemplate(Request $request){
+        $this->validate($request, [
+            'ticket_template'=>'required|numeric',
+            'event_id'=>'required|numeric'
+        ]); 
+        $event = Event::find($request->event_id);
+        $event->ticket_template = $request->ticket_template;
+        //we update the staus to unverified onl if it was draft
+        if($event->status==3){
+            $event->status = 0;
+        }
+        $event->save();
+
+        //Give message after successfull operation
+        $request->session()->flash('status', 'Ticket template updated successfully');
+
+        return redirect($this->EventOrganizerUnverifiedredirectPath);
+        
+
+    }
+
     public function showEditForm($slug){
         $ticket_categories = TicketCategory::all();
         
-        $event = Event::select('events.id','events.name','events.slug','events.description','events.location','events.latitude','events.longitude','events.type','events.slug','event_sponsor_media.media_url')
-                    ->join('event_sponsor_media', 'event_sponsor_media.event_id', '=', 'events.id')
+        $event = Event::select('events.id','events.name','events.slug','events.description','events.status','events.location','events.latitude','events.longitude','events.type','events.slug','events.media_url','events.ticket_sale_end_date')
                     ->where('events.slug',$slug)
                     ->orderBy('id','desc')
                     ->first();
+        //allow edit for free events and paid events that are not verified only
+        if($event->status==1 && $event->type!=1){
+            return redirect($this->EventOrganizerVerifiedPaidredirectPath);            
+        }
         $event_dates = EventDate::select('id','start','end')->where('event_id',$event->id)->get();
-        $ticket_category_details = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.ticket_sale_end_date','ticket_category_details.category_id','ticket_categories.slug','ticket_categories.name')
+        $ticket_category_details = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.category_id','ticket_categories.slug','ticket_categories.name')
                                     ->join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
                                     ->where('event_id', $event->id)
                                     ->get();
@@ -54,7 +105,6 @@ class EventsController extends Controller
             'ticket_categories'=>$ticket_categories,
             'ticket_category_details'=>$ticket_category_details
         );   
-        //dd($data);
 
         return view('event_organizer.pages.edit_event')->with($data);
 
@@ -62,34 +112,21 @@ class EventsController extends Controller
 
     public function store(Request $request){
                         
+        try{
         $this->validate($request, [
             'name'=>'required',
             'description'=>'required',            
             'location'=>'required',
             'type'=>'required',
-            'image'=>'image',
+            'ticket_sale_end_date'=>'nullable|date',
+            'event_image'=>'required|array',
+            'event_sponsor_image'=>'nullable|array'
         ]); 
 
-        //check if its paid event and validate required fields
-        // if($request->type==2){
-        //     //get selected categories
-        //     $ticket_category = TicketCategory::find($single_category);
-        //     $ticket_slug = $ticket_category->slug;
-        // }
-
-        // Handle image upload
-
-        $filenameWithExt = $request->file('image')->getClientOriginalName();
-        //get just file name
-        $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-        //get just ext
-        $extension = $request->file('image')->getClientOriginalExtension();
-        //file name to store
-        $fileNameToStore = 'event'.'_'.time().'.'.$extension;
-        //upload image
-        $path = $request->file('image')->storeAs('public/images/events',$fileNameToStore);
-
+        
         $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
+
+        // dd(Auth::guard('web_event_organizer')->user()->id,$event_organizer_id);
 
         $event = new Event();
         $event->name = $request->name;
@@ -98,166 +135,142 @@ class EventsController extends Controller
         $event->longitude = $request->longitude;
         $event->latitude = $request->latitude;
         $event->description = $request->description;
-        $event->media_url = $fileNameToStore;
-        $event->type = $request->type;
-        $event->save();
-
-        $event_id = $event->id;
-
-        foreach ($request->dates as $date) {
-            //echo 'start: '.$date['start']. 'stop: '.$date['stop'].'<br>';
-            $event_date = new EventDate();
-            $event_date->event_id = $event_id;
-            $event_date->start = date('Y-m-d H:i:s',strtotime($date['start']));
-            $event_date->end = date('Y-m-d H:i:s',strtotime($date['stop']));
-            $event_date->save();
+        //if it is paid event we insert ticket_sale_end_date and set status to draft
+        if($request->type==2 && $request->has('ticket_sale_end_date')){
+            $event->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->ticket_sale_end_date));
+            $event->status = 3;
         }
+        $event->media_url = $this->uploadImage('event_image','/public/storage/images/events',0);
+        $event->type = $request->type;
+        //if its a free event we set to verified
+        if($request->type==1){
+            $event->status = 1;
+        }
+        $event->save();
+        $this->insertEventDates($request->dates,$event->id);
 
-        // $event_sponsor_media = new EventSponsorMedia();
-        // $event_sponsor_media->event_id = $event_id;
-        // $event_sponsor_media->media_url = $fileNameToStore;
-        // $event_sponsor_media->save();
+        if($request->has('sponsor_images_checkbox')) {
+            if($request->event_sponsor_image['0']!=null){
+                //insert the event sponsor media images
+                $this->insertEventSponsorImages($request->event_sponsor_image,$event->id);
+    
+            }
+        }               
 
         //insert price and category if it's a paid event
         if($request->type==2){
-
-            foreach($request->category as $single_category){
-                //get the slug of category from db
-                $ticket_category = TicketCategory::find($single_category);
-                $ticket_slug = $ticket_category->slug;
-                //creat names for inputs
-                $amount = $ticket_slug.'_amount';
-                $tickets = $ticket_slug.'_tickets';
-                $ticket_sale_end_date = $ticket_slug.'_ticket_sale_end_date';
-
-                $ticket_category_details = new TicketCategoryDetail;
-                $ticket_category_details->event_id = $event_id;
-                $ticket_category_details->category_id = $ticket_category->id;
-                $ticket_category_details->price = $request->$amount;
-                $ticket_category_details->no_of_tickets = $request->$tickets;
-                $ticket_category_details->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->$ticket_sale_end_date));
-                $ticket_category_details->save();
-                
-            }
+            $this->insertTicketCategoryDetails($request,$event->id);
         }
 
-        //Give message after successfull operation
-        $request->session()->flash('status', 'Event added successfully');
-        return redirect($this->EventOrganizerUnverifiedredirectPath);
+        if($request->type==1){
+            //if free event
+            $request->session()->flash('status', 'Event added successfully');
+            return redirect($this->EventOrganizerFreeredirectPath);
+        }else{
+            //for paid event redirect to choose ticket template            
+            $request->session()->flash('status', 'Event added successfully. Choose the ticket template');
+            return redirect('event_organizer/events/add/ticket-template/'.$event->slug);
+        }
+    }catch(Exception $exception){
+        logger("event creation failed: ".$exception->getMessage());
+
+            return redirect()->back()->withInput();
+    }
 
     }
 
     public function update(Request $request){
-        //dd($request->all());
         $this->validate($request, [
             'name'=>'required',
             'description'=>'required',            
             'location'=>'required',
             'type'=>'required',
-        ]); 
-
-        //check if its paid event and validate required fields
-        // if($request->type==2){
-        //     //get selected categories
-        //     $ticket_category = TicketCategory::find($single_category);
-        //     $ticket_slug = $ticket_category->slug;
-        // }
-
-        // check if image was updated
-        if ($request->hasFile('image')) {
-            // Handle image upload
-            $filenameWithExt = $request->file('image')->getClientOriginalName();
-            //get just file name
-            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-            //get just ext
-            $extension = $request->file('image')->getClientOriginalExtension();
-            //file name to store
-            $fileNameToStore = 'event'.'_'.time().'.'.$extension;
-            //upload image
-            $path = $request->file('image')->storeAs('public/images/events',$fileNameToStore);
-
-            //delete the previous image
-            unlink(public_path('storage/images/events/'.$request->previous_image_url));
-        }
+            'ticket_sale_end_date'=>'nullable|date',
+            'event_image'=>'nullable|array'
+        ]);         
 
         $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-
         $event = Event::find($request->id);
-
         //get previous event type before updating event
         $prev_event_type = $event->type;
-
         $event->name = $request->name;
         $event->event_organizer_id = $event_organizer_id;
         $event->location = $request->location;
         $event->longitude = $request->longitude;
         $event->latitude = $request->latitude;
         $event->description = $request->description;
-        $event->media_url = $fileNameToStore;
+        //if its a free event we set to verified
+        if($request->type==1){
+            $event->status = 1;
+        }
+        //if it is paid event we insert ticket_sale_end_date
+        if($request->type==2&&$request->has('ticket_sale_end_date')){
+            $event->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->ticket_sale_end_date));
+        }
+        // check if image was updated
+        if($request->event_image['0']!=null){
+            $event->media_url = $this->uploadImage('event_image','/public/storage/images/events',0);
+            //delete the previous image
+            unlink(public_path('storage/images/events/'.$event->previous_image_url));
+            // unlink(public_path('storage/images/events/'.$request->previous_image_url));
+        }
         $event->type = $request->type;
-
         $event->save();
 
         $event_id = $event->id;
 
+        if($request->has('sponsor_images_checkbox')) {
+            if($request->event_sponsor_image['0']!=null){
+                //we delete all previous images if they exist
+                $this->deleteSponsorImages($event->id);
+                //insert the new event sponsor media images
+                $this->insertEventSponsorImages($request->event_sponsor_image,$event->id);    
+            }
+        } else{
+            //if its unchecked delete if its present on db
+            $this->deleteSponsorImages($event->id);
+        }
+
         //delete previous dates and insert new ones
         $event_date = EventDate::where('event_id',$event_id);
         $event_date->delete();
-        foreach ($request->dates as $date) {
-            $event_date = new EventDate();
-            $event_date->event_id = $event_id;
-            $event_date->start = date('Y-m-d H:i:s',strtotime($date['start']));
-            $event_date->end = date('Y-m-d H:i:s',strtotime($date['stop']));
-            $event_date->save();
-        }
-
-        if ($request->hasFile('image')) {
-            $event_sponsor_media = EventSponsorMedia::where('event_id',$event_id)->first();
-            $event_sponsor_media->media_url = $fileNameToStore;
-            $event_sponsor_media->save();
-        }
+        $this->insertEventDates($request->dates,$event_id);
 
         //check if it was a paid event and changed to free. If so we will delete its record from ticket_category_details table
         if($request->type==1 && $prev_event_type==2){
             $ticket_category_details = TicketCategoryDetail::where('event_id',$request->id);
             $ticket_category_details->delete();
             
+        }else{
+            //else if it was a free and change to paid, we set event status to unverified
+            $event->status = 0;
+            $event->save();
         }
 
         //update price and category if it's a paid event
         if($request->type==2){
             //delete all its records from ticket_category_details table and insert the new ones
             $ticket_category_details = TicketCategoryDetail::where('event_id',$request->id);
-            $ticket_category_details->delete();
-            
-            foreach($request->category as $single_category){
-                //get the slug of category from db
-                $ticket_category = TicketCategory::find($single_category);
-                $ticket_slug = $ticket_category->slug;
-                //creat names for inputs
-                $amount = $ticket_slug.'_amount';
-                $tickets = $ticket_slug.'_tickets';
-                $ticket_sale_end_date = $ticket_slug.'_ticket_sale_end_date';
-
-                $ticket_category_details = new TicketCategoryDetail;
-                $ticket_category_details->event_id = $event_id;
-                $ticket_category_details->category_id = $ticket_category->id;
-                $ticket_category_details->price = $request->$amount;
-                $ticket_category_details->no_of_tickets = $request->$tickets;
-                $ticket_category_details->ticket_sale_end_date = date('Y-m-d H:i:s',strtotime($request->$ticket_sale_end_date));
-                $ticket_category_details->save();
-                
-            }           
+            $ticket_category_details->delete();            
+            $this->insertTicketCategoryDetails($request,$event_id);
         }
 
         //Give message after successfull operation
         $request->session()->flash('status', 'Event updated successfully');
 
+        //if the user checked that he needs to update ticket template. But first we ensure the sponsor images are there
+        if($request->has('sponsor_images_checkbox')) {
+            if($request->has('update_ticket_template_checkbox')) {
+                return redirect('event_organizer/events/add/ticket-template/'.$event->slug);
+            }
+            
+        }
+
         //redirect event organizer to approproate place
         $event_status = $event->status;
-        if($request->type==1 && $event_status!=0){
-            //if free event and not unverified
-            return redirect($this->EventOrganizerVerifiedFreeredirectPath);
+        if($request->type==1){
+            //if free event
+            return redirect($this->EventOrganizerFreeredirectPath);
 
         }else if($request->type==2 && $event_status!=0){
             //if paid event and not unverified
@@ -271,17 +284,103 @@ class EventsController extends Controller
 
     }
 
+    //Expects the image name, the storage location of the image and the image array index
+    public function uploadImage($image_name,$storage_location,$index){
+
+        // Pass Slim's getImages the name of your file input
+        $images = Slim::getImages($image_name);
+
+        $image = $images[$index];
+        // Grab the ouput data (data modified after Slim has done its thing)
+        if ( isset($image['output']['data']) )
+        {
+            // Original file name
+            $name = $image['output']['name'];
+
+            // Base64 of the image
+            $data = $image['output']['data'];
+
+            // Server path
+            $path = base_path() . $storage_location;
+
+            // Save the file to the server
+            $file = Slim::saveFile($data, $name, $path);
+
+            return $file['name'];
+
+        } 
+        
+    }
+
+    public function insertEventSponsorImages($images,$event_id){
+        for ($i=0; $i < count($images); $i++) { 
+            if($images[$i]!=null){                
+                $event_sponsor_media = new EventSponsorMedia();
+                $event_sponsor_media->event_id = $event_id;
+                $event_sponsor_media->media_url = $this->uploadImage('event_sponsor_image','/public/storage/images/event_sponsors',$i);
+                $event_sponsor_media->save();
+            }
+        }
+        return;
+    }
+
+    public function insertEventDates($dates,$event_id){
+        foreach ($dates as $date) {
+            //echo 'start: '.$date['start']. 'stop: '.$date['stop'].'<br>';
+            $event_date = new EventDate();
+            $event_date->event_id = $event_id;
+            $event_date->start = date('Y-m-d H:i:s',strtotime($date['start']));
+            $event_date->end = date('Y-m-d H:i:s',strtotime($date['stop']));
+            $event_date->save();
+        }
+        return;
+    }
+
+    public function insertTicketCategoryDetails($request,$event_id){
+        foreach($request->category as $single_category){
+            //get the slug of category from db
+            $ticket_category = TicketCategory::find($single_category);
+            $ticket_slug = $ticket_category->slug;
+            //creat names for inputs
+            $amount = $ticket_slug.'_amount';
+            $tickets = $ticket_slug.'_tickets';
+
+            $ticket_category_details = new TicketCategoryDetail;
+            $ticket_category_details->event_id = $event_id;
+            $ticket_category_details->category_id = $ticket_category->id;
+            $ticket_category_details->price = $request->$amount;
+            $ticket_category_details->no_of_tickets = $request->$tickets;
+            $ticket_category_details->save();
+            
+        }
+        return;
+
+    }
+
+    public function showSingleEvent($slug){
+        $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','events.media_url','events.featured_event','event_organizers.id as event_organizer_id','event_organizers.first_name','event_organizers.last_name')
+                    ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
+                    ->where('slug',$slug)
+                    ->get();
+        $data=array(
+            'type'=>'single',
+            'events'=>$events
+            );
+        return view('common_pages.events')->with($data);
+
+    }
+
     public function Unverifiedindex(){
         $user = $this->CheckUserType();
         if($user=="Admin"){
-            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.id as event_organizer_id','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','events.media_url','events.featured_event','event_organizers.id as event_organizer_id','event_organizers.first_name','event_organizers.last_name')
                     ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
                     ->where('events.status',0)
                     ->get();
         }else{
             //we will search for events that belong to current event organizer only
             $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.media_url','events.type','events.status','events.created_at','events.featured_event','event_organizers.first_name','event_organizers.last_name')
                     ->where('events.status',0)
                     ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
                     ->where('events.event_organizer_id',$event_organizer_id)                    
@@ -299,7 +398,7 @@ class EventsController extends Controller
     public function UnverifiedPaidindex(){
         $user = $this->CheckUserType();
         if($user=="Admin"){
-            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.id as event_organizer_id','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.featured_event','events.created_at','events.media_url','event_organizers.id as event_organizer_id','event_organizers.first_name','event_organizers.last_name')
                     ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
                     ->where('events.type',2)
                     ->where('events.status',0)
@@ -307,7 +406,7 @@ class EventsController extends Controller
         }else{
             //we will search for events that belong to current event organizer only
             $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.media_url','events.type','events.status','events.created_at','events.featured_event','event_organizers.first_name','event_organizers.last_name')
                     ->where('events.type',2)
                     ->where('events.status',0)
                     ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
@@ -323,37 +422,37 @@ class EventsController extends Controller
 
     }
 
-    public function UnverifiedFreeindex(){
-        $user = $this->CheckUserType();
-        if($user=="Admin"){
-            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.id as event_organizer_id','event_organizers.first_name','event_organizers.last_name')
-                    ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
-                    ->where('events.type',1)
-                    ->where('events.status',0)
-                    ->get();
-        }else{
-            //we will search for events that belong to current event organizer only
-            $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
-                    ->where('events.type',1)
-                    ->where('events.status',0)
-                    ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
-                    ->where('events.event_organizer_id',$event_organizer_id)                    
-                    ->get();
+    // public function UnverifiedFreeindex(){
+    //     $user = $this->CheckUserType();
+    //     if($user=="Admin"){
+    //         $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.id as event_organizer_id','event_organizers.first_name','event_organizers.last_name')
+    //                 ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
+    //                 ->where('events.type',1)
+    //                 ->where('events.status',0)
+    //                 ->get();
+    //     }else{
+    //         //we will search for events that belong to current event organizer only
+    //         $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
+    //         $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+    //                 ->where('events.type',1)
+    //                 ->where('events.status',0)
+    //                 ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
+    //                 ->where('events.event_organizer_id',$event_organizer_id)                    
+    //                 ->get();
 
-        }
-        $data=array(
-           'type'=>'unverified free',
-           'events'=>$events
-        );
-        return view('common_pages.events')->with($data);
+    //     }
+    //     $data=array(
+    //        'type'=>'unverified free',
+    //        'events'=>$events
+    //     );
+    //     return view('common_pages.events')->with($data);
 
-    }
+    // }
 
     public function VerifiedPaidindex(){
         $user = $this->CheckUserType();
         if($user=="Admin"){
-            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.featured_event','events.media_url','events.created_at','event_organizers.first_name','event_organizers.last_name')
                 ->where('events.type',2)
                 ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
                 ->whereIn('events.status',[1,2])
@@ -361,7 +460,7 @@ class EventsController extends Controller
         }else{
             //we will search for events that belong to current evenet organizer only
             $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.media_url','events.status','events.created_at','events.featured_event','event_organizers.first_name','event_organizers.last_name')
                 ->where('events.type',2)
                 ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
                 ->whereIn('events.status',[1,2])
@@ -377,43 +476,40 @@ class EventsController extends Controller
         return view('common_pages.events')->with($data);        
     }
 
-    public function VerifiedFreeindex(){
+    public function Freeindex(){
         $user = $this->CheckUserType();
         if($user=="Admin"){
-            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.description','events.location','events.type','events.status','events.featured_event','events.media_url','events.created_at','event_organizers.first_name','event_organizers.id as event_organizer_id','event_organizers.last_name')
                     ->where('events.type',1)
                     ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
-                    ->whereIn('events.status',[1,2])
                     ->get();
         }else{
             //we will search for events that belong to current evenet organizer only
             $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.created_at','event_organizers.first_name','event_organizers.last_name')
+            $events = Event::select('events.id','events.name','events.slug','events.description','events.location','events.type','events.status','events.media_url','events.created_at','events.featured_event','event_organizers.first_name','event_organizers.last_name')
                     ->where('events.type',1)
                     ->join('event_organizers', 'event_organizers.id', '=', 'events.event_organizer_id')
-                    ->whereIn('events.status',[1,2])
                     ->where('events.event_organizer_id',$event_organizer_id) 
                     ->get();
 
         }
         $data=array(
-           'type'=>'verified free',
+           'type'=>'free',
            'events'=>$events
         );
-        return view('common_pages.events')->with($data);  
+        return view('common_pages.events')->with($data); 
         
     }
 
     public function verify(Request $request)
     {
-        $id = $request->id;
-        $type = $request->type;
-        $event = Event::find($id);
-        
+        $id = Crypt::decrypt($request->id);
+
+        $event = Event::find($id);        
         $event->status=1;
         $event->save();
-        $request->session()->flash('status', 'Verified successfully');
-           
+
+        $request->session()->flash('status', 'Verified successfully');           
         return redirect($this->UnverifiedredirectPath);
         
         
@@ -422,7 +518,7 @@ class EventsController extends Controller
 
     public function activate(Request $request)
     {        
-        $id = $request->id;
+        $id = Crypt::decrypt($request->id);
         $type = $request->type;
         $event = Event::find($id);
         
@@ -431,8 +527,8 @@ class EventsController extends Controller
         $request->session()->flash('status', 'Activated successfully');
 
         //check where the request came from and redirect back to that page
-        if ($type=="verified free") {            
-            return redirect($this->VerifiedFreeredirectPath);
+        if ($type=="free") {            
+            return redirect($this->FreeredirectPath);
         } else {            
             return redirect($this->VerifiedPaidredirectPath);
         }
@@ -441,7 +537,7 @@ class EventsController extends Controller
 
     public function deactivate(Request $request)
     {        
-        $id = $request->id;
+        $id = Crypt::decrypt($request->id);
         $type = $request->type;
         $event = Event::find($id);
         
@@ -450,20 +546,59 @@ class EventsController extends Controller
         $request->session()->flash('status', 'Deactivated successfully');
 
         //check where the request came from and redirect back to that page
-        if ($type=="verified free") {            
-            return redirect($this->VerifiedFreeredirectPath);
+        if ($type=="free") {            
+            return redirect($this->FreeredirectPath);
         } else {            
             return redirect($this->VerifiedPaidredirectPath);
         }
         
     }
 
+    public function updateFeaturedEvent(Request $request){
+        $this->validate($request, [
+            'id'=>'required',
+            'featured_event_to'=>'required'
+        ]); 
+        if($request->featured_event_to=='yes'){
+            $status = 1;
+            $message = 'marked';
+        }else{
+            $status = 2;
+            $message = 'removed';
+        }
+
+        $event = Event::find(Crypt::decrypt($request->id));
+        $event->featured_event = $status;
+        $event->save();
+
+        $request->session()->flash('status', 'The event was '.$message.' as featured event');
+
+        //redirect admin to approproate place
+        $event_status = $event->status;
+        $event_type = $event->type;
+        if($event_type==1){
+            //if free event
+            return redirect($this->FreeredirectPath);
+
+        }else if($event_type==2 && $event_status!=0){
+            //if paid event and not unverified
+            return redirect($this->VerifiedPaidredirectPath);
+
+        }else{
+            //if its unverified
+            return redirect($this->UnverifiedredirectPath);
+
+        }
+
+    }
+
     public function destroy(Request $request){
-        $event = Event::find($request->id);
+        $event_id = Crypt::decrypt($request->id);
+        $event = Event::find($event_id);
         $event_status = $event->status;
         if($request->type==1 && $event_status!=0){
             //if free event and not unverified
-            $redirect = redirect($this->EventOrganizerVerifiedFreeredirectPath);
+            $redirect = redirect($this->EventOrganizerFreeredirectPath);
 
         }else if($request->type==2 && $event_status!=0){
             //if paid event and not unverified
@@ -477,7 +612,7 @@ class EventsController extends Controller
 
         //first delete scanners if they exist
         if($event->scanners->count()>0){
-            $event_scanners = EventScanner::where('event_id',$request->id)->get();
+            $event_scanners = EventScanner::where('event_id',$event_id)->get();
             foreach($event_scanners as $event_scanner){                
                 $scanner = Scanner::find($event_scanner->scanner_id);                
                 $scanner->delete();
@@ -489,20 +624,19 @@ class EventsController extends Controller
         //check if its paid event
         if($event->type==2){
             //delete ticket_category_details table
-            $ticket_category_details = TicketCategoryDetail::where('event_id',$request->id);
+            $ticket_category_details = TicketCategoryDetail::where('event_id',$event_id);
             $ticket_category_details->delete();
         }
 
-        //delete event_sponsor_media table
-        $event_sponsor_media = EventSponsorMedia::where('event_id',$request->id);
-        $event_sponsor_media->delete();
+        //delete event_sponsor_media 
+        $this->deleteSponsorImages($event_id);
 
         //delete event_dates table
-        $event_dates = EventDate::where('event_id',$request->id);
+        $event_dates = EventDate::where('event_id',$event_id);
         $event_dates->delete();
 
         //delete image
-        Storage::delete('images/events/'.$event->image_url);
+        unlink(public_path('storage/images/events/'.$event->media_url));
 
         //finally delete events table
         $event->delete();
@@ -511,6 +645,97 @@ class EventsController extends Controller
         return $redirect;
 
     } 
+
+    public function deleteSponsorImages($event_id){
+        //check if record exist first
+        if(EventSponsorMedia::where('event_id',$event_id)->count()>0){
+            $sponsor_images = EventSponsorMedia::where('event_id',$event_id)->get();
+            foreach($sponsor_images as $single_sponser_image){
+                //delete image
+                unlink(public_path('storage/images/event_sponsors/'.$single_sponser_image->media_url));
+                $single_sponser_image->delete();                
+            }
+
+        }
+        return;
+    }
+
+    public function ticketsReport(){
+        $tickets = Ticket::all(); 
+
+        $data = [
+            'filter'=>'all',
+            'tickets'=>$tickets,
+            'tickets_from_web'=>$this->getTicketsFromSource(1),
+            'tickets_from_mobile'=>$this->getTicketsFromSource(2)
+        ];
+        return view('event_organizer.pages.tickets_report')->with($data);
+    }
+
+    public function ticketsSource($source_name){
+        if($source_name=='website'){
+            $source = 1;
+        }else{
+            $source = 2;
+        }
+
+        $tickets_source = $this->getTicketsFromSource($source);
+        $data = [
+            'filter'=>$source_name,
+            'tickets'=>$tickets_source,
+            'tickets_from_web'=>$this->getTicketsFromSource(1),
+            'tickets_from_mobile'=>$this->getTicketsFromSource(2)
+        ];
+        return view('event_organizer.pages.tickets_report')->with($data);
+    }
+
+    public function getTicketsFromSource($source){
+        $callback = function($query) use($source){
+            $query->where('ticket_customers.source',$source);
+        };
+
+        $tickets = Ticket::whereHas('ticket_customer',$callback)
+        ->with(['ticket_customer'=>$callback])
+        ->get();
+
+        return $tickets;
+    }
+
+    public function paidEventsReports(){
+        // FIXME:
+        $paid_events = Event::join('ticket_category_details','ticket_category_details.event_id','=','events.id')
+            ->join('tickets','tickets.ticket_category_detail_id','=','ticket_category_details.id')
+            ->join('ticket_customers','tickets.ticket_customer_id','=','ticket_customers.id')
+            ->selectRaw("events.*, tickets.ticket_category_detail_id ,count(DISTINCT tickets.ticket_customer_id) as customers, sum(ticket_category_details.price) as total_price")
+            ->groupBy(['events.id'])
+            ->get();
+
+
+
+//        foreach ($paid_events as  &$event){
+//            $event['from_web'] += $event->source == TicketCustomer::SOURCE_WEB ? 1 : 0;
+//            $event['from_app'] += $event->source == TicketCustomer::SOURCE_APP ? 1 : 0;
+//
+//        };
+//            ->mapToGroups(function ($event,$key){
+//            return $event;//[$event['status'] => $event];
+//        });
+
+//        dd($paid_events);
+
+        $data = [
+            'filter'=>'all',
+            'paid_events'=>$paid_events,
+            'paid_events_from_web'=> 2,//$events->has(TicketCustomer::SOURCE_WEB) ? $events[TicketCustomer::SOURCE_WEB]->count() : 0,
+            'paid_events_from_mobile'=> 2, //$events->has(TicketCustomer::SOURCE_APP) ? $events[TicketCustomer::SOURCE_APP]->count() : 0,
+        ];
+
+        return view('admin.pages.paid_events_reports')->with($data);
+    }
+
+    public function paidEventsSource($source_name){
+
+    }
 
     public function CheckUserType(){
         //we check whether the logged in user is admin or event organizer

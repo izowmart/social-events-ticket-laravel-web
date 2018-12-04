@@ -25,7 +25,7 @@ class VenuesController extends Controller
      */
     public function index()
     {
-        $venues = Venue::select('venues.id','venues.slug','venues.name as venue_name','venues.contact_person_name','venues.contact_person_phone','venues.contact_person_email','venues.latitude','venues.longitude','towns.id as town_id','towns.name as town_name')
+        $venues = Venue::select('venues.id','venues.slug','venues.name as venue_name','venues.contact_person_name','venues.contact_person_phone','venues.contact_person_email','venues.latitude','venues.longitude','venues.venue_image','venues.featured_status','towns.id as town_id','towns.name as town_name')
                 ->join('towns', 'towns.id', '=', 'venues.town_id')
                 ->get();
         return view('admin.pages.venues')->with('venues',$venues); 
@@ -44,7 +44,7 @@ class VenuesController extends Controller
     {
         $towns = Town::orderBy('name','asc')->get();
         return view('admin.pages.add_venue')->with('towns',$towns); 
-    }
+    } 
 
     public function showEditForm($slug)
     {
@@ -67,18 +67,17 @@ class VenuesController extends Controller
 
     public function store(Request $request)
     {
-        
-        $this->validate($request, [
-            'venue_name'=>'required',
-            'longitude'=>'required',
-            'latitude'=>'required',
-            'town_id'=>'required',
-            'contact_person_name'=>'required',
-            'contact_person_phone'=>'required',
-            'contact_person_email'=>'required'
-        ]); 
 
-        
+        $this->validate($request, [
+                'venue_name'=>'required',
+                'longitude'=>'required',
+                'latitude'=>'required',
+                'town_id'=>'required',
+                'contact_person_name'=>'required',
+                'contact_person_phone'=>'required',
+                'contact_person_email'=>'required',
+            ]); 
+        $featured_status = $request->featured;
         $venue = new Venue();
         $venue->name = $request->venue_name;
         $venue->town_id = $request->town_id;
@@ -87,10 +86,30 @@ class VenuesController extends Controller
         $venue->contact_person_name = $request->contact_person_name;
         $venue->contact_person_phone = $request->contact_person_phone;
         $venue->contact_person_email = $request->contact_person_email;
+        if(empty($featured_status)) {
+            $featured_status = 0;
+        }
+        $venue->featured_status = $featured_status;
+        $venue->featured_description = $request->featured_description;
+        if ($request->hasFile('venue_image')) {
+            $this->validate($request,[
+                'venue_image' => 'image: jpg,png,jpeg',
+            ]);
+            $name = $request->file('venue_image')->getClientOriginalName();
+            $filename = time().'_'. $name;
+            $request->file('venue_image')->move('venue_images', $filename);
+            $venue->venue_image = $filename;
+
+        }
+        else
+        {
+            $filename = 'pin.jpeg';
+            $venue->venue_image = $filename;
+        }
         
         $venue->save();
 
-        //Give message to admin after successfull registration
+        //Give message to admin after successful registration
         $request->session()->flash('status', 'Venue added successfully');
         return redirect($this->redirectPath);
     } 
@@ -101,16 +120,17 @@ class VenuesController extends Controller
     {
         
         $this->validate($request, [
-            'id'=>'required',
             'venue_name'=>'required',
             'longitude'=>'required',
             'latitude'=>'required',
             'town_id'=>'required',
             'contact_person_name'=>'required',
             'contact_person_phone'=>'required',
-            'contact_person_email'=>'required'
+            'contact_person_email'=>'required',
         ]); 
-        
+
+
+
         $venue = Venue::find($request->id);
         $venue->town_id = $request->town_id;
         $venue->name = $request->venue_name;
@@ -119,6 +139,18 @@ class VenuesController extends Controller
         $venue->contact_person_name = $request->contact_person_name;
         $venue->contact_person_phone = $request->contact_person_phone;
         $venue->contact_person_email = $request->contact_person_email;
+        // $venue->venue_image = $filename;
+
+        if ($request->hasFile('venue_image')) {
+            $this->validate($request,[
+                'venue_image' => 'image: jpg,png,jpeg',
+            ]);
+            $name = $request->file('venue_image')->getClientOriginalName();
+            $filename = time().'_'. $name;
+            $request->file('venue_image')->move('venue_images', $filename);
+            $venue->venue_image = $filename;
+
+        }
         
         $venue->save();
 
@@ -134,6 +166,23 @@ class VenuesController extends Controller
         $venue->delete();
         //Give message to admin after successfull operation
         $request->session()->flash('status', 'Venue deleted successfully');
+        return redirect($this->redirectPath);
+    }
+
+    public function featureVenue(Request $request)
+    {
+        $venue = Venue::find($request->id);
+        $venue->featured_status = !$venue->featured_status;
+        $venue->featured_description = $request->featured_description;
+        $venue->save();
+        return redirect($this->redirectPath);
+    }
+
+    public function unfeatureVenue($slug)
+    {
+        $venue = Venue::where('slug', '=', $slug)->first();
+        $venue->featured_status = !$venue->featured_status;
+        $venue->save();
         return redirect($this->redirectPath);
     }
 }

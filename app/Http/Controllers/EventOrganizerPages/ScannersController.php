@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\EventOrganizerPages;
 
+use App\Http\Traits\UniversalMethods;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -22,17 +24,17 @@ class ScannersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index($event_slug)
     {
+        $event = Event::select('id','name','slug')->where('slug',$event_slug)->first();
         $scanners = Scanner::select('scanners.id','scanners.first_name','scanners.last_name','scanners.email','events.status as event_status')
                     ->join('event_scanners', 'event_scanners.scanner_id','=','scanners.id')
                     ->join('events', 'events.id','=','event_scanners.event_id')
-                    ->where('event_scanners.event_id', '=', $request->id)
+                    ->where('event_scanners.event_id', '=', $event->id)
                     ->get();
         $data = array(
             'scanners'=>$scanners,
-            'event_id'=>$request->id,
-            'event_name'=>$request->event_name
+            'event'=>$event,
         );
         return view('event_organizer.pages.scanners')->with($data);
     }
@@ -42,9 +44,10 @@ class ScannersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function showAddForm(Request $request)
+    public function showAddForm($event_slug)
     {
-        return view('event_organizer.pages.add_scanner')->with('event_id',$request->id);
+        $event = Event::select('id','slug','name')->where('slug',$event_slug)->first();
+        return view('event_organizer.pages.add_scanner')->with('event',$event);
     }
 
     /**
@@ -52,12 +55,12 @@ class ScannersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function showEditForm(Request $request)
+    public function showEditForm($event_slug,$scanner_id)
     {
-        $scanner = Scanner::find($request->id);
+        $scanner = Scanner::find(Crypt::decrypt($scanner_id));
         $data = array(
             'scanner'=>$scanner,
-            'event_status'=>$request->event_status
+            'event_slug'=>$event_slug
         );
         return view('event_organizer.pages.edit_scanner')->with($data);
     }
@@ -70,16 +73,15 @@ class ScannersController extends Controller
      */
     public function store(Request $request)
     {
-        //REMEMBER TO OPTIMIZE THIS FUNCTION!!!
         $this->validate($request, [
             'first_name'=>'required',
             'last_name'=>'required',
             'email'=>'required|email|max:255|unique:scanners'
         ]); 
 
-        $event_id = $request->event_id;
+        $event_id = Crypt::decrypt($request->event_id);
         $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
-        $password = substr(md5(microtime()),rand(0,26),8);
+        $password = UniversalMethods::passwordGenerator();
 
         $scanner = new Scanner();
         $scanner->event_organizer_id = $event_organizer_id;
@@ -89,11 +91,8 @@ class ScannersController extends Controller
         $scanner->password = bcrypt($password);
         $scanner->save();
 
-        $scanner_details = Scanner::where('email',$request->email)->first();
-        $scanner_id = $scanner_details->id;
-
         $event_scanner = new EventScanner();
-        $event_scanner->scanner_id = $scanner_id;
+        $event_scanner->scanner_id = $scanner->id;
         $event_scanner->event_id = $event_id;
         $event_scanner->save();
                 
@@ -102,30 +101,20 @@ class ScannersController extends Controller
         $event_name = $request->event_name;
 
         $data = array('name'=>$request->first_name,'email'=>$request->email,'password'=>$password,'event_name'=>$event_name);
-        Mail::send('event_organizer.scanner_mail', $data, function($message) use ($email) {
-            $message->to($email)->subject
-                ('Added as scanner');
-            $message->from('xyz@gmail.com','FIKA');
+        $beautymail = app()->make(\Snowfire\Beautymail\Beautymail::class);
+        $beautymail->send('event_organizer.scanner_mail', $data, function($message) use ($email,$first_name)
+        {
+            $message
+                ->from('noreply@fikaplaces.com','Fika Places')
+                ->to($email, $first_name)
+                ->subject('Registered as scanner');
         });
 
         //Give message after successfull operation
         $request->session()->flash('status', 'Scanner added successfully');
+        
+        return redirect('event_organizer/events/'.$request->event_slug.'/scanners');
 
-        //redirect event organizer to approproate place;
-        $event_status = $request->status;
-        if($request->type==1 && $event_status!=0){
-            //if free event and not unverified
-            return redirect($this->EventOrganizerVerifiedFreeredirectPath);
-
-        }else if($request->type==2 && $event_status!=0){
-            //if paid event and not unverified
-            return redirect($this->EventOrganizerVerifiedPaidredirectPath);
-
-        }else{
-            //if its unverified
-            return redirect($this->EventOrganizerUnverifiedredirectPath);
-
-        }
 
     }
 
@@ -154,21 +143,7 @@ class ScannersController extends Controller
         //Give message after successfull operation
         $request->session()->flash('status', 'Scanner updated successfully');
 
-        //redirect event organizer to approproate place;
-        $event_status = $request->event_status;
-        if($request->type==1 && $event_status!=0){
-            //if free event and not unverified
-            return redirect($this->EventOrganizerVerifiedFreeredirectPath);
-
-        }else if($request->type==2 && $event_status!=0){
-            //if paid event and not unverified
-            return redirect($this->EventOrganizerVerifiedPaidredirectPath);
-
-        }else{
-            //if its unverified
-            return redirect($this->EventOrganizerUnverifiedredirectPath);
-
-        }
+        return redirect('event_organizer/events/'.$request->event_slug.'/scanners');
 
     }
 
@@ -185,21 +160,9 @@ class ScannersController extends Controller
         $event_scanner->delete();
         $scanner->delete();
         $event_status = $request->status;
-        if($request->type==1 && $event_status!=0){
-            //if free event and not unverified
-            $redirect = redirect($this->EventOrganizerVerifiedFreeredirectPath);
-
-        }else if($request->type==2 && $event_status!=0){
-            //if paid event and not unverified
-            $redirect = redirect($this->EventOrganizerVerifiedPaidredirectPath);
-
-        }else{
-            //if its unverified
-            $redirect = redirect($this->EventOrganizerUnverifiedredirectPath);
-
-        }
+        
         //Give message to event organizer after successfull operation
         $request->session()->flash('status', 'Scanner deleted successfully');
-        return $redirect;
+        return redirect('event_organizer/events/'.$request->event_slug.'/scanners');
     }
 }

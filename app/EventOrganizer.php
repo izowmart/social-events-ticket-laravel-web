@@ -28,4 +28,9 @@ class EventOrganizer extends Authenticatable
     {
         $this->notify(new EventOrganizerResetPasswordNotification($token));
     }
+
+    public function getNameAttribute()
+    {
+        return $this->first_name.' '.$this->last_name;
+    }
 }

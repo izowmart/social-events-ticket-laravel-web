@@ -11,109 +11,114 @@ namespace App\Http\Controllers\Api;
 
 use App\Event;
 use App\Http\Traits\UniversalMethods;
-use App\PaymentRequest;
-use App\PaymentResponse;
+use App\TicketCategoryDetail;
 use App\TicketCustomer;
-use Illuminate\Support\Facades\Request;
+use App\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class MulaPaymentController
 {
-    public $secretKey;
-    public $ivKey;
-
-    public function __construct()
+    public function initiate_payment(Request $request)
     {
-        $this->secretKey = "rHkgZYVKnCGLXFRb";
-        $this->ivKey = "HtJBgFPQh3qwcRmk";
+        try {
 
-    }
+            $validator = Validator::make($request->all(),
+                [
+                    'tickets'                               => 'required|array',
+                    'tickets.*.ticket_category_detail_id'   => 'required|integer|exists:ticket_category_details,id',
+                    'tickets.*.no_of_tickets'               => 'required|integer',
+                ],
+                [
+                    'tickets.required'                              => 'invalid request',
+                    'tickets.array'                                 => 'invalid value',
+                    'tickets.*.ticket_category_detail_id.required'  => 'invalid value',
+                    'tickets.*.ticket_category_detail_id.integer'   => 'invalid value',
+                    'tickets.*.ticket_category_detail_id.exists'    => 'ticket details are incorrect',
+                    'tickets.*.no_of_tickets.required'              => 'invalid request',
+                    'tickets.*.no_of_tickets.integer'               => 'correctly enter the number of tickets'
+                ]);
 
-    public function initiate_payment($user_id, $event_id)
-    {
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' => 'failed because of ' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray())
+                ]);
+            }
 
-//        $validator = Validator::make($data_array,
-//            [
-//                'event_id' => 'required|integer|exists:events,id',
-//                'customer_id' => 'required|integer|exists:ticket_customers,id',
-//            ],
-//            [
-//                'event_id.required' => 'event id required',
-//                'event_id.integer' => 'event id integer',
-//                'event_id.exists' => 'event id must exists',
-//                'customer_id.required' => 'customer id required',
-//                'customer_id.integer' => 'customer id integer',
-//                'customer_id.exists' => 'customer id exists',
-//
-//            ]);
-//
-//        if ($validator->fails()) {
-//            return response()->json([
-//                'message' => 'failed because of '.UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray())
-//            ]);
-//        }
+            $user = $request->user();
+           //process the information for the tickets purchase request
+            $tickets = $request->tickets;
+            $data_array=[];
+            $event_id = 0;
+            $event = new Event();
+            $total = 0;
+            foreach ($tickets as $ticket)  {
+                //get the ticket_category_detail_id & the no_of_tickets the client would want to purchase
+                $ticket_category_detail_id = $ticket['ticket_category_detail_id'];
+                $no_of_tickets = $ticket['no_of_tickets'];
+
+                $ticket_category_detail = TicketCategoryDetail::find($ticket_category_detail_id);
+
+                $event_id = $ticket_category_detail->event_id;
+                $event = Event::find($event_id);
+                $category_slug = $ticket_category_detail->category->slug;
+
+                $ticket_sale_end_date_time = $event->ticket_sale_end_date;
+                $total += $no_of_tickets*(int)$ticket_category_detail->price;
+
+                $data_array['ticket_sale_end_date_time'] = $ticket_sale_end_date_time;
+                $data_array[$category_slug.'_quantity'] = $no_of_tickets;
+            }
+
+            $data_array['subtotal'] = $total;
 
 
-        //$event_id = $data_array['event_id'];
-        $ticket_customer_id = $user_id;//$data_array['customer_id'];
+            $ticket_customer = TicketCustomer::updateOrCreate(
+                [
+                    'email' => $user->email,
+                ],
+                [
+                    'phone_number' => UniversalMethods::formatPhoneNumber($user->phone_number),
+                    'first_name'   => $user->first_name,
+                    'last_name'    => $user->last_name,
+                    'user_id'      => $user != null ? $user->id : null,
+                    'source'       => TicketCustomer::SOURCE_APP,
+                ]
+            );
 
-        $event = Event::find($event_id);
-        $ticket_customer = TicketCustomer::find($ticket_customer_id);
+            DB::beginTransaction();
 
+            list($payload, $encryptedPayload) = UniversalMethods::process_mula_payments($ticket_customer, $data_array,
+                $event, $event_id,false);
 
-        $payload = [
-            "merchantTransactionID" => now()->timestamp."".uniqid(),
-            "customerFirstName"     => $ticket_customer->first_name,
-            "customerLastName"      => $ticket_customer->last_name,
-            "MSISDN"                => UniversalMethods::formatPhoneNumber($ticket_customer->phone_number),
-            "customerEmail"         => $ticket_customer->email,
-            "amount"                => "100", //TODO::get the amount for the type of ticket the customer has decided to purchase
-            "currencyCode"          => "KES",
-            "accountNumber"         => "123456",
-            "serviceCode"           => "APISBX3857",
-            "dueDate"               => "2018-10-24 11:09:59", //TODO::this is to be replaced by the ticket_sale_end_date_time
-            "serviceDescription"    => "Payment for ".$event->name,
-            "accessKey"             => '$2a$08$Ga/jSxv1qturlAr8SkHhzOaprXnfOJUTqB6fLRrc/0nSYpRlAd96e',
-            "countryCode"           => "KE",
-            "languageCode"          => "en",
-            "successRedirectUrl"    =>  route("mobile_success_url"),
-            "failRedirectUrl"       =>  route("mobile_failure_url"),
-            "paymentWebhookUrl"     =>  route("process_payment"),
-        ];
+            DB::commit();
 
-        //attach a pending payment request
-        PaymentRequest::create([
-            'merchantTransactionID'     => $payload['merchantTransactionID'],
-            'MSISDN'                    =>$payload['MSISDN'],
-            'customerEmail'             => $payload['customerEmail'],
-            'amount'                    => $payload['amount']
-        ]);
+            return response()->json([
+                    'success' => true,
+                    'message' => 'params fetched successfully',
+                    'datum'   => [
+                        'params'      => $encryptedPayload,
+                        'accessKey'   => $payload['accessKey'],
+                        'countryCode' => $payload['countryCode']
+                    ]
+                ]
+            );
+        } catch ( \Exception $exception ) {
+            DB::rollBack();
 
-        //The encryption method to be used
-        $encrypt_method = "AES-256-CBC";
+            return response()->json([
+                    'success' => false,
+                    'message' => 'params fetch failed: '.$exception->getMessage().'\n'.$exception->getTraceAsString(),
+                    'datum'   => [
+                        'params'      => null,
+                        'accessKey'   => '',
+                        'countryCode' => ''
+                    ]
+                ]
+            );
 
-        // Hash the secret key
-        $key = hash('sha256', $this->secretKey);
-
-        // Hash the iv - encrypt method AES-256-CBC expects 16 bytes
-        $iv = substr(hash('sha256', $this->ivKey), 0, 16);
-        $encrypted = openssl_encrypt(
-            json_encode($payload, true), $encrypt_method, $key, 0, $iv
-        );
-
-        //Base 64 Encode the encrypted payload
-        $encryptedPayload = base64_encode($encrypted);
-
-//        /*
-        return response()->json([
-            'success'   =>  true,
-            'message'   => 'params fetched successfully',
-            'datum'     => [
-                'params' => $encryptedPayload,
-                'accessKey' => $payload['accessKey'],
-                'countryCode' => $payload['countryCode']
-            ]
-            ]
-        );
+        }
 //         */
 
         /*

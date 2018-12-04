@@ -1,5 +1,13 @@
 @extends('common_pages.layouts')
 
+@section('title')
+    <title>{{ucwords(trans($type))}} @if($type!='single') Events @else Event @endif - @auth('web_admin') Admin @endauth @auth('web_event_organizer') Event Organizer @endauth Fika Places</title>
+@endsection
+
+@section('styles')    
+<link type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css" rel="stylesheet">
+@endsection
+
 @section('content')
     @include('includes.header')
     @include('includes.side-menu')
@@ -18,7 +26,11 @@
               <li class="breadcrumb-item"><a href="{{ route('admin_'.str_replace(' ', '_', $type).'_events') }}">{{ucfirst(trans($type))}} Events</a></li>
           @endauth
           @auth('web_event_organizer')
-              <li class="breadcrumb-item"><a href="{{ route('event_organizer_'.str_replace(' ', '_', $type).'_events') }}">{{ucfirst(trans($type))}} Events</a></li>
+          @if ($type!='single')
+          <li class="breadcrumb-item"><a href="{{ route('event_organizer_'.str_replace(' ', '_', $type).'_events') }}">{{ucfirst(trans($type))}} Events</a></li> 
+          @else
+          <li class="breadcrumb-item"><a href="{{ route('event_organizer_'.str_replace(' ', '_', $type).'_event',['slug'=>$events->first()->slug]) }}">{{ucfirst(trans($type))}} Events</a></li>    
+          @endif              
           @endauth
           
         </ul>
@@ -36,13 +48,17 @@
                     <th>Name</th>
                     <th>Location</th>                   
                     <th>Type</th>
-                    <th>Status</th>
+                    <th>Image</th>
+                    @if ($type!=='free')
+                    <th>Status</th>                        
+                    @endif
                     @auth('web_event_organizer')                        
                     <th>Scanners</th> 
                     @endauth   
                     @auth('web_admin')                
-                    <th>Added by</th>                          
-                    @endauth              
+                    <th>Added by</th>                       
+                    @endauth           
+                    <th>Featured event</th>      
                     <th>Created on</th>
                     <th>Action</th>
                   </tr>
@@ -50,15 +66,23 @@
                 <tbody>
                     @foreach ($events as $event)
                     <tr class="item">
-                        <td>{{str_limit($event->name, $limit = 20, $end = '...')}}</td> 
-                        <td>{{str_limit($event->location, $limit = 15, $end = '...')}}</td>
+                        <td>{{str_limit($event->name, $limit = 55, $end = '...')}}</td> 
+                        <td>{{str_limit($event->location, $limit = 50, $end = '...')}}</td>                        
                         <td>
                             @if ($event->type==1)
                                 {{'free'}}
                             @else                                
                                 {{'paid'}}
                             @endif
-                        </td>                      
+                        </td>   
+                        <td>
+                            <div class="zoom-gallery">
+                                <a href="{{ asset('storage/images/events/'.$event->media_url)}}" data-source="{{ asset('storage/images/events/'.$event->media_url)}}" class="btn btn-sm btn-outline-primary" data-info="{{$event->id}}">
+                                    View
+                                </a>
+                            </div>
+                        </td> 
+                        @if ($type!=='free')                                           
                         <td>
                             @if ($event->status==1)
                                 {{'verified'}}
@@ -67,29 +91,49 @@
                             @else                                
                                 {{'unverified'}}
                             @endif
-                        </td>
+                        </td>                                             
+                        @endif
                         @auth('web_event_organizer') 
                         <td>{{ $event->scanners->count() }}
                             @if ($event->scanners->count()>0)
-                                <a href="{{ route('scanners') }}" onclick="event.preventDefault(); document.getElementById('scanner-form-{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">View</a>
-                                <form id="scanner-form-{{$event->id}}" action="{{ route('scanners') }}" method="POST" style="display: none;">
-                                    {{ csrf_field() }}
-                                    <input type="hidden" name="id" value="{{$event->id}}">
-                                    <input type="hidden" name="event_name" value="{{$event->name}}">
-                                </form>
+                                <a href="{{ route('scanners',['event_slug'=>$event->slug]) }}" class="btn btn-sm btn-outline-primary">View</a>
                             @else
-                                <a href="{{ route('add_scanner') }}" onclick="event.preventDefault(); document.getElementById('scanner-form-{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">Add</a>
-                                <form id="scanner-form-{{$event->id}}" action="{{ route('add_scanner') }}" method="POST" style="display: none;">
-                                    {{ csrf_field() }}
-                                    <input type="hidden" name="id" value="{{$event->id}}">
-                                    <input type="hidden" name="event_name" value="{{$event->name}}">
-                                    <input type="hidden" name="event_status" value="{{$event->status}}">
-                                </form>
+                                <a href="{{ route('add_scanner',['event_slug'=>$event->slug]) }}" class="btn btn-sm btn-outline-primary">Add</a>
                             @endif
                         </td>   
                         @endauth
                         @auth('web_admin')                                               
-                        <td><a href="{{ route('single_event_organizer', ['id'=>Crypt::encrypt($event->event_organizer_id)]) }}">{{$event->first_name}} {{$event->last_name}}</a></td>                             
+                        <td><a href="{{ route('single_event_organizer', ['id'=>Crypt::encrypt($event->event_organizer_id)]) }}">{{$event->first_name}} {{$event->last_name}}</a></td>  
+                        <td>
+                            <div class="btn-group" role="group" aria-label="Button group with nested dropdown"> 
+                            @if ($event->featured_event==2)
+                                <button id="active_status_btn_{{$event->id}}" class="btn btn-primary" type="button">{{'No'}}</button>
+                                <div class="btn-group" role="group">
+                                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right"><a class="dropdown-item" style="cursor: pointer;" onClick="event.preventDefault(); featuredEventBtn({{$event->id}},'yes')">Yes</a></div>
+                                </div>
+                            @else  
+                                <button class="btn btn-success" type="button">{{'Yes'}}</button>    
+                                <div class="btn-group" role="group">
+                                <button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right"><a class="dropdown-item" style="cursor: pointer;" onClick="event.preventDefault(); featuredEventBtn({{$event->id}},'no')">No</a></div>
+                                </div>              
+                            @endif
+                            </div>
+                            <form id="update_featured_event_{{$event->id}}" action="{{ route('admin_update_featured_event') }}" method="POST" style="display: none;">
+                            {{ csrf_field() }}
+                            <input type="hidden" name="id" value="{{Crypt::encrypt($event->id)}}">
+                            <input id="featured_event_to_input_{{$event->id}}" type="hidden" name="featured_event_to" value="">
+                            </form>
+                        </td>                           
+                        @endauth                        
+                        @auth('web_event_organizer')
+                        <td>@if ($event->featured_event==2)
+                            No
+                        @else
+                            Yes
+                        @endif
+                        </td>
                         @endauth
                         <td>{{date("jS M Y, g:i a", strtotime($event->created_at))}}</td>
                         <td>
@@ -99,7 +143,7 @@
                                 <a href="{{ route('admin_verify_event_post') }}" onclick="event.preventDefault(); document.getElementById('verify_form_{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">Verify</a>
                                 <form id="verify_form_{{$event->id}}" action="{{ route('admin_verify_event_post') }}" method="POST" style="display: none;">
                                     {{ csrf_field() }}
-                                    <input type="hidden" name="id" value="{{$event->id}}">
+                                    <input type="hidden" name="id" value="{{Crypt::encrypt($event->id)}}">
                                     <input type="hidden" name="type" value="{{$type}}">
                                 </form>
                             @endif 
@@ -107,7 +151,7 @@
                                 <a href="{{ route('admin_deactivate_event_post') }}" onclick="event.preventDefault(); document.getElementById('deactivate_form_{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">Deactivate</a>
                                 <form id="deactivate_form_{{$event->id}}" action="{{ route('admin_deactivate_event_post') }}" method="POST" style="display: none;">
                                     {{ csrf_field() }}
-                                    <input type="hidden" name="id" value="{{$event->id}}">
+                                    <input type="hidden" name="id" value="{{Crypt::encrypt($event->id)}}">
                                     <input type="hidden" name="type" value="{{$type}}">
                                 </form>
                             @endif 
@@ -115,19 +159,19 @@
                                 <a href="{{ route('admin_activate_event_post') }}" onclick="event.preventDefault(); document.getElementById('activate_form_{{$event->id}}').submit();" class="btn btn-sm btn-outline-primary">Activate</a>
                                 <form id="activate_form_{{$event->id}}" action="{{ route('admin_activate_event_post') }}" method="POST" style="display: none;">
                                     {{ csrf_field() }}
-                                    <input type="hidden" name="id" value="{{$event->id}}">
+                                    <input type="hidden" name="id" value="{{Crypt::encrypt($event->id)}}">
                                     <input type="hidden" name="type" value="{{$type}}">
                                 </form>
                             @endif
                         @endauth
 
                         @auth('web_event_organizer')
-                            <a href="{{ route('edit_event', ['slug'=>$event->slug]) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <a @if ($event->status==1 && $event->type!=1) onclick="vefirifiedEvent();" @else href="{{ route('edit_event', ['slug'=>$event->slug]) }}" @endif class="btn btn-sm btn-outline-primary">Edit</a>
                             
                             <button onClick="deleteBtn({{$event->id}})" class="btn btn-sm btn-outline-danger">Delete</button>
                             <form id="delete_form_{{$event->id}}" action="{{ route('delete_event') }}" method="POST" style="display: none;">
                                 {{ csrf_field() }}
-                                <input type="hidden" name="id" value="{{$event->id}}">
+                                <input type="hidden" name="id" value="{{Crypt::encrypt($event->id)}}">
                             </form>
                         @endauth
                         
@@ -152,7 +196,16 @@
 });</script>
 <script type="text/javascript" src="{{ asset('js/plugins/bootstrap-notify.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/plugins/sweetalert.min.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js"></script>
 <script>
+@auth('web_admin')
+  function featuredEventBtn(id,status_to) {
+    // console.log("Property id: "+id+'\t'+"Status to be updated to: "+status_to+"\n");
+    $('#featured_event_to_input_'+id).val(status_to);
+    $('#update_featured_event_'+id).submit();
+  }
+@endauth
+@auth('web_event_organizer')
   function deleteBtn(id) {    
     swal({
       		title: "Are you sure?",
@@ -172,6 +225,29 @@
       		
       	});
   }
+  function vefirifiedEvent() {    
+    swal({
+      		title: "Not edditable",
+      		text: "You can not edit this event because is alredy verified and visible to users on website.",
+      		type: "error",
+      		showCancelButton: false,
+      		confirmButtonText: "Ok",
+      		closeOnConfirm: false,
+      	});
+  }
+@endauth
+  $(document).ready(function() {
+      $('.zoom-gallery').magnificPopup({
+          delegate: 'a',
+          type: 'image',
+          closeOnContentClick: false,
+          closeBtnInside: false,
+          mainClass: 'mfp-with-zoom mfp-img-mobile',
+          image: {
+              verticalFit: true
+          }            
+      });
+  });
   
 </script>
 @if (session('status'))

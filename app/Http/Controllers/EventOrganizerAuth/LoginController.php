@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 //Auth facade
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -58,9 +58,9 @@ class LoginController extends Controller
         // Check if user was successfully loaded, that the password matches
         // and active is not 1. If so, override the default error message.
         if ($user && \Hash::check($request->password, $user->password) && $user->status == 0) {
-            $errors = [$this->username() => 'Your account is not actived.'];
+            $errors = [$this->username() => 'Your account is not activated.'];
         }else if($user && \Hash::check($request->password, $user->password) && $user->status == 2){
-            $errors = [$this->username() => 'Your account is deactived.'];
+            $errors = [$this->username() => 'Your account is deactivated.'];
         }
         if ($request->expectsJson()) {
             return response()->json($errors, 422);

@@ -10,7 +10,7 @@ use Carbon\Carbon;
 
 class HomeController extends Controller
 {
-    public function index(){        
+    public function index(){
         $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
         //select all events 
         $all_events = Event::select('id')->where('event_organizer_id',$event_organizer_id);

@@ -1,7 +1,12 @@
-@extends('common_pages.layouts')
+@extends('common_pages.layouts') 
+
+@section('title')
+    <title>Add Venue - Admin Fika Places</title>
+@endsection
 
 @section('styles')
 <link rel="stylesheet" type="text/css" href="//github.com/downloads/lafeber/world-flags-sprite/flags16.css" />
+<link rel="stylesheet" type="text/css" href="{{ asset('css/venues.css') }}" />
     
 @endsection
 
@@ -26,7 +31,7 @@
         <div class="col-md-12">
           <div class="tile">              
             <div class="tile-body">
-              <form method="POST" action="{{ route('add_venue_post') }}">
+              <form method="POST" action="{{ route('add_venue_post') }}" enctype="multipart/form-data">
                 {{ csrf_field() }}
                   <div class="row">
                     <div class="col-md-10">
@@ -73,7 +78,7 @@
                     <div class="col-md-6">
                       <div class="form-group">
                         <label>Contact person name</label>
-                        <input type="text" class="form-control" placeholder="Name of the person to be contact" name="contact_person_name" required/>  
+                        <input type="text" class="form-control" placeholder="Name of the person to be contacted" name="contact_person_name" required/>  
                         @if ($errors->has('contact_person_name'))
                             <span class="help-block">
                                 <strong>{{ $errors->first('contact_person_name') }}</strong>
@@ -107,6 +112,23 @@
                       </div>
                     </div>
                   </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Image of the venue (optional)</label>
+                        <input type="file" class="form-control-file" name="venue_image">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <label for="featured" class="btn btn-link">Tick if venue is featured</label>
+                      <input type="checkbox" value="1" id="featured" name="featured">
+                      <input type="text" class="form-control featured_description" placeholder="Enter the description of the venue" name="featured_description">
+                    </div>
+                  </div>
+                </div>
+              </div>
                   <div class="tile-footer">
                     <button class="btn btn-primary" type="submit">Submit</button>
                   </div>
@@ -120,7 +142,7 @@
 @endsection
 
 @section('other-scripts')
-<script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=true&libraries=places&key=AIzaSyBO5Else2rW4UNyXiCMp3y20JV7BseTMys"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=true&libraries=places&key=AIzaSyAWMiw7tAqWan2iOUqRzzM2BGQ9z6Pe8wI"></script>
 <script src="https://cdn.jsdelivr.net/npm/places.js@1.10.0"></script>
 <script src="{{ asset('js/plugins/jquery.placepicker.js') }}"></script>
 <script>

@@ -1,5 +1,9 @@
 @extends('common_pages.layouts')
 
+@section('title')
+    <title>Add Scanner - Event Organizer Fika Places</title>
+@endsection
+
 @section('content')
     @include('includes.header')
     @include('includes.side-menu')
@@ -14,21 +18,23 @@
           <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
           <li class="breadcrumb-item"><a href="{{ route('admin_home') }}">Home</a></li>
           <li class="breadcrumb-item"><a href="{{ route('event_organizer_unverified_events') }}">Events</a></li>
-          <li class="breadcrumb-item"><a href="{{ route('add_scanner') }}">Add scanner</a></li>
+          <li class="breadcrumb-item"><a href="{{ route('add_scanner',['event_slug',$event->slug]) }}">Add scanner</a></li>
         </ul>
       </div>
       <div class="row">
         <div class="col-md-12">
           <div class="tile">              
             <div class="tile-body">
-              <form method="POST" action="{{ route('add_scanner_post') }}">
+              <form method="POST" action="{{ route('add_scanner_post',['event_slug',$event->slug]) }}">
                 {{ csrf_field() }}
                   <div class="row">
                     <div class="col-md-6">
                       <div class="form-group">
                         <label>First name</label>
                         <input type="text" class="form-control" placeholder="The scanner's first name" name="first_name" required/>  
-                        <input type="hidden" name="event_id" value="{{$event_id}}"> 
+                        <input type="hidden" name="event_id" value="{{Crypt::encrypt($event->id)}}"> 
+                        <input type="hidden" name="event_name" value="{{$event->name}}">
+                        <input type="hidden" name="event_slug" value="{{$event->slug}}">
                         @if ($errors->has('first_name'))
                             <span class="help-block">
                                 <strong>{{ $errors->first('first_name') }}</strong>

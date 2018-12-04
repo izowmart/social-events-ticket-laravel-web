@@ -1,7 +1,11 @@
 @extends('common_pages.layouts')
 
-<link rel="stylesheet" type="text/css" href="//github.com/downloads/lafeber/world-flags-sprite/flags16.css" />
-    
+@section('title')
+    <title>Edit Country - Admin Fika Places</title>
+@endsection
+
+@section('styles')
+<link rel="stylesheet" type="text/css" href="//github.com/downloads/lafeber/world-flags-sprite/flags16.css" />    
 @endsection
 
 @section('content')

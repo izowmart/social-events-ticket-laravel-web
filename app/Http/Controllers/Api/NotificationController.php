@@ -27,15 +27,11 @@ class NotificationController extends Controller
             $userTransformer = new UserTransformer();
             $userTransformer->setUserId($user_id);
 
-            $data = [
-                'notifications' => fractal($notifications,NotificationTransformer::class),
-                'users'         => fractal($users,$userTransformer)
-            ];
-
             return Response::json(array(
                     "success" => true,
                     "message" => "found " . count($notifications),
-                    "data" => $data,
+                    'notifications' => fractal($notifications,NotificationTransformer::class),
+                    'users'         => fractal($users,$userTransformer)
                 )
 
             );

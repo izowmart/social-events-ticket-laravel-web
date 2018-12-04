@@ -1,7 +1,8 @@
 @extends('tickets.layouts')
 
 @section('content')
-<div class="row page-row">
+{{-- <div class="row page-row"> --}}
+<div class="row">
     @foreach ($events as $event)
     <div class="col-md-3 col-sm-12">
         <div class="card">
@@ -15,16 +16,6 @@
                 <div class="row">
                     <div class="col-md-6">
                         <p class="dates"><i class="fa fa-calendar-check-o"></i> {{date("jS M Y", strtotime($event->start))}}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p class="price"><i style="font-size: 18px;" class="fa fa-money"></i> 
-                        @if ($event->price==null)
-                            {{'Free'}}
-                        @else
-                            Ksh {{$event->price}}
-                        @endif 
-                        </p>
-
                     </div>
                 </div>
                 <p class="location"><i style="font-size: 18px;" class="fa fa-map-marker"></i> {{$event->location}}</p>
