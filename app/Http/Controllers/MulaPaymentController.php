@@ -529,8 +529,9 @@ class MulaPaymentController extends Controller
         if (!file_exists($qr_code_images_dir)) {
             mkdir($qr_code_images_dir, 0777, true);
         }
+        $timestamp = now()->timestamp;
 
-        $qr_code_image_name = now()->timestamp . ".png";
+        $qr_code_image_name = $timestamp . ".png";
         $qr_code = QrCode::format('png')->size(100)->generate('http://fikaplaces.com/tickets/' . $unique_ticket_identifier,
             $qr_code_images_dir . '/' . $qr_code_image_name);
 
@@ -548,7 +549,7 @@ class MulaPaymentController extends Controller
 
 
         //generate and save pdf
-        $ticket_name = "T" . now()->timestamp . uniqid();
+        $ticket_name = "T" . $timestamp . uniqid();
         $pdf_name = $ticket_name . ".pdf";
         $pdf_dir = public_path('bought_tickets/pdfs');
 
@@ -572,7 +573,8 @@ class MulaPaymentController extends Controller
             'validation_token'          => $unique_ticket_identifier,
             'qr_code_image_url'         => $qr_code_image_name,
             'pdf_format_url'            => $pdf_name,
-            'ticket_category_detail_id' => $ticket_category_detail->id
+            'ticket_category_detail_id' => $ticket_category_detail->id,
+            'unique_ID'                 => $timestamp
         ];
 
         //save the tickets records
