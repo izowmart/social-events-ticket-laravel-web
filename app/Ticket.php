@@ -26,7 +26,7 @@ class Ticket extends Model
 
     public function ticket_category_detail()
     {
-        return $this->hasOne('App\TicketCategoryDetail','ticket_category_detail_id');
+        return $this->hasOne('App\TicketCategoryDetail','id','ticket_category_detail_id');
     }
 
     public function event()
@@ -34,10 +34,10 @@ class Ticket extends Model
         return $this->belongsTo('App\Event', 'event_id');
     }
 
-    public function category()
-    {
-        return $this->belongsTo('App\TicketCategory', 'ticket_category_id');
-    }
+//    public function category()
+//    {
+//        return $this->ticket_category_detail->category();
+//    }
 
     public function ticket_scan()
     {
