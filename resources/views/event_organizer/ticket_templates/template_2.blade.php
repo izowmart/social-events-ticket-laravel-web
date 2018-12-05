@@ -13,6 +13,7 @@
                 @else
                     Paid
                 @endif</p>
+                <p><span>No:</span> #87654321</p>
             </div>
         @if($event->sponsor_media)
         <div class="ticket-end">
@@ -29,8 +30,9 @@
         @endif
         </div>
     </div>
-    <div class="row">
-        <p class="ticket-powered-by" >Powered by FIKA Places <img class="ticket-sponsors" src="{{ asset('FikaIconWhite120x120.jpg') }}"></p>
+    <div class="text-center">
+        <p>Powered by FIKA Places
+        <img class="rounded" src="{{ asset('FikaIconWhite120x120.jpg') }}" alt="logo" style="height: 5%; width: 5%"></p>
     </div>
 </div>
     
