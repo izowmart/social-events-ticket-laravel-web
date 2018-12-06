@@ -31,7 +31,7 @@ class EventTransformer extends TransformerAbstract
                 'dates'                 => fractal($event->event_dates,EventDateTransformer::class)->withResourceName('dates'),
                 'ticket_categories'     => fractal($event->ticket_category_details, $ticket_category_transformer)->withResourceName('ticket_categories'),
                 'tickets'               => fractal($tickets,TicketTransformer::class)->withResourceName('tickets'),
-                'tickets_count'            => count($tickets)
+                'tickets_count'           => count($tickets)
             ];
     }
 
