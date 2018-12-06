@@ -6,14 +6,21 @@
             <div class="ticket-info">
     
                 <p><span>Venue:</span> {{$event->location}}</p>
-                <p><span>Date:</span> {{date("m/d/Y", strtotime($event_dates->first()->start))}} - {{date("m/d/Y", strtotime($event_dates->first()->end))}}</p>
-                <p><span>Time:</span> {{date("g:i a", strtotime($event_dates->first()->start))}} - {{date("g:i a", strtotime($event_dates->first()->end))}}</p>
+                <p><span>Time:</span>
+                <ol>
+                    @foreach($event_dates as $event_date)
+                        <li>{{$event_date}}</li>
+                    @endforeach
+                </ol>
+                </p>
+                {{--<p><span>Date:</span> {{date("m/d/Y", strtotime($event_dates->first()->start))}} - {{date("m/d/Y", strtotime($event_dates->first()->end))}}</p>--}}
+                {{--<p><span>Time:</span> {{date("g:i a", strtotime($event_dates->first()->start))}} - {{date("g:i a", strtotime($event_dates->first()->end))}}</p>--}}
                 <p><span>Category:</span> @if ($event->type==1)
                     Free
                 @else
                     Paid
                 @endif</p>
-                <p><span>No:</span> #87654321</p>
+                <p><span>No:</span> {{isset($ticket_no) ? "#".$ticket_no : "#87654321" }}</p>
             </div>
         @if($event->sponsor_media)
         <div class="ticket-end">

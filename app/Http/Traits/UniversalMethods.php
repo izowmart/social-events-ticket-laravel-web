@@ -14,6 +14,7 @@ use App\Ticket;
 use App\TicketCategoryDetail;
 use App\TicketPurchaseRequest;
 use App\TicketScan;
+use Carbon\Carbon;
 
 trait UniversalMethods
 {
@@ -203,5 +204,37 @@ trait UniversalMethods
                 9) . $lowercaseWord;
 
         return $password;
+    }
+
+
+    /**
+     * @param $event_dates
+     *
+     * @return string
+     */
+    public static function getEventDateTimeStr($event_dates): array
+    {
+        $event_times= [];
+        foreach ($event_dates as  $event_date) {
+            $start_date_time = Carbon::parse($event_date->start);
+
+            $start_year = $start_date_time->year;
+            $start_month = $start_date_time->month;
+            $start_day = $start_date_time->day;
+            $start_date = Carbon::create($start_year, $start_month, $start_day);
+
+            $end_date_time = Carbon::parse($event_date->end);
+
+            $end_year = $end_date_time->year;
+            $end_month = $end_date_time->month;
+            $end_day = $end_date_time->day;
+            $end_date = Carbon::create($end_year, $end_month, $end_day);
+
+            $same = $start_date->eq($end_date);
+
+            $event_time = $same ? Carbon::parse($event_date->start)->toFormattedDateString() . " " . Carbon::parse($event_date->start)->format('h:i A') . " - " . Carbon::parse($event_date->end)->format('h:i A') : Carbon::parse($event_date->start)->toFormattedDateString() . " " . Carbon::parse($event_date->start)->format('h:i A') . " - " . Carbon::parse($event_date->end)->toFormattedDateString() . " " . Carbon::parse($event_date->end)->format('h:i A');
+            array_push($event_times , $event_time);
+        }
+        return $event_times;
     }
 }

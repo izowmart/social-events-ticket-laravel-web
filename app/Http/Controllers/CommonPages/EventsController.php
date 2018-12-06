@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\CommonPages;
 
+use App\Http\Traits\UniversalMethods;
 use App\TicketCustomer;
 use Exception;
 use function foo\func;
@@ -47,14 +48,18 @@ class EventsController extends Controller
         if($event->status==1 || $event->type==1){
             return redirect($this->EventOrganizerVerifiedPaidredirectPath);            
         }
-        $event_dates = EventDate::select('id','start','end')->where('event_id',$event->id)->get();
+        $event_dates = EventDate::select('id','start','end')
+            ->where('event_id',$event->id)
+            ->orderBy('start','ASC')
+            ->get();
+
         $ticket_category_details = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.no_of_tickets','ticket_category_details.category_id','ticket_categories.slug','ticket_categories.name')
                                     ->join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
                                     ->where('event_id', $event->id)
                                     ->get();
         $data = array(
             'event'=>$event,
-            'event_dates'=>$event_dates,
+            'event_dates'=>UniversalMethods::getEventDateTimeStr($event_dates),
             'ticket_category_details'=>$ticket_category_details
         );   
         return view('event_organizer.pages.select_ticket_template')->with($data);

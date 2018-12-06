@@ -539,12 +539,11 @@ class MulaPaymentController extends Controller
         * Prepare the content for the ticket pdf template
         */
         $ticket_template_data = [
-            'event_name'                => $event->name,
-            'event_location'            => $event->location,
-            'event_start_date_time'     => $event_dates->first()->start,
-            'event_end_date_time'       => $event_dates->first()->end,
+            'event'                => $event,
+            'event_dates'                => UniversalMethods::getEventDateTimeStr($event_dates),
             'ticket_type'               => $ticket_type,
             'ticket_qr_code_image_name' => $qr_code_image_name,
+            'ticket_no'                 => $timestamp
         ];
 
 
@@ -559,9 +558,12 @@ class MulaPaymentController extends Controller
 
         $ticket_pdf_path = $pdf_dir . '/' . $pdf_name;
 
+        //select the event template
+        $template = $event->ticket_template == 1 ? "event_organizer.ticket_templates.template_1" : "event_organizer.ticket_templates.template_2";
+
         //create the pdf for each ticket to be shared via email
 //        return PDF::loadView( 'tickets.display-tickets', $ticket_template_data)->save( $pdf_dir.'/'.$pdf_name )->stream($pdf_name);
-        $pdf = PDF::loadView('tickets.display-tickets', $ticket_template_data)->save($ticket_pdf_path);
+        $pdf = PDF::loadView($template, $ticket_template_data)->save($ticket_pdf_path);
 
         $ticket_category_detail = TicketCategoryDetail::where('event_id', $event_id)
             ->where('category_id', $ticket_category_id)

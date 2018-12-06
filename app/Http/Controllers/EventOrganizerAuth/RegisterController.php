@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\EventOrganizerAuth;
 
+use App\Mail\NewEventOrganizerAccount;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 //Validator facade used in validator method
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 //event_organizer Model
 use App\EventOrganizer;
@@ -31,6 +33,13 @@ class RegisterController extends Controller
 
        //Create event_organizer
         $event_organizer = $this->create($request->all());
+
+        $data=[
+            'name' => $event_organizer->name
+        ];
+
+        //send them a welcome email
+        Mail::to($event_organizer)->queue(new NewEventOrganizerAccount($data));
 
         //Give message to event_organizer after successfull registration
         $request->session()->flash('status', 'Regestered successfully, You can proceed to login.');
