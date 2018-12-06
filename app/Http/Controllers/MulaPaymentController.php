@@ -28,16 +28,9 @@ class MulaPaymentController extends Controller
 
     public function __construct()
     {
-        /*
-         *TEST
         $this->secretKey = "CXNjbwmtVcfDYBTh";
         $this->ivKey = "cpZdGWvh4rfB78C9";
-        */
-        /*
-         * PRODUCTION
-         */
-        $this->secretKey = "spjYntujBuOHfulJ";
-        $this->ivKey = "0mdHcgBP4ABYeADK";
+
     }
 
     /*************************************
