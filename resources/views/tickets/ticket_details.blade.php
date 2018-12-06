@@ -323,7 +323,7 @@
           
             $("#"+quantity).on("change paste keyup",function() {
                  $("#subtotal").val(0);
-                 console.log("start: "+main_total);
+                 // console.log("start: "+main_total);
                 var get_price = $("#"+price).text();
                 var get_quantity = $("#"+quantity).val();
                 var get_total_price = get_price * get_quantity;
@@ -337,7 +337,7 @@
                     // add only if the value is number
                     if(!isNaN(value) && value.length != 0) {
                         sum += parseFloat(value);
-                        console.log("sum: " + sum);
+                        // console.log("sum: " + sum);
                     }
                 });
                 $("#subtotal").val(sum);
@@ -352,10 +352,10 @@
             e.preventDefault();
         });
        $('.total').on("change",function() {
-           console.log("On change triggered");
+           // console.log("On change triggered");
            $('.total').each(function(index) {
                var value = $(this).val();
-               console.log("Total: "+value);
+               // console.log("Total: "+value);
            });
         });
         var encryptionURL = "{{route('encryption_url')}}";
@@ -382,7 +382,7 @@
                                                             // elmForm.submit();
    
                                                             var params = $('#myForm').serialize();
-                                                            console.log(params);
+                                                            // console.log(params);
 
                                                              function encrypt() {
                                                                 return fetch(encryptionURL, {
