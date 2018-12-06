@@ -262,7 +262,7 @@
 <script>
  var main_total = 0;
  @if ($event->type==2)
- var total_categories = {{$total_categories}};
+ var total_categories = eval("{{$total_categories}}");
  if($('.sold-out').length==total_categories){
      $('#purchase-btn').remove();
 

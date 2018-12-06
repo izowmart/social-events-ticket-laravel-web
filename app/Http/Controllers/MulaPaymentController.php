@@ -397,6 +397,7 @@ class MulaPaymentController extends Controller
 
             $tickets_array = [];
             $pdfs_array = [];
+            $tickets_count=0;
 
             foreach ($ticket_purchase_requests as $ticket_purchase_request) {
                 /*
@@ -408,6 +409,7 @@ class MulaPaymentController extends Controller
                  */
 
                 $ticket_type_count = $ticket_purchase_request->tickets_count;
+                $tickets_count += $ticket_type_count;
 
                 //loop through given the number of tickets per category
                 for ($i = 0; $i < $ticket_type_count; $i++) {
@@ -429,7 +431,8 @@ class MulaPaymentController extends Controller
             $email_data = [
                 'name'  => $ticket_customer->first_name,
                 'event' => Event::find($event_id),
-                'files' => $pdfs_array
+                'files' => $pdfs_array,
+                'tickets_count' => $tickets_count
             ];
 
             Mail::to($ticket_customer)->queue(new TicketsBought($email_data));
