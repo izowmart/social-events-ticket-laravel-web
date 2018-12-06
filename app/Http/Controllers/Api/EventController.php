@@ -23,6 +23,19 @@ class EventController extends Controller
 
             if ($ticket_customer != null) {
                 $ticket_customer_id = $ticket_customer->id;
+            }else{
+                //check for ticket customer record based on the email
+                $ticket_customer = TicketCustomer::where('email', '=', $user->email)->first();
+
+                if ($ticket_customer != null) {
+                    //update ticket customer details with the user id
+                    TicketCustomer::where('email', '=', $user->email)
+                        ->update([
+                            'user_id' => $user->id
+                        ]);
+
+                    $ticket_customer_id = $ticket_customer->id;
+                }
             }
 
             $events = Event::join('event_dates', 'event_dates.event_id', '=', 'events.id')
