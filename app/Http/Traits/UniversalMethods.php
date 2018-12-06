@@ -65,8 +65,10 @@ trait UniversalMethods
         $event,
         $event_id,
         $from_web = true,
-        $ivKey = "cpZdGWvh4rfB78C9",
-        $secretKey = "CXNjbwmtVcfDYBTh"
+//        $ivKey = "cpZdGWvh4rfB78C9", Test
+        $ivKey = "0mdHcgBP4ABYeADK", //production
+//        $secretKey = "CXNjbwmtVcfDYBTh" TEST
+        $secretKey = "spjYntujBuOHfulJ" //production
 
     ) {
         $merchantTransactionID = now()->timestamp . "" . uniqid();
@@ -83,7 +85,8 @@ trait UniversalMethods
             "serviceCode"           => "FIKDEV8910",
             "dueDate"               => $data_array['ticket_sale_end_date_time'], //TODO::this is to be replaced by the ticket_sale_end_date_time
             "serviceDescription"    => "Payment for " . $event->name,
-            "accessKey"             => '$2a$08$FIRIU0JS9GESx6ePn/wsUuX4aq2HAsJ16qmz/bTYbT4j7lZ9R6r1W',
+//            "accessKey"             => '$2a$08$FIRIU0JS9GESx6ePn/wsUuX4aq2HAsJ16qmz/bTYbT4j7lZ9R6r1W', TEST
+            "accessKey"             => 'ZmQIqoH2u6GSfjm6vPNwhIVUXkj9W8ity6fMdEoyhnVDdYMqjckDlWKAN34U', //PRODUCTION
             "countryCode"           => "KE",
             "languageCode"          => "en",
             "successRedirectUrl"    => $from_web ? route("success_url") : route('mobile_success_url'),
