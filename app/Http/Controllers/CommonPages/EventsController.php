@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\CommonPages;
 
 use App\Http\Traits\UniversalMethods;
+use App\Mail\NewEventVerification;
 use App\TicketCustomer;
 use Exception;
 use function foo\func;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 use App\Event;
@@ -513,6 +515,17 @@ class EventsController extends Controller
         $event = Event::find($id);        
         $event->status=1;
         $event->save();
+
+        $event_organizer = $event->event_organizer;
+
+        //verify the event organizer about this
+        $data = [
+            'name' =>$event_organizer->name,
+            'event_name' => $event->name
+        ];
+
+        //email the event organizer on the verification
+        Mail::to($event_organizer)->queue(new NewEventVerification($data));
 
         $request->session()->flash('status', 'Verified successfully');           
         return redirect($this->UnverifiedredirectPath);
