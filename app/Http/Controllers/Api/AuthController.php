@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Intervention\Image\Facades\Image;
+use Snowfire\Beautymail\Beautymail;
 
 
 class AuthController extends Controller
@@ -99,6 +100,18 @@ class AuthController extends Controller
                         $tokenResult->token->expires_at
                     )->toDateTimeString();
 
+
+
+                    //send user a welcome email
+                    $beautymail = app()->make(Beautymail::class);
+                    $beautymail->send('user.welcome_email', ['user'=>$user], function($message) use($user)
+                    {
+                        $message
+                            ->from('info@fikaplaces.com')
+                            ->to($user->email, $user->name)
+                            ->subject('Welcome to FIKA Places!');
+                    });
+
                     DB::commit();
                     return response()->json(
                         [
@@ -125,7 +138,7 @@ class AuthController extends Controller
             return response()->json(
                 [
                     'success' => false,
-                    'message' => 'User Account Creation Failed!',
+                    'message' => 'User Account Creation Failed: '.$exception->getMessage(),
                     'data'    => [],
                 ], 500
             );

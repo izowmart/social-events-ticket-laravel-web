@@ -13,11 +13,13 @@
     </tr>
     <tr>
         <td class="paragraph">
-            Thank you for creating a Fika Places account.
+            <p>Thank you for creating a Fika Places account.</p>
 
-            Fika Places allows users to locate and appreciate the different venues around them. We also provide updates on new venues and upcoming events. Users are also able to buy tickets directly from our App or through our website.
-            For more information on Fika Places please visit our website www.fikaplaces.com
-            Please share the app with your friends and help us grow our community.
+            <p>Fika Places allows users to locate and appreciate the different venues around them. We also provide
+                updates on new venues and upcoming events. Users are also able to buy tickets directly from our App or
+                through our website.</p>
+            <p>For more information on Fika Places please <a href="www.fikaplaces.com">visit our website</a></p>
+            <p>Please share the app with your friends and help us grow our community.</p>
         </td>
     </tr>
     <tr>
@@ -29,10 +31,12 @@
     </tr>
     <tr>
         <td class="paragraph">
-            Follow us on social media for news on offers and giveaways
-            Facebook (clickable icon)
-            Instagram (clickable icon)
-            Twitter (clickable icon)
+            <p>Follow us on social media for news on offers and giveaways:</p>
+            <ul>
+                <li><a href="https://www.facebook.com/fika.live/">Facebook</a></li>
+                <li><a href="https://twitter.com/fika_live/">Twitter</a></li>
+                <li><a href="https://instagram.com/fikaplaces">Instagram</a></li>
+            </ul>
         </td>
 
     </tr>

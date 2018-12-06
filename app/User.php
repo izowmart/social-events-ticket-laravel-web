@@ -152,4 +152,9 @@ class User extends Authenticatable
         return $this->posts()->leftJoin('shares','posts.id','=','shares.new_post_id')
             ->whereNull('shares.new_post_id');
     }
+
+    public function getNameAttribute()
+    {
+        return ucwords($this->first_name. ' '.$this->last_name);
+    }
 }
