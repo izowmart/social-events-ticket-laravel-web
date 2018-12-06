@@ -18,8 +18,10 @@ return [
         'logo'        => [
             'path'   => '%PUBLIC%/FikaIconWhite120x120.jpg',
             'width'  => '120',
-            'height' => '100',
-        ]
+            'height' => '120',
+        ],
+        'twitter'  => 'https://twitter.com/fika_live/',
+        'facebook' => 'https://www.facebook.com/fika.live/',
     ],
  
 ];
