@@ -246,6 +246,11 @@ Route::group(['prefix' => 'tickets'], function () {
 
 Route::get('display-tickets', 'TicketsController@displayTickets')->name('display-tickets');
 
+//display ticket information
+Route::get('ticket-information',function (){
+    return view('ticket_information');
+})->name('ticket-info');
+
 //Terms and conditions pages
 Route::get('terms-and-conditions', 'HomeController@showTermsAndConditions')->name('terms-and-conditions');
 Route::get('privacy-policy', 'HomeController@showPrivacyPolicy')->name('privacy-policy');

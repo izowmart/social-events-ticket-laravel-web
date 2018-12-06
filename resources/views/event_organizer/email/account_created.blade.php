@@ -10,7 +10,10 @@
 <p>To open the Fika Ticket Scanner use the same login credentials as your Event Organiser profile.</p>
 <p>For information on Selling Tickets please visit <a href="{{route('ticket-info')}}">the Ticket Info Page</a></p>
 
-We also post updates on offers and giveaways on our social media platforms so please follow us on:
-Facebook (clickable link)
-Instagram (clickable link)
-Twitter (clickable link)
+<p>We also post updates on offers and giveaways on our social media platforms so please follow us on:</p>
+<ul>
+    <li><a href="https://www.facebook.com/fika.live/">Facebook</a></li>
+    <li><a href="https://twitter.com/fika_live/">Twitter</a></li>
+    <li><a href="https://instagram.com/fikaplaces">Instagram</a></li>
+
+</ul>
