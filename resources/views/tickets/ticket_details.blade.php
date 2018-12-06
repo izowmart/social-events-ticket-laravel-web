@@ -256,7 +256,8 @@
 
 @section('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
-<script id="mula-checkout-library" type="text/javascript" src="https://beep2.cellulant.com:9212/checkout/v2/mula-checkout.js"></script>
+{{--<script id="mula-checkout-library" type="text/javascript" src="https://beep2.cellulant.com:9212/checkout/v2/mula-checkout.js"></script>--}}
+<script id="mula-checkout-library" type="text/javascript" src="https://mula.africa/v2/mula-checkout.js"></script>
 <script src="{{ asset('js/plugins/jquery.smartWizard.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.1/dist/sweetalert2.all.min.js"></script>
 <script>
