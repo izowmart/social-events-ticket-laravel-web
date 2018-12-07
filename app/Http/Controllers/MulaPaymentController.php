@@ -518,8 +518,11 @@ class MulaPaymentController extends Controller
                     $ticket_array = $this->createTickets($ticket_purchase_request->name, $event_id,
                         $ticket_purchase_request->category_id, $ticket_customer_id,
                         $approved_payment_request_id);
-
-
+                    //an empty array means that we hit a snag when creating the tickets
+                    //return false
+                    if (empty($ticket_array)){
+                        return false;
+                    }
                     $pdf_array = $ticket_array['pdf_format_url'];
 
                     $tickets_array[] = $ticket_array;
@@ -615,79 +618,86 @@ class MulaPaymentController extends Controller
         $ticket_customer_id,
         $approved_payment_request_id
     ) {
-        $payload = "" . now()->timestamp . "" . $event_id . "" . $ticket_category_id . "" . $ticket_customer_id . "" . $approved_payment_request_id;
-        $unique_ticket_identifier = hash_hmac('sha256', strtolower(trim($payload)), config('app.key'));
+        try {
+            $payload = "" . now()->timestamp . "" . $event_id . "" . $ticket_category_id . "" . $ticket_customer_id . "" . $approved_payment_request_id;
+            $unique_ticket_identifier = hash_hmac('sha256', strtolower(trim($payload)), config('app.key'));
 
-        $event = Event::find($event_id);
+            $event = Event::find($event_id);
 
-        $event_dates = $event->event_dates;
+            $event_dates = $event->event_dates;
 
-        /*
-         * generate qr code for each ticket and save it as image
-         * this is to be used
-         * 1. on the pdf to be shared via email
-         * 2. on the app as an image...
-         */
+            /*
+             * generate qr code for each ticket and save it as image
+             * this is to be used
+             * 1. on the pdf to be shared via email
+             * 2. on the app as an image...
+             */
 
-        $qr_code_images_dir = public_path('bought_tickets/qr_code_images');
+            $qr_code_images_dir = public_path('bought_tickets/qr_code_images');
 
-        if (!file_exists($qr_code_images_dir)) {
-            mkdir($qr_code_images_dir, 0777, true);
-        }
-        $timestamp = now()->timestamp;
+            if (!file_exists($qr_code_images_dir)) {
+                mkdir($qr_code_images_dir, 0777, true);
+            }
+            $timestamp = now()->timestamp;
 
-        $qr_code_image_name = $timestamp . ".png";
-        $qr_code = QrCode::format('png')->size(100)->generate('http://fikaplaces.com/tickets/' . $unique_ticket_identifier,
-            $qr_code_images_dir . '/' . $qr_code_image_name);
+            $qr_code_image_name = $timestamp . ".png";
+            $qr_code = QrCode::format('png')->size(100)->generate('http://fikaplaces.com/tickets/' . $unique_ticket_identifier,
+                $qr_code_images_dir . '/' . $qr_code_image_name);
 
-        /*
-        * Prepare the content for the ticket pdf template
-        */
-        $ticket_template_data = [
-            'event'                => $event,
-            'event_dates'                => UniversalMethods::getEventDateTimeArray($event_dates),
-            'ticket_type'               => $ticket_type,
-            'ticket_qr_code_image_name' => $qr_code_image_name,
-            'ticket_no'                 => $timestamp
-        ];
+            /*
+            * Prepare the content for the ticket pdf template
+            */
+            $ticket_template_data = [
+                'event'                     => $event,
+                'event_dates'               => UniversalMethods::getEventDateTimeArray($event_dates),
+                'ticket_type'               => $ticket_type,
+                'ticket_qr_code_image_name' => $qr_code_image_name,
+                'ticket_no'                 => $timestamp
+            ];
 
 
-        //generate and save pdf
-        $ticket_name = "T" . $timestamp . uniqid();
-        $pdf_name = $ticket_name . ".pdf";
-        $pdf_dir = public_path('bought_tickets/pdfs');
+            //generate and save pdf
+            $ticket_name = "T" . $timestamp . uniqid();
+            $pdf_name = $ticket_name . ".pdf";
+            $pdf_dir = public_path('bought_tickets/pdfs');
 
-        if (!file_exists($pdf_dir)) {
-            mkdir($pdf_dir, 0777, true);
-        }
+            if (!file_exists($pdf_dir)) {
+                mkdir($pdf_dir, 0777, true);
+            }
 
-        $ticket_pdf_path = $pdf_dir . '/' . $pdf_name;
+            $ticket_pdf_path = $pdf_dir . '/' . $pdf_name;
 
-        //select the event template
-        $template = $event->ticket_template == 1 ? "event_organizer.ticket_templates.template_1" : "event_organizer.ticket_templates.template_2";
+            //select the event template
+            $template = $event->ticket_template == 1 ? "event_organizer.ticket_templates.template_1" : "event_organizer.ticket_templates.template_2";
 
-        //create the pdf for each ticket to be shared via email
+            //create the pdf for each ticket to be shared via email
 //        return PDF::loadView( 'tickets.display-tickets', $ticket_template_data)->save( $pdf_dir.'/'.$pdf_name )->stream($pdf_name);
-        $pdf = PDF::loadView($template, $ticket_template_data)->save($ticket_pdf_path);
+            $pdf = PDF::loadView($template, $ticket_template_data)->save($ticket_pdf_path);
 
-        $ticket_category_detail = TicketCategoryDetail::where('event_id', $event_id)
-            ->where('category_id', $ticket_category_id)
-            ->first();
+            $ticket_category_detail = TicketCategoryDetail::where('event_id', $event_id)
+                ->where('category_id', $ticket_category_id)
+                ->first();
 
-        $data = [
-            'event_id'                  => $event_id,
-            'ticket_customer_id'        => $ticket_customer_id,
-            'validation_token'          => $unique_ticket_identifier,
-            'qr_code_image_url'         => $qr_code_image_name,
-            'pdf_format_url'            => $pdf_name,
-            'ticket_category_detail_id' => $ticket_category_detail->id,
-            'unique_ID'                 => $timestamp
-        ];
+            $data = [
+                'event_id'                  => $event_id,
+                'ticket_customer_id'        => $ticket_customer_id,
+                'validation_token'          => $unique_ticket_identifier,
+                'qr_code_image_url'         => $qr_code_image_name,
+                'pdf_format_url'            => $pdf_name,
+                'ticket_category_detail_id' => $ticket_category_detail->id,
+                'unique_ID'                 => $timestamp
+            ];
 
-        //save the tickets records
-        Ticket::create($data);
+            //save the tickets records
+            Ticket::create($data);
 
-        return $data;
+            return $data;
+        } catch ( \Exception $exception ) {
+            logger("error creating tickets: \n" . $exception->getMessage() . "\n file: " . $exception->getFile() .
+                "\n line: " . $exception->getLine() . "\n trace: " . $exception->getTraceAsString());
+
+            return [];
+        }
     }
 
 
