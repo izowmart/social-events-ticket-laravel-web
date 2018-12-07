@@ -61,7 +61,7 @@ class EventsController extends Controller
                                     ->get();
         $data = array(
             'event'=>$event,
-            'event_dates'=>UniversalMethods::getEventDateTimeStr($event_dates),
+            'event_dates'=>UniversalMethods::getEventDateTimeArray($event_dates),
             'ticket_category_details'=>$ticket_category_details
         );   
         return view('event_organizer.pages.select_ticket_template')->with($data);
