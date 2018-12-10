@@ -283,6 +283,8 @@ class MulaPaymentController extends Controller
                 'response' => $payload
             ]);
 
+            DB::beginTransaction();
+
             //check whether the merchantTransactionID
             $pending_payment_request = PaymentRequest::where('merchantTransactionID', $result->merchantTransactionID)
 //                ->where('MSISDN', UniversalMethods::formatPhoneNumber($result->MSISDN))
@@ -334,6 +336,8 @@ class MulaPaymentController extends Controller
                 $processing_result = $this->processSuccessfulPayment($pending_payment_request,$payload);
 
                 if (!$processing_result) {
+                    DB::rollBack();
+
                     return response()->json([
                         'checkoutRequestID'     => $result->checkoutRequestID,
                         'merchantTransactionID' => $result->merchantTransactionID,
@@ -342,6 +346,7 @@ class MulaPaymentController extends Controller
                         'receiptNumber'         => $result->merchantTransactionID,
                     ]);
                 }else{
+                    DB::commit();
                     //return acceptance response
                     return response()->json([
                         'checkoutRequestID'     => $result->checkoutRequestID,
@@ -354,6 +359,7 @@ class MulaPaymentController extends Controller
                 }
             }
 //            else {
+            DB::rollBack();
                 //reject the payment
                 return response()->json([
                     'checkoutRequestID'     => $result->checkoutRequestID,
@@ -367,6 +373,7 @@ class MulaPaymentController extends Controller
         } catch ( \Exception $exception ) {
             logger("PAYMENT PROCESS error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
 
+            DB::rollBack();
             //reject the payment
             return response()->json([
                 'checkoutRequestID'     => $resultInitial->checkoutRequestID,
