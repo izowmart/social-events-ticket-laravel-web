@@ -198,8 +198,6 @@ Route::group(['middleware' => 'event_organizer_auth','prefix'=>'event_organizer'
     
     Route::get('home', 'EventOrganizerPages\HomeController@index')->name('event_organizer_home');
 
-    Route::post('logout', 'EventOrganizerAuth\LoginController@logout')->name('event_organizer_logout');
-
     Route::group(['prefix'=>'events'], function () {
         Route::get('unverified', 'CommonPages\EventsController@Unverifiedindex')->name('event_organizer_unverified_events');
         Route::get('unverified/paid', 'CommonPages\EventsController@UnverifiedPaidindex')->name('event_organizer_unverified_paid_events');
@@ -227,7 +225,7 @@ Route::group(['middleware' => 'event_organizer_auth','prefix'=>'event_organizer'
 
         });
 
-
+        Route::post('logout', 'EventOrganizerAuth\LoginController@logout')->name('event_organizer_logout');
     });
 
     Route::group(['prefix'=>'reports'], function () {
@@ -247,6 +245,11 @@ Route::group(['prefix' => 'tickets'], function () {
 });
 
 Route::get('display-tickets', 'TicketsController@displayTickets')->name('display-tickets');
+
+//display ticket information
+Route::get('ticket-information',function (){
+    return view('ticket_information');
+})->name('ticket-info');
 
 //Terms and conditions pages
 Route::get('terms-and-conditions', 'HomeController@showTermsAndConditions')->name('terms-and-conditions');

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\AdminPages;
 
+use App\Mail\NewEventVerification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use App\Http\Controllers\Controller;
 use App\EventOrganizer;
+use Illuminate\Support\Facades\Mail;
 
 class EventOrganizersController extends Controller
 {

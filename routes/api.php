@@ -74,6 +74,7 @@ Route::group(['prefix' => 'user', 'middleware' => 'auth:api'], function () use (
     Route::post('venues/near', 'Api\VenueController@venues_near_me');
 
     Route::post('nunua_tickets', $base_url . 'Api\MulaPaymentController@initiate_payment');
+    Route::post('event_category_details', 'Api\EventController@event_ticket_category_details');
 });
 
 Route::group(['prefix' => 'scanner', 'middleware' => 'api'], function () use ($base_url) {

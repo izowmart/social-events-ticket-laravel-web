@@ -25,6 +25,7 @@
               data-toggle="tooltip" title="{{$unverified_events->count()}} unverified event(s)"
           @else
               href="{{ route('event_organizer_verified_paid_events') }}"
+             {{--data-toggle="tooltip" title=""--}}
           @endif>
           @if ($unverified_events->count()>0)
             <span class="pending text-center">{{$unverified_events->count()}}</span>              
@@ -38,7 +39,7 @@
           </a>
         </div>  
         <div class="col-md-6 col-lg-3 home-widget">
-          <a href="" >
+          <a href="" data-toggle="tooltip" title="{{count($upcoming_events)}} upcoming events">
             <div class="widget-small info coloured-icon"><i class="icon fa fa-files-o fa-3x"></i>
               <div class="info">
                 <h4>UPCOMING EVENTS</h4>
@@ -48,12 +49,12 @@
           </a>
         </div>
         <div class="col-md-6 col-lg-3 home-widget">
-          <a href="" data-toggle="tooltip" title="4 new scanners">                
-            <span class="pending text-center">4</span>
+          <a href="" data-toggle="tooltip" title="{{count($scanners)}} scanners so far">
+            {{--<span class="pending text-center">4</span>--}}
             <div class="widget-small warning coloured-icon"><i class="icon fa fa-files-o fa-3x"></i>
               <div class="info">
                 <h4>SCANNERS</h4>
-                <p><b>102</b></p>
+                <p><b>{{count($scanners)}}</b></p>
               </div>
             </div>
           </a>

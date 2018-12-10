@@ -14,8 +14,7 @@
             <form id="admin-logout-form" action="{{ route('admin_logout') }}" method="POST" style="display: none;">
                 {{ csrf_field() }}
             </form>
-          @endauth
-          @auth('web_event_organizer')          
+          @elseauth('web_event_organizer')
             <li><a class="dropdown-item" href="{{ route('event_organizer_logout') }}" onclick="event.preventDefault();
                                                       document.getElementById('event-organizer-logout-form').submit();"><i class="fa fa-sign-out fa-lg"></i> Logout</a></li>
             <form id="event-organizer-logout-form" action="{{ route('event_organizer_logout') }}" method="POST" style="display: none;">

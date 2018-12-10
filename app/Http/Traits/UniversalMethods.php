@@ -14,6 +14,7 @@ use App\Ticket;
 use App\TicketCategoryDetail;
 use App\TicketPurchaseRequest;
 use App\TicketScan;
+use Carbon\Carbon;
 
 trait UniversalMethods
 {
@@ -64,11 +65,73 @@ trait UniversalMethods
         $event,
         $event_id,
         $from_web = true,
+        /**
+         * PRODUCTION
+         */
+        $ivKey = "0mdHcgBP4ABYeADK",
+        $secretKey = "spjYntujBuOHfulJ"
+
+        /*
+         * TEST*
         $ivKey = "cpZdGWvh4rfB78C9",
         $secretKey = "CXNjbwmtVcfDYBTh"
-
+        */
     ) {
+
         $merchantTransactionID = now()->timestamp . "" . uniqid();
+
+        //create a pending payment request
+        $payment_request = PaymentRequest::create([
+            'merchantTransactionID' => $merchantTransactionID,
+            'amount'                => $data_array['subtotal'],
+            'ticket_customer_id'    => $ticket_customer->id,
+            'event_id'              => $event_id
+        ]);
+
+
+        //check that the tickets sought are available
+        foreach ($data_array as $index => $item) {
+            if (stristr($index, "quantity") === false) {
+                continue;
+            } else {
+                //get the slug
+                $ticket_category_slug = substr($index, 0, strpos($index, '_'));
+
+                //get the ticket category details record
+                $ticket_category_detail = TicketCategoryDetail::join('ticket_categories', 'ticket_categories.id', '=',
+                    'ticket_category_details.category_id')
+                    ->where('event_id', $event_id)
+                    ->where('slug', $ticket_category_slug)
+                    ->select('ticket_category_details.id')
+                    ->first();
+
+                //check the remaining tickets
+                $tickets_available = UniversalMethods::getRemainingCategoryTickets($event_id,
+                    $ticket_category_detail->id);
+
+                //get the sought tickets
+                $tickets_sought = (int)$item;
+
+                //if sought is more than available
+                //return null to let the user choose the tickets again,
+                //otherwise let's proceed and create the ticketpurchaserequest records
+                if ($tickets_sought > $tickets_available) {
+                    return [null, null];
+                }else{
+                    $record_to_save = [
+                        'payment_request_id'        => $payment_request->id,
+                        'ticket_category_detail_id' => $ticket_category_detail->id,
+                        'tickets_count'             => (int)$item
+                    ];
+
+                    //save the ticket categories to be purchased with their counts
+                    TicketPurchaseRequest::create($record_to_save);
+                }
+            }
+
+        }
+
+        //let's process the encrypted payload
         $payload = [
             "merchantTransactionID" => $merchantTransactionID,
             "customerFirstName"     => $ticket_customer->first_name,
@@ -79,10 +142,23 @@ trait UniversalMethods
             //get the amount for the type of ticket the customer has decided to purchase
             "currencyCode"          => "KES",
             "accountNumber"         => "123456",
-            "serviceCode"           => "FIKDEV8910",
-            "dueDate"               => $data_array['ticket_sale_end_date_time'], //TODO::this is to be replaced by the ticket_sale_end_date_time
+
+            "dueDate"               => $data_array['ticket_sale_end_date_time'], //ticket_sale_end_date_time
             "serviceDescription"    => "Payment for " . $event->name,
+            /**
+             * TEST
+             *
             "accessKey"             => '$2a$08$FIRIU0JS9GESx6ePn/wsUuX4aq2HAsJ16qmz/bTYbT4j7lZ9R6r1W',
+            "serviceCode"           => "FIKDEV8910",
+             */
+
+            /**
+             * PRODUCTION
+             */
+            "accessKey"             => "ZmQIqoH2u6GSfjm6vPNwhIVUXkj9W8ity6fMdEoyhnVDdYMqjckDlWKAN34U",
+            "serviceCode"           => "FIKAPLACES",
+            "payerClientCode"      => "SAFKE", //this determines which option the user can pay with
+            //end of production
             "countryCode"           => "KE",
             "languageCode"          => "en",
             "successRedirectUrl"    => $from_web ? route("success_url") : route('mobile_success_url'),
@@ -92,44 +168,37 @@ trait UniversalMethods
 
         logger("payload before encryption: " . json_encode($payload));
 
-        //create a pending payment request
-        $payment_request = PaymentRequest::create([
-            'merchantTransactionID' => $payload['merchantTransactionID'],
-            'amount'                => $payload['amount'],
-            'ticket_customer_id'    => $ticket_customer->id,
-            'event_id'              => $event_id
-        ]);
 
-        //keep a record of the tickets quantities to be bought and their prices
-        foreach ($data_array as $index => $item) {
-            if (stristr($index, "quantity") === false) {
-                continue;
-            } else {
-                //get the slug
-                $ticket_category_slug = substr($index, 0, strpos($index, '_'));
-
-                //get the ticket category
-//                $ticket_category = TicketCategory::where('slug', $ticket_category_slug)->first();
-
-                //get the ticket category details record
-                $ticket_category_details = TicketCategoryDetail::join('ticket_categories', 'ticket_categories.id', '=',
-                    'ticket_category_details.category_id')
-                    ->where('event_id', $event_id)
-                    ->where('slug', $ticket_category_slug)
-                    ->select('ticket_category_details.id')
-                    ->first();
-
-
-                $record_to_save = [
-                    'payment_request_id'        => $payment_request->id,
-                    'ticket_category_detail_id' => $ticket_category_details->id,
-                    'tickets_count'             => (int)$item
-                ];
-
-                //save the ticket categories to be purchased with their counts
-                TicketPurchaseRequest::create($record_to_save);
-            }
-        }
+//        //keep a record of the tickets quantities to be bought and their prices
+//        foreach ($data_array as $index => $item) {
+//            if (stristr($index, "quantity") === false) {
+//                continue;
+//            } else {
+//                //get the slug
+//                $ticket_category_slug = substr($index, 0, strpos($index, '_'));
+//
+//                //get the ticket category
+////                $ticket_category = TicketCategory::where('slug', $ticket_category_slug)->first();
+//
+//                //get the ticket category details record
+//                $ticket_category_details = TicketCategoryDetail::join('ticket_categories', 'ticket_categories.id', '=',
+//                    'ticket_category_details.category_id')
+//                    ->where('event_id', $event_id)
+//                    ->where('slug', $ticket_category_slug)
+//                    ->select('ticket_category_details.id')
+//                    ->first();
+//
+//
+//                $record_to_save = [
+//                    'payment_request_id'        => $payment_request->id,
+//                    'ticket_category_detail_id' => $ticket_category_details->id,
+//                    'tickets_count'             => (int)$item
+//                ];
+//
+//                //save the ticket categories to be purchased with their counts
+//                TicketPurchaseRequest::create($record_to_save);
+//            }
+//        }
 
         //The encryption method to be used
         $encrypt_method = "AES-256-CBC";
@@ -203,5 +272,68 @@ trait UniversalMethods
                 9) . $lowercaseWord;
 
         return $password;
+    }
+
+
+    /**
+     * @param $event_dates
+     *
+     * @return string
+     */
+    public static function getEventDateTimeStr($event_dates): string
+    {
+        $event_times= "";
+        foreach ($event_dates as  $event_date) {
+            $start_date_time = Carbon::parse($event_date->start);
+
+            $start_year = $start_date_time->year;
+            $start_month = $start_date_time->month;
+            $start_day = $start_date_time->day;
+            $start_date = Carbon::create($start_year, $start_month, $start_day);
+
+            $end_date_time = Carbon::parse($event_date->end);
+
+            $end_year = $end_date_time->year;
+            $end_month = $end_date_time->month;
+            $end_day = $end_date_time->day;
+            $end_date = Carbon::create($end_year, $end_month, $end_day);
+
+            $same = $start_date->eq($end_date);
+
+            $event_time = $same ? Carbon::parse($event_date->start)->toFormattedDateString() . " " . Carbon::parse($event_date->start)->format('h:i A') . " - " . Carbon::parse($event_date->end)->format('h:i A') : Carbon::parse($event_date->start)->toFormattedDateString() . " " . Carbon::parse($event_date->start)->format('h:i A') . " - " . Carbon::parse($event_date->end)->toFormattedDateString() . " " . Carbon::parse($event_date->end)->format('h:i A');
+            $event_times .= $event_time." ,";
+        }
+        return $event_times;
+    }
+
+    /**
+     * @param $event_dates
+     *
+     * @return array
+     */
+    public static function getEventDateTimeArray($event_dates): array
+    {
+        $event_times= [];
+        foreach ($event_dates as  $event_date) {
+            $start_date_time = Carbon::parse($event_date->start);
+
+            $start_year = $start_date_time->year;
+            $start_month = $start_date_time->month;
+            $start_day = $start_date_time->day;
+            $start_date = Carbon::create($start_year, $start_month, $start_day);
+
+            $end_date_time = Carbon::parse($event_date->end);
+
+            $end_year = $end_date_time->year;
+            $end_month = $end_date_time->month;
+            $end_day = $end_date_time->day;
+            $end_date = Carbon::create($end_year, $end_month, $end_day);
+
+            $same = $start_date->eq($end_date);
+
+            $event_time = $same ? Carbon::parse($event_date->start)->toFormattedDateString() . " " . Carbon::parse($event_date->start)->format('h:i A') . " - " . Carbon::parse($event_date->end)->format('h:i A') : Carbon::parse($event_date->start)->toFormattedDateString() . " " . Carbon::parse($event_date->start)->format('h:i A') . " - " . Carbon::parse($event_date->end)->toFormattedDateString() . " " . Carbon::parse($event_date->end)->format('h:i A');
+            array_push($event_times , $event_time);
+        }
+        return $event_times;
     }
 }

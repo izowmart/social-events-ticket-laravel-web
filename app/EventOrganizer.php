@@ -33,4 +33,9 @@ class EventOrganizer extends Authenticatable
     {
         return $this->first_name.' '.$this->last_name;
     }
+
+    public function scanners()
+    {
+        return $this->hasMany('App\Scanner','event_organizer_id');
+    }
 }

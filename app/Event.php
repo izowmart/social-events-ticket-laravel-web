@@ -58,4 +58,9 @@ class Event extends Model
     {
         return $this->hasMany('App\Ticket', 'event_id');
     }
+
+    public function event_organizer()
+    {
+        return $this->hasOne('App\EventOrganizer','id','event_organizer_id');
+    }
 }

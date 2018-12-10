@@ -14,6 +14,7 @@ use App\TicketCustomer;
 use App\TicketPurchaseRequest;
 use App\User;
 use Barryvdh\DomPDF\Facade as PDF;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -28,8 +29,16 @@ class MulaPaymentController extends Controller
 
     public function __construct()
     {
+        /*
+         * TEST*
         $this->secretKey = "CXNjbwmtVcfDYBTh";
         $this->ivKey = "cpZdGWvh4rfB78C9";
+        */
+
+        /*
+         * PRODUCTION */
+        $this->secretKey = "spjYntujBuOHfulJ";
+        $this->ivKey = "0mdHcgBP4ABYeADK";
 
     }
 
@@ -42,6 +51,11 @@ class MulaPaymentController extends Controller
      * encrypt the data for sending to the mula endpoint to initiate the payment for the client
      *
      * @param \Illuminate\Http\Request $request
+     * ->this includes:-
+     * first_name, last_name, phone_number, email
+     * event_id, ticket_sale_end_date_time, subtotal &
+     * (category_slug)_quantity ==> this is repeated for each of the user's selected ticket types
+     * with a count of how many they'd want to get e.g. ['vip_quantity' => 10]
      *
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
@@ -89,6 +103,20 @@ class MulaPaymentController extends Controller
             list($payload, $encryptedPayload) = UniversalMethods::process_mula_payments($ticket_customer, $data_array,
                 $event, $event_id);
 
+            //if payload == null,
+            // then the tickets sought are more than the tickets available,
+            // therefore, let's take the user back and let them select again
+            //otherwise we are good to go....
+            if ($payload == null){
+                DB::rollBack();
+
+                return response()->json([
+                    'params'      => null,
+                    'accessKey'   => "",
+                    'countryCode' => ""
+                ]);
+            }
+
             DB::commit();
 
             return response()->json([
@@ -110,7 +138,7 @@ class MulaPaymentController extends Controller
     }
 
     /**
-     * process successful web payment
+     * show a success message to the user
      *
      * @param \Illuminate\Http\Request $request
      *
@@ -119,9 +147,9 @@ class MulaPaymentController extends Controller
     public function success(Request $request)
     {
         try {
-//            $payload = $this->processSuccessfulPaymentRequest($request);
+
             $result = $request->getContent();
-//            $payload = json_decode($result);
+
             parse_str($result, $payload);
 
             //save the response to the db
@@ -130,37 +158,60 @@ class MulaPaymentController extends Controller
                 'response' => $result
             ]);
 
-            //log the payment
-//            logger("PAYMENT SUCCESS:: type: ".gettype($result). "\ncontent:" . $result." payload type: ".gettype($payload));
-
-//            logger("success payload: type: " . gettype($payload) . " content: " . json_encode($payload));
-//            $pending_payment_request = $this->fetchPendingPaymentRequest($payload);
-
-            //fetch the pending  payment
-            $pending_payment_request = PaymentRequest::where('merchantTransactionID', $payload['merchantTransactionID'])
-//                ->where('MSISDN', UniversalMethods::formatPhoneNumber($payload->MSISDN))
-//            ->where('amount', '=', $request->amountPaid)
-                ->where('payment_request_status', '=', 0)
-                ->first();
-
-            //TODO:: push this to a queue as a job?
-            if ($pending_payment_request != null) {
-                $result = $this->processSuccessfulPayment($pending_payment_request,$payload);
-
-                if ($result) {
-                    //display a success message to the user
-                    return view('payments.success');
-                }
-            }
-
-            //FIXME:: else show an error message
-            return view('payments.failure');
-
+            //display a success message to the user
+            return view('payments.success');
         } catch ( \Exception $exception ) {
-            logger("PAYMENT SUCCESS error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
-
-            return view('payments.failure');
+            logger("payment success: " . $exception->getMessage());
+            //display a success message to the user
+            return view('payments.success');
         }
+//        try {
+////            $payload = $this->processSuccessfulPaymentRequest($request);
+//            $result = $request->getContent();
+////            $payload = json_decode($result);
+//            parse_str($result, $payload);
+//
+//            //save the response to the db
+//            PaymentResponse::create([
+//                'type'     => 'success',
+//                'response' => $result
+//            ]);
+//
+//            //log the payment
+////            logger("PAYMENT SUCCESS:: type: ".gettype($result). "\ncontent:" . $result." payload type: ".gettype($payload));
+//
+////            logger("success payload: type: " . gettype($payload) . " content: " . json_encode($payload));
+////            $pending_payment_request = $this->fetchPendingPaymentRequest($payload);
+//
+//            //fetch the pending  payment
+//            $pending_payment_request = PaymentRequest::where('merchantTransactionID', $payload['merchantTransactionID'])
+////                ->where('MSISDN', UniversalMethods::formatPhoneNumber($payload->MSISDN))
+////            ->where('amount', '=', $request->amountPaid)
+//                ->where('payment_request_status', '=', 0)
+//                ->where('payment_accepted', '=', true) //has this payment been accepted by our system...
+//                ->first();
+//
+//            //TODO:: push this to a queue as a job?
+//            if ($pending_payment_request != null) {
+//                $result = $this->processSuccessfulPayment($pending_payment_request,$payload);
+//
+//                if ($result) {
+//                    //display a success message to the user
+//                    return view('payments.success');
+//                }
+//            }else{
+//                //save the parameters of this success response....
+//
+//            }
+//
+//            //FIXME:: else show an error message
+//            return view('payments.failure');
+//
+//        } catch ( \Exception $exception ) {
+//            logger("PAYMENT SUCCESS error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
+//
+//            return view('payments.failure');
+//        }
     }
 
     /**
@@ -179,18 +230,15 @@ class MulaPaymentController extends Controller
                 'type'     => 'failure',
                 'response' => $payload
             ]);
-            //log the payment
-            logger("PAYMENT FAILURE::  " . $payload);
 
-            //update the pending payment request record with failed status
-            $this->declinePendingPaymentRequest($request);
-
-
-            //display a success message to the user
+            //display a failure message to the user
             return view('payments.failure');
 
         } catch ( \Exception $exception ) {
             logger("PAYMENT FAILURE error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
+
+            //display a failure message to the user
+            return view('payments.failure');
         }
     }
 
@@ -210,7 +258,11 @@ class MulaPaymentController extends Controller
      * this is the webhook that pinged by the MULA
      * system after receiving the payment from the client
      * --------------------    ------------------------
-     *  we validate the payment and either accept or reject it
+     *  we validate the payment and either process & accept or reject it entirely
+     * Validation:-
+     * a. do we recognize the merchantTransactionID
+     * b. are the tickets sought available?
+     * c. has the time lapsed for ticket sale?
      *
      * @param \Illuminate\Http\Request $request
      *
@@ -220,6 +272,7 @@ class MulaPaymentController extends Controller
     {
         $payloadInitial = $request->getContent();
         $resultInitial = json_decode($payloadInitial);
+
         try {
             $payload = $payloadInitial;
             $result = $resultInitial;
@@ -230,13 +283,9 @@ class MulaPaymentController extends Controller
                 'response' => $payload
             ]);
 
-            //log the response
-//            logger("PROCESS PAYMENT::\n payload type is" . gettype($payload) . "\npayload" . $payload . "\n result type is " . gettype($result));
+            DB::beginTransaction();
 
-
-            //confirm whether the payment should be accepted or not
             //check whether the merchantTransactionID
-            // & the amounts are recognized //TODO:: do we accept payments greater than the expected value???
             $pending_payment_request = PaymentRequest::where('merchantTransactionID', $result->merchantTransactionID)
 //                ->where('MSISDN', UniversalMethods::formatPhoneNumber($result->MSISDN))
 //                ->where('amount','=', $result->amountPaid)
@@ -244,16 +293,73 @@ class MulaPaymentController extends Controller
                 ->first();
 
             if ($pending_payment_request != null) {
+                $event = Event::find($pending_payment_request->event_id);
 
-                //accept the payment
-                return response()->json([
-                    'checkoutRequestID'     => $result->checkoutRequestID,
-                    'merchantTransactionID' => $result->merchantTransactionID,
-                    'statusCode'            => 183,
-                    'statusDescription'     => "Successful Payment",
-                    'receiptNumber'         => $result->merchantTransactionID,
-                ]);
-            } else {
+                //has the ticket sale time lapse
+                $deadline_lapsed = Carbon::now()->gt(Carbon::parse($event->ticket_sale_end_date));
+
+                if ($deadline_lapsed) {
+                    //let's reject the payment
+                    return response()->json([
+                        'checkoutRequestID'     => $result->checkoutRequestID,
+                        'merchantTransactionID' => $result->merchantTransactionID,
+                        'statusCode'            => 180,
+                        'statusDescription'     => "Payment declined",
+                        'receiptNumber'         => $result->merchantTransactionID,
+                    ]);
+                }
+
+                //are the tickets available???
+                $ticket_purchase_requests = TicketPurchaseRequest::where('payment_request_id', '=', $pending_payment_request->id)
+                    ->get();
+
+                //check whether all tickets the client wants are available..
+                foreach ($ticket_purchase_requests as $ticket_purchase_request) {
+                    $tickets_sought = $ticket_purchase_request != null ? $ticket_purchase_request->tickets_count : 0;
+                    $ticket_category_detail = TicketCategoryDetail::find($ticket_purchase_request->ticket_category_detail_id);
+
+                    $ticket_category = $ticket_category_detail->category;
+
+                    $tickets_available = UniversalMethods::getRemainingCategoryTickets($pending_payment_request->event_id, $ticket_category->id);
+
+                    if ($tickets_sought > $tickets_available){
+                        //let's reject the payment
+                        return response()->json([
+                            'checkoutRequestID'     => $result->checkoutRequestID,
+                            'merchantTransactionID' => $result->merchantTransactionID,
+                            'statusCode'            => 180,
+                            'statusDescription'     => "Payment declined",
+                            'receiptNumber'         => $result->merchantTransactionID,
+                        ]);
+                    }
+                }
+                $processing_result = $this->processSuccessfulPayment($pending_payment_request,$payload);
+
+                if (!$processing_result) {
+                    DB::rollBack();
+
+                    return response()->json([
+                        'checkoutRequestID'     => $result->checkoutRequestID,
+                        'merchantTransactionID' => $result->merchantTransactionID,
+                        'statusCode'            => 180,
+                        'statusDescription'     => "Payment declined",
+                        'receiptNumber'         => $result->merchantTransactionID,
+                    ]);
+                }else{
+                    DB::commit();
+                    //return acceptance response
+                    return response()->json([
+                        'checkoutRequestID'     => $result->checkoutRequestID,
+                        'merchantTransactionID' => $result->merchantTransactionID,
+                        'statusCode'            => 183,
+                        'statusDescription'     => "Successful Payment",
+                        'receiptNumber'         => $result->merchantTransactionID,
+                    ]);
+
+                }
+            }
+//            else {
+            DB::rollBack();
                 //reject the payment
                 return response()->json([
                     'checkoutRequestID'     => $result->checkoutRequestID,
@@ -262,11 +368,12 @@ class MulaPaymentController extends Controller
                     'statusDescription'     => "Payment declined",
                     'receiptNumber'         => $result->merchantTransactionID,
                 ]);
-            }
+//            }
 
         } catch ( \Exception $exception ) {
             logger("PAYMENT PROCESS error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
 
+            DB::rollBack();
             //reject the payment
             return response()->json([
                 'checkoutRequestID'     => $resultInitial->checkoutRequestID,
@@ -308,13 +415,14 @@ class MulaPaymentController extends Controller
             logger("PAYMENT SUCCESS::  " . $payload);
 
             //process the successful payment
-            $this->processPayment($request);
+//            $this->processPayment($request);
 
             //display a success message to the user
             return view('payments.mobile_success');
 
         } catch ( \Exception $exception ) {
             logger("PAYMENT SUCCESS error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
+            return view('payments.mobile_success');
         }
     }
 
@@ -337,12 +445,13 @@ class MulaPaymentController extends Controller
             logger("PAYMENT FAILURE::  " . $payload);
 
             //update the pending payment request record with failed status
-            $this->declinePendingPaymentRequest($request);
+//            $this->declinePendingPaymentRequest($request);
 
             //display a success message to the user
             return view('payments.mobile_failure');
         } catch ( \Exception $exception ) {
             logger("PAYMENT FAILURE error:: " . $exception->getMessage() . "\nTrace::: " . $exception->getTraceAsString());
+            return view('payments.mobile_failure');
         }
     }
 
@@ -370,14 +479,14 @@ class MulaPaymentController extends Controller
             $approved_payment_request = $this->approvePendingPaymentRequest($pending_payment_request);
 
             //capture the payment details as given from MULA and tie to the approved pending payment request
-            $mula_payload_payments = json_decode($payload['payments'],true);
+            $mula_payload_payments = json_decode($payload)->payments;
 
             logger("mula payload count: " . count($mula_payload_payments)." content: ".json_encode($mula_payload_payments));
 
             //save each payment record
             foreach ($mula_payload_payments as $index => $mula_payload_payment) {
-                $mula_payload_payment['payment_request_id'] = $approved_payment_request->id;
-                Payment::create($mula_payload_payment);  ;
+                $mula_payload_payment->payment_request_id = $approved_payment_request->id;
+                Payment::create((array)$mula_payload_payment);  ;
             }
 
             //get the pending ticket purchase requests records
@@ -397,6 +506,7 @@ class MulaPaymentController extends Controller
 
             $tickets_array = [];
             $pdfs_array = [];
+            $tickets_count=0;
 
             foreach ($ticket_purchase_requests as $ticket_purchase_request) {
                 /*
@@ -408,14 +518,18 @@ class MulaPaymentController extends Controller
                  */
 
                 $ticket_type_count = $ticket_purchase_request->tickets_count;
+                $tickets_count += $ticket_type_count;
 
                 //loop through given the number of tickets per category
                 for ($i = 0; $i < $ticket_type_count; $i++) {
                     $ticket_array = $this->createTickets($ticket_purchase_request->name, $event_id,
                         $ticket_purchase_request->category_id, $ticket_customer_id,
                         $approved_payment_request_id);
-
-
+                    //an empty array means that we hit a snag when creating the tickets
+                    //return false
+                    if (empty($ticket_array)){
+                        return false;
+                    }
                     $pdf_array = $ticket_array['pdf_format_url'];
 
                     $tickets_array[] = $ticket_array;
@@ -429,7 +543,8 @@ class MulaPaymentController extends Controller
             $email_data = [
                 'name'  => $ticket_customer->first_name,
                 'event' => Event::find($event_id),
-                'files' => $pdfs_array
+                'files' => $pdfs_array,
+                'tickets_count' => $tickets_count
             ];
 
             Mail::to($ticket_customer)->queue(new TicketsBought($email_data));
@@ -510,75 +625,86 @@ class MulaPaymentController extends Controller
         $ticket_customer_id,
         $approved_payment_request_id
     ) {
-        $payload = "" . now()->timestamp . "" . $event_id . "" . $ticket_category_id . "" . $ticket_customer_id . "" . $approved_payment_request_id;
-        $unique_ticket_identifier = hash_hmac('sha256', strtolower(trim($payload)), config('app.key'));
+        try {
+            $payload = "" . now()->timestamp . "" . $event_id . "" . $ticket_category_id . "" . $ticket_customer_id . "" . $approved_payment_request_id;
+            $unique_ticket_identifier = hash_hmac('sha256', strtolower(trim($payload)), config('app.key'));
 
-        $event = Event::find($event_id);
+            $event = Event::find($event_id);
 
-        $event_dates = $event->event_dates;
+            $event_dates = $event->event_dates;
 
-        /*
-         * generate qr code for each ticket and save it as image
-         * this is to be used
-         * 1. on the pdf to be shared via email
-         * 2. on the app as an image...
-         */
+            /*
+             * generate qr code for each ticket and save it as image
+             * this is to be used
+             * 1. on the pdf to be shared via email
+             * 2. on the app as an image...
+             */
 
-        $qr_code_images_dir = public_path('bought_tickets/qr_code_images');
+            $qr_code_images_dir = public_path('bought_tickets/qr_code_images');
 
-        if (!file_exists($qr_code_images_dir)) {
-            mkdir($qr_code_images_dir, 0777, true);
-        }
+            if (!file_exists($qr_code_images_dir)) {
+                mkdir($qr_code_images_dir, 0777, true);
+            }
+            $timestamp = now()->timestamp;
 
-        $qr_code_image_name = now()->timestamp . ".png";
-        $qr_code = QrCode::format('png')->size(100)->generate('http://fikaplaces.com/tickets/' . $unique_ticket_identifier,
-            $qr_code_images_dir . '/' . $qr_code_image_name);
+            $qr_code_image_name = $timestamp . ".png";
+            $qr_code = QrCode::format('png')->size(100)->generate('http://fikaplaces.com/tickets/' . $unique_ticket_identifier,
+                $qr_code_images_dir . '/' . $qr_code_image_name);
 
-        /*
-        * Prepare the content for the ticket pdf template
-        */
-        $ticket_template_data = [
-            'event_name'                => $event->name,
-            'event_location'            => $event->location,
-            'event_start_date_time'     => $event_dates->first()->start,
-            'event_end_date_time'       => $event_dates->first()->end,
-            'ticket_type'               => $ticket_type,
-            'ticket_qr_code_image_name' => $qr_code_image_name,
-        ];
+            /*
+            * Prepare the content for the ticket pdf template
+            */
+            $ticket_template_data = [
+                'event'                     => $event,
+                'event_dates'               => UniversalMethods::getEventDateTimeArray($event_dates),
+                'ticket_type'               => $ticket_type,
+                'ticket_qr_code_image_name' => $qr_code_image_name,
+                'ticket_no'                 => $timestamp
+            ];
 
 
-        //generate and save pdf
-        $ticket_name = "T" . now()->timestamp . uniqid();
-        $pdf_name = $ticket_name . ".pdf";
-        $pdf_dir = public_path('bought_tickets/pdfs');
+            //generate and save pdf
+            $ticket_name = "T" . $timestamp . uniqid();
+            $pdf_name = $ticket_name . ".pdf";
+            $pdf_dir = public_path('bought_tickets/pdfs');
 
-        if (!file_exists($pdf_dir)) {
-            mkdir($pdf_dir, 0777, true);
-        }
+            if (!file_exists($pdf_dir)) {
+                mkdir($pdf_dir, 0777, true);
+            }
 
-        $ticket_pdf_path = $pdf_dir . '/' . $pdf_name;
+            $ticket_pdf_path = $pdf_dir . '/' . $pdf_name;
 
-        //create the pdf for each ticket to be shared via email
+            //select the event template
+            $template = $event->ticket_template == 1 ? "event_organizer.ticket_templates.template_1" : "event_organizer.ticket_templates.template_2";
+
+            //create the pdf for each ticket to be shared via email
 //        return PDF::loadView( 'tickets.display-tickets', $ticket_template_data)->save( $pdf_dir.'/'.$pdf_name )->stream($pdf_name);
-        $pdf = PDF::loadView('tickets.display-tickets', $ticket_template_data)->save($ticket_pdf_path);
+            $pdf = PDF::loadView($template, $ticket_template_data)->save($ticket_pdf_path);
 
-        $ticket_category_detail = TicketCategoryDetail::where('event_id', $event_id)
-            ->where('category_id', $ticket_category_id)
-            ->first();
+            $ticket_category_detail = TicketCategoryDetail::where('event_id', $event_id)
+                ->where('category_id', $ticket_category_id)
+                ->first();
 
-        $data = [
-            'event_id'                  => $event_id,
-            'ticket_customer_id'        => $ticket_customer_id,
-            'validation_token'          => $unique_ticket_identifier,
-            'qr_code_image_url'         => $qr_code_image_name,
-            'pdf_format_url'            => $pdf_name,
-            'ticket_category_detail_id' => $ticket_category_detail->id
-        ];
+            $data = [
+                'event_id'                  => $event_id,
+                'ticket_customer_id'        => $ticket_customer_id,
+                'validation_token'          => $unique_ticket_identifier,
+                'qr_code_image_url'         => $qr_code_image_name,
+                'pdf_format_url'            => $pdf_name,
+                'ticket_category_detail_id' => $ticket_category_detail->id,
+                'unique_ID'                 => $timestamp
+            ];
 
-        //save the tickets records
-        Ticket::create($data);
+            //save the tickets records
+            Ticket::create($data);
 
-        return $data;
+            return $data;
+        } catch ( \Exception $exception ) {
+            logger("error creating tickets: \n" . $exception->getMessage() . "\n file: " . $exception->getFile() .
+                "\n line: " . $exception->getLine() . "\n trace: " . $exception->getTraceAsString());
+
+            return [];
+        }
     }
 
 

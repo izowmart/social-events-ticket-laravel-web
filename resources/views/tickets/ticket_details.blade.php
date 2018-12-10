@@ -256,13 +256,14 @@
 
 @section('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.5/validator.min.js"></script>
-<script id="mula-checkout-library" type="text/javascript" src="https://beep2.cellulant.com:9212/checkout/v2/mula-checkout.js"></script>
+{{--<script id="mula-checkout-library" type="text/javascript" src="https://beep2.cellulant.com:9212/checkout/v2/mula-checkout.js"></script>--}}
+<script id="mula-checkout-library" type="text/javascript" src="https://mula.africa/v2/mula-checkout.js"></script>
 <script src="{{ asset('js/plugins/jquery.smartWizard.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.1/dist/sweetalert2.all.min.js"></script>
 <script>
  var main_total = 0;
  @if ($event->type==2)
- var total_categories = {{$total_categories}};
+ var total_categories = eval("{{$total_categories}}");
  if($('.sold-out').length==total_categories){
      $('#purchase-btn').remove();
 
@@ -322,7 +323,7 @@
           
             $("#"+quantity).on("change paste keyup",function() {
                  $("#subtotal").val(0);
-                 console.log("start: "+main_total);
+                 // console.log("start: "+main_total);
                 var get_price = $("#"+price).text();
                 var get_quantity = $("#"+quantity).val();
                 var get_total_price = get_price * get_quantity;
@@ -336,7 +337,7 @@
                     // add only if the value is number
                     if(!isNaN(value) && value.length != 0) {
                         sum += parseFloat(value);
-                        console.log("sum: " + sum);
+                        // console.log("sum: " + sum);
                     }
                 });
                 $("#subtotal").val(sum);
@@ -351,10 +352,10 @@
             e.preventDefault();
         });
        $('.total').on("change",function() {
-           console.log("On change triggered");
+           // console.log("On change triggered");
            $('.total').each(function(index) {
                var value = $(this).val();
-               console.log("Total: "+value);
+               // console.log("Total: "+value);
            });
         });
         var encryptionURL = "{{route('encryption_url')}}";
@@ -381,7 +382,7 @@
                                                             // elmForm.submit();
    
                                                             var params = $('#myForm').serialize();
-                                                            console.log(params);
+                                                            // console.log(params);
 
                                                              function encrypt() {
                                                                 return fetch(encryptionURL, {

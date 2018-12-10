@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Intervention\Image\Facades\Image;
+use Snowfire\Beautymail\Beautymail;
 
 
 class AuthController extends Controller
@@ -99,6 +100,18 @@ class AuthController extends Controller
                         $tokenResult->token->expires_at
                     )->toDateTimeString();
 
+
+
+                    //send user a welcome email
+                    $beautymail = app()->make(Beautymail::class);
+                    $beautymail->send('user.welcome_email', ['user'=>$user], function($message) use($user)
+                    {
+                        $message
+                            ->from('info@fikaplaces.com')
+                            ->to($user->email, $user->name)
+                            ->subject('Welcome to FIKA Places!');
+                    });
+
                     DB::commit();
                     return response()->json(
                         [
@@ -125,7 +138,7 @@ class AuthController extends Controller
             return response()->json(
                 [
                     'success' => false,
-                    'message' => 'User Account Creation Failed!',
+                    'message' => 'User Account Creation Failed: '.$exception->getMessage(),
                     'data'    => [],
                 ], 500
             );
@@ -138,7 +151,7 @@ class AuthController extends Controller
         try {
             $validator = Validator::make($request->all(),
                 [
-                    'user_id'       => 'required|integer|exists:users,id',
+//                    'user_id'       => 'required|integer|exists:users,id',
                     'username'      => 'required|alpha_dash',
                     'first_name'    => 'required|string',
                     'last_name'     => 'required|string',
@@ -146,7 +159,7 @@ class AuthController extends Controller
                     'profile_url'   => 'nullable|string',
                     'gender'        => 'nullable|int',
                     'country_id'    => 'nullable|int',
-                    'phone_number'  => ['nullable', 'string', Rule::unique('users')->ignore($request->user_id, 'id')]
+                    'phone_number'  => ['nullable', 'string','regex:/^(7|07|\+2547|2547)(\d){8}/', Rule::unique('users')->ignore($request->user_id, 'id')]
                 ],
                 [
                     'username.required'    => 'Please provide a username',
@@ -165,7 +178,8 @@ class AuthController extends Controller
                     ], 200
                 );
             } else {
-                $user_id = $request->user_id;
+                $user = $request->user();//User::where('id', $user_id)->first();
+//                $user_id = $user->id;
 
                 $username = $request->username;
                 $last_name = $request->last_name;
@@ -173,11 +187,8 @@ class AuthController extends Controller
                 $year_of_birth = $request->year_of_birth;
                 $gender = $request->gender;
                 $country_id = $request->country_id;
-                $phone_number = $request->phone_number;
+                $phone_number = UniversalMethods::formatPhoneNumber($request->phone_number);
                 $profile_url = $request->has('profile_url') ? $request->profile_url : null;
-
-
-                $user = User::where('id', $user_id)->first();
 
                 if ($user != null) {
 
