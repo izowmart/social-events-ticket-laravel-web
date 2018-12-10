@@ -47,8 +47,25 @@ class MulaPaymentController
             }
 
             $user = $request->user();
+
+            //register the user as a ticket customer
+            $ticket_customer = TicketCustomer::updateOrCreate(
+                [
+                    'email' => $user->email,
+                ],
+                [
+                    'phone_number' => UniversalMethods::formatPhoneNumber($user->phone_number),
+                    'first_name'   => $user->first_name,
+                    'last_name'    => $user->last_name,
+                    'user_id'      => $user != null ? $user->id : null,
+                    'source'       => TicketCustomer::SOURCE_APP,
+                ]
+            );
+
            //process the information for the tickets purchase request
             $tickets = $request->tickets;
+            //this array should contain:
+            //ticket_sale_end_date_time, category_slug_quantity,subtotal
             $data_array=[];
             $event_id = 0;
             $event = new Event();
@@ -73,24 +90,30 @@ class MulaPaymentController
 
             $data_array['subtotal'] = $total;
 
-
-            $ticket_customer = TicketCustomer::updateOrCreate(
-                [
-                    'email' => $user->email,
-                ],
-                [
-                    'phone_number' => UniversalMethods::formatPhoneNumber($user->phone_number),
-                    'first_name'   => $user->first_name,
-                    'last_name'    => $user->last_name,
-                    'user_id'      => $user != null ? $user->id : null,
-                    'source'       => TicketCustomer::SOURCE_APP,
-                ]
-            );
-
             DB::beginTransaction();
 
             list($payload, $encryptedPayload) = UniversalMethods::process_mula_payments($ticket_customer, $data_array,
                 $event, $event_id,false);
+
+            //if payload == null,
+            // then the tickets sought are more than the tickets available,
+            // therefore, let's take the user back and let them select again
+            //otherwise we are good to go....
+            if ($payload == null){
+                DB::rollBack();
+
+                return response()->json([
+                        'success' => false,
+                        'message' => 'params fetch failed',
+                        'datum'   => [
+                            'params'      => null,
+                            'accessKey'   => '',
+                            'countryCode' => ''
+                        ]
+                    ]
+                );
+            }
+
 
             DB::commit();
 

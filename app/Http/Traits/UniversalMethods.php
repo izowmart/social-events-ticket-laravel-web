@@ -102,12 +102,13 @@ trait UniversalMethods
                     'ticket_category_details.category_id')
                     ->where('event_id', $event_id)
                     ->where('slug', $ticket_category_slug)
-                    ->select('ticket_category_details.id')
+                    ->select('ticket_category_details.category_id','ticket_category_details.id')
                     ->first();
 
                 //check the remaining tickets
+                //pass the event_id and the category_id
                 $tickets_available = UniversalMethods::getRemainingCategoryTickets($event_id,
-                    $ticket_category_detail->id);
+                    $ticket_category_detail->category_id);
 
                 //get the sought tickets
                 $tickets_sought = (int)$item;
