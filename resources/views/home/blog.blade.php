@@ -1,6 +1,6 @@
 @extends('home.layout')
 @section('content')
-<section class="parallax-window" data-parallax="scroll" data-image-src="img/slider1.jpg" data-natural-width="1400" data-natural-height="">
+<section class="parallax-window" data-parallax="scroll" data-image-src="{{url('images/home/slider1.jpg')}}" data-natural-width="1400" data-natural-height="">
     <div class="parallax-content-1">
         <div class="animated fadeInDown">
             <h1>Community Blog</h1>
@@ -28,7 +28,7 @@
             <div class="col-lg-9">
                 <div class="box_style_1">
                     <div class="post">
-                        <a href="post.html"><img src="img/blog-3.jpg" alt="Image" class="img-fluid">
+                        <a href="post.html"><img src="{{url('images/home/blog-3.jpg')}}" alt="Image" class="img-fluid">
                         </a>
                         <div class="post_info clearfix">
                             <div class="post-left">
@@ -58,7 +58,7 @@
                     <hr>
 
                     <div class="post">
-                        <a href="#"><img src="img/blog-3.jpg" alt="Image" class="img-fluid">
+                        <a href="#"><img src="{{url('images/home/blog-3.jpg')}}" alt="Image" class="img-fluid">
                         </a>
                         <div class="post_info clearfix">
                             <div class="post-left">
@@ -84,7 +84,7 @@
                     <hr>
 
                     <div class="post">
-                        <a href="blog_post_right_sidebar.html"><img src="img/blog-3.jpg" alt="Image" class="img-fluid">
+                        <a href="blog_post_right_sidebar.html"><img src="{{url('images/home/blog-3.jpg')}}" alt="Image" class="img-fluid">
                         </a>
                         <div class="post_info clearfix">
                             <div class="post-left">
