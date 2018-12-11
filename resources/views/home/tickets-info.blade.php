@@ -1,6 +1,6 @@
 @extends('home.layout')
 @section('content')
-<section class="parallax-window" data-parallax="scroll" data-image-src="img/about.jpg" data-natural-width="1400" data-natural-height="470">
+<section class="parallax-window" data-parallax="scroll" data-image-src="{{url('images/home/about.jpg')}}" data-natural-width="1400" data-natural-height="470">
     <div class="parallax-content-1">
         <div class="animated fadeInDown">
             <h1>Buy Tickets</h1>
@@ -105,7 +105,7 @@
                             </div>
                             <div class="img_container">
                                 <a href="single_event.html">
-                                    <img src="img/featured.jpg" width="800" height="533" class="img-fluid" alt="Image">
+                                    <img src="{{url('images/home/featured.jpg')}}" width="800" height="533" class="img-fluid" alt="Image">
                                     <div class="short_info">
                                     </div>
                                 </a>
@@ -127,7 +127,7 @@
                             </div>
                             <div class="img_container">
                                 <a href="single_event.html">
-                                    <img src="img/featured.jpg" width="800" height="533" class="img-fluid" alt="Image">
+                                    <img src="{{url('images/home/featured.jpg')}}" width="800" height="533" class="img-fluid" alt="Image">
                                     <div class="short_info">
                                     </div>
                                 </a>
@@ -152,7 +152,7 @@
                             </div>
                             <div class="img_container">
                                 <a href="single_event.html">
-                                    <img src="img/featured.jpg" width="800" height="533" class="img-fluid" alt="Image">
+                                    <img src="{{url('images/home/featured.jpg')}}" width="800" height="533" class="img-fluid" alt="Image">
                                     <div class="short_info">
                                     </div>
                                 </a>
@@ -174,7 +174,7 @@
                             </div>
                             <div class="img_container">
                                 <a href="single_event.html">
-                                    <img src="img/featured.jpg" width="800" height="533" class="img-fluid" alt="Image">
+                                    <img src="{{url('images/home/featured.jpg')}}" width="800" height="533" class="img-fluid" alt="Image">
                                     <div class="short_info">
                                     </div>
                                 </a>
@@ -199,7 +199,7 @@
                             </div>
                             <div class="img_container">
                                 <a href="single_event.html">
-                                    <img src="img/featured.jpg" width="800" height="533" class="img-fluid" alt="Image">
+                                    <img src="{{url('images/home/featured.jpg')}}" width="800" height="533" class="img-fluid" alt="Image">
                                     <div class="short_info">
                                     </div>
                                 </a>
@@ -221,7 +221,7 @@
                             </div>
                             <div class="img_container">
                                 <a href="single_event.html">
-                                    <img src="img/featured.jpg" width="800" height="533" class="img-fluid" alt="Image">
+                                    <img src="{{url('images/home/featured.jpg')}}" width="800" height="533" class="img-fluid" alt="Image">
                                     <div class="short_info">
                                     </div>
                                 </a>
@@ -246,7 +246,7 @@
                             </div>
                             <div class="img_container">
                                 <a href="single_event.html">
-                                    <img src="img/featured.jpg" width="800" height="533" class="img-fluid" alt="Image">
+                                    <img src="{{url('images/home/featured.jpg')}}" width="800" height="533" class="img-fluid" alt="Image">
                                     <div class="short_info">
                                     </div>
                                 </a>
@@ -268,7 +268,7 @@
                             </div>
                             <div class="img_container">
                                 <a href="single_event.html">
-                                    <img src="img/featured.jpg" width="800" height="533" class="img-fluid" alt="Image">
+                                    <img src="{{url('images/home/featured.jpg')}}" width="800" height="533" class="img-fluid" alt="Image">
                                     <div class="short_info">
                                     </div>
                                 </a>
