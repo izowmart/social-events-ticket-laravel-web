@@ -261,8 +261,8 @@
     </div>
     <form>
         <div class="sign-in-wrapper">
-            <a href="#0" class="social_bt facebook">Login with Facebook</a>
-            <a href="#0" class="social_bt google">Login with Google</a>
+            {{--<a href="#0" class="social_bt facebook">Login with Facebook</a>--}}
+            {{--<a href="#0" class="social_bt google">Login with Google</a>--}}
             <div class="divider"><span>Or</span></div>
             <div class="form-group">
                 <label>Email</label>
@@ -301,7 +301,7 @@
 <!-- /Sign In Popup -->
 
 <!-- Common scripts -->
-<script src="{{'js/jquery-3.2.1.min.js'}}"></script>
+<script src="{{'js/jquery-2.2.4.min.js'}}"></script> {{--NOTE:: using any other version of js causes the search, login & mobile menu not to work--}}
 <script src="{{'js/home/common_scripts_min.js'}}"></script>
 <script src="{{'js/home/functions.js'}}"></script>
 
