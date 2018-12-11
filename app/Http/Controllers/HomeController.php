@@ -44,6 +44,11 @@ class HomeController extends Controller
         return view('home.contact');
     }
 
+    public function selling()
+    {
+        return view('home.start_selling');
+    }
+
     public function home_user()
     {
         return view('user.home');

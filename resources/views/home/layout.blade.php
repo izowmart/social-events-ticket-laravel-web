@@ -141,7 +141,7 @@
 
                 <div class="col-6">
                     <ul id="top_links">
-                        <li><a href="sell.html">Sell Tickets</a></li>
+                        <li><a href="{{route('start-selling')}}">Sell Tickets</a></li>
 
                         <li><a href="#sign-in-dialog" id="access_link">Sign in</a></li>
                     </ul>
