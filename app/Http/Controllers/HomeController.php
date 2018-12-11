@@ -21,7 +21,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home.layout');
+        return view('home.index');
     }
 
     public function about()
@@ -31,12 +31,17 @@ class HomeController extends Controller
 
     public function tickets()
     {
-        return view('home.tickets');
+        return view('home.tickets-info');
     }
 
     public function blog()
     {
         return view('home.blog');
+    }
+
+    public function contact()
+    {
+        return view('home.contact');
     }
 
     public function home_user()
