@@ -61,7 +61,7 @@
     </div>
     <div class="text-center">
         <p>Powered by FIKA Places
-            <img class="rounded" src="{{ asset('FikaIconWhite120x120.jpg') }}" alt="logo"
+            <img class="rounded" src="{{ asset('fika_logo.jpg') }}" alt="logo"
                  style="height: 5%; width: 5%"></p>
     </div>
 </div>
