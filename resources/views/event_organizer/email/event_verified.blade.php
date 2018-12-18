@@ -6,7 +6,7 @@
 <br>
 <br>
 
-Fika PLACES App
+<a href="https://play.google.com/store/apps/details?id=com.fika.places">Fika PLACES App</a>
 Fika Ticket Scanner App
 <ul>
     <li><a href="https://www.facebook.com/fika.live/">Facebook</a></li>

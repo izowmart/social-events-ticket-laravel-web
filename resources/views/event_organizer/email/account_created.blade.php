@@ -6,6 +6,7 @@
 
 <p>For events that require tickets we also provide you with a FREE ticket scanning App, which will enable you to quickly scan tickets and keep account of all event data.</p>
 
+<p>Download Fika App <a href="https://play.google.com/store/apps/details?id=com.fika.places">Here</a></p>
 <p>Download Fika Ticket Scanner here (......)</p>
 <p>To open the Fika Ticket Scanner use the same login credentials as your Event Organiser profile.</p>
 <p>For information on Selling Tickets please visit <a href="{{route('ticket-info')}}">the Ticket Info Page</a></p>
