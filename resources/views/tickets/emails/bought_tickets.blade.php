@@ -20,12 +20,11 @@
 
         <p>We sincerely hope that you enjoy the event.</p>
 
-        <p>Please download our App and explore different venues around you.</p>
-        (App Link)
+        <p>Please download our App and explore different venues around you <a href="https://play.google.com/store/apps/details?id=com.fika.places">here</a></p>
         <p>Those who have the App will also be able to qualify for different gifts and offers during Fika events.</p>
 
 
-        <p>For more information on Fika Places you can visit our website www.fikaplaces.com</p>
+        <p>For more information on Fika Places you can visit <a href="http://www.fikaplaces.com">our website</a></p>
         <p>You should also follow us on social media for interesting information and updates on offers</p>
         <ul>
             <li><a href="https://www.facebook.com/fika.live/">Facebook</a></li>
