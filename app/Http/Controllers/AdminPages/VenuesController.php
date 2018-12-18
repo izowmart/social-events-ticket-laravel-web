@@ -163,9 +163,14 @@ class VenuesController extends Controller
     {
         $id = $request->id;
         $venue = Venue::find($id);
-        $venue->delete();
-        //Give message to admin after successfull operation
-        $request->session()->flash('status', 'Venue deleted successfully');
+        if ($venue->posts->count()==0) {
+            $venue->delete();
+            //Give message to admin after successfull operation
+            $message = "Venue deleted successfully";
+        }else{
+            $message = "Venue already has posts, it cannot be deleted!";
+        }
+        $request->session()->flash('status', $message);
         return redirect($this->redirectPath);
     }
 

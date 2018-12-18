@@ -44,6 +44,7 @@ class UserResetPasswordNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
+            ->from("info@fikaplaces.com","FIKA Places")
             ->line('You are receiving this email because we received a password reset request for your account.')
             ->action('Reset Password', url('user/reset', $this->token))
             ->line('If you did not request a password reset, no further action is required.');

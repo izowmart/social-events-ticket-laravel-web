@@ -30,7 +30,7 @@ class NewEventOrganizerAccount extends Mailable
     public function build()
     {
         return $this->view('event_organizer.email.account_created')
-            ->from('info@fikaplaces.com')
+            ->from('info@fikaplaces.com',"FIKA Places")
             ->subject('Welcome To FIKA Places')
             ->with($this->data);
     }

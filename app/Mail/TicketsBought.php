@@ -32,7 +32,7 @@ class TicketsBought extends Mailable
     public function build()
     {
         $message = $this->view('tickets.emails.bought_tickets')
-            ->from('info@fikaplaces.com')
+            ->from('info@fikaplaces.com',"FIKA Places")
             ->subject('Your Tickets')
             ->with($this->data)
         ;
