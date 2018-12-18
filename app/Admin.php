@@ -44,4 +44,9 @@ class Admin extends Authenticatable
     {
         return $this->first_name.' '.$this->last_name;
   }
+
+    public function adverts()
+    {
+        return $this->hasMany('App\Advert', 'admin_id');
+    }
 }
