@@ -13,7 +13,12 @@
 
 
 Route::get('/', 'HomeController@index')->name('home');
-Route::get('/test_payment', 'MulaPaymentController@index')->name('payment_home');
+Route::get('about-us', 'HomeController@about')->name('about');
+Route::get('tickets-info', 'HomeController@tickets')->name('tickets-info');
+Route::get('start-selling', 'HomeController@selling')->name('start-selling');
+Route::get('blog', 'HomeController@blog')->name('blog');
+Route::get('contact', 'HomeController@contact')->name('contact');
+
 Route::group(['prefix' => 'payments'], function () {
     // Route::get('https://beep2.cellulant.com:9212:/checkout/v2/modal')
     Route::post('encryption_url', 'MulaPaymentController@encryptData')->name('encryption_url');
