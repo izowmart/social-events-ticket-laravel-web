@@ -263,7 +263,7 @@
         <div class="sign-in-wrapper">
             {{--<a href="#0" class="social_bt facebook">Login with Facebook</a>--}}
             {{--<a href="#0" class="social_bt google">Login with Google</a>--}}
-            <div class="divider"><span>Or</span></div>
+            {{--<div class="divider"><span>Or</span></div>--}}
             <div class="form-group">
                 <label>Email</label>
                 <input type="email" class="form-control" name="email" id="email">
