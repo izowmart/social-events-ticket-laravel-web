@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\EventOrganizerAuth;
 
 use App\Mail\NewEventOrganizerAccount;
+use App\Scanner;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -38,11 +39,20 @@ class RegisterController extends Controller
             'name' => $event_organizer->name
         ];
 
+        //create a scanner account with their details
+        $scanner = new Scanner();
+        $scanner->event_organizer_id = $event_organizer->id;
+        $scanner->first_name = $request->first_name;
+        $scanner->last_name = $request->last_name;
+        $scanner->email = $request->email;
+        $scanner->password = bcrypt($request->password);
+        $scanner->save();
+
         //send them a welcome email
         Mail::to($event_organizer)->queue(new NewEventOrganizerAccount($data));
 
         //Give message to event_organizer after successfull registration
-        $request->session()->flash('status', 'Regestered successfully, You can proceed to login.');
+        $request->session()->flash('status', 'Registered successfully, You can proceed to login.');
         return redirect($this->redirectPath);
     }
 
