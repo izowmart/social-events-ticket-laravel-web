@@ -10,11 +10,6 @@
     <title>Fika Places | Kenya's #1 Ticket Platforms</title>
 
     <!-- Favicons-->
-    {{--<link rel="shortcut icon" href="{{url('favicon.ico')}}" type="image/x-icon">--}}
-    {{--<link rel="apple-touch-icon" type="image/x-icon" href="img/apple-touch-icon-57x57-precomposed.png">--}}
-    {{--<link rel="apple-touch-icon" type="image/x-icon" sizes="72x72" href="img/apple-touch-icon-72x72-precomposed.png">--}}
-    {{--<link rel="apple-touch-icon" type="image/x-icon" sizes="114x114" href="img/apple-touch-icon-114x114-precomposed.png">--}}
-    {{--<link rel="apple-touch-icon" type="image/x-icon" sizes="144x144" href="img/apple-touch-icon-144x144-precomposed.png">--}}
     <link rel="apple-touch-icon" sizes="57x57" href="{{url('apple-icon-57x57.png')}}">
     <link rel="apple-touch-icon" sizes="60x60" href="{{url('apple-icon-60x60.png')}}">
     <link rel="apple-touch-icon" sizes="72x72" href="{{url('apple-icon-72x72.png')}}">
@@ -28,22 +23,22 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{url('favicon-32x32.png')}}">
     <link rel="icon" type="image/png" sizes="96x96" href="{{url('favicon-96x96.png')}}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{url('favicon-16x16.png')}}">
-    <link rel="manifest" href="{{'manifest.json'}}">
+    <link rel="manifest" href="{{url('manifest.json')}}">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="{{url('ms-icon-144x144.png')}}">
     <meta name="theme-color" content="#ffffff">
     
     <!-- COMMON CSS -->
-    <link href="{{'css/bootstrap.min.css'}}" rel="stylesheet">
-    <link href="{{'css/home/style.css'}}" rel="stylesheet">
-    <link href="{{'css/home/vendors.css'}}" rel="stylesheet">
+    <link href="{{url('css/bootstrap.min.css')}}" rel="stylesheet">
+    <link href="{{url('css/home/style.css')}}" rel="stylesheet">
+    <link href="{{url('css/home/vendors.css')}}" rel="stylesheet">
 
     <!-- CUSTOM CSS -->
-    <link href="{{'css/home/custom.css'}}" rel="stylesheet">
+    <link href="{{url('css/home/custom.css')}}" rel="stylesheet">
 
     <!-- REVOLUTION SLIDER CSS -->
-    <link rel="stylesheet" type="text/css" href="{{'rev_slider_files/fonts/font-awesome/css/font-awesome.css'}}">
-    <link rel="stylesheet" type="text/css" href="{{'rev_slider_files/css/settings.css'}}">
+    <link rel="stylesheet" type="text/css" href="{{url('rev_slider_files/fonts/font-awesome/css/font-awesome.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{url('rev_slider_files/css/settings.css')}}">
 
     <!-- REVOLUTION LAYERS STYLES -->
     <style>
@@ -150,42 +145,7 @@
         </div><!-- End container-->
     </div><!-- End top line-->
 
-    <div class="container">
-        <div class="row">
-            <div class="col-3">
-                <div id="logo_home">
-                    <h1><a href="{{route('home')}}" title="Fika Places">Fika Places</a></h1>
-                </div>
-            </div>
-            <nav class="col-9">
-                <a class="cmn-toggle-switch cmn-toggle-switch__htx open_close" href="javascript:void(0);"><span>Menu mobile</span></a>
-                <div class="main-menu">
-                    <div id="header_menu">
-                        <img src="{{url('images/home/logo_sticky.png')}}" width="160" height="34" alt="logo" data-retina="true">
-                    </div>
-                    <a href="#" class="open_close" id="close_in"><i class="icon_set_1_icon-77"></i></a>
-                    <ul>
-                        <li><a href="{{route('home')}}" >Home</a></li>
-                        <li><a href="{{route('about')}}" >About Us</a></li>
-                        <li><a href="{{route('tickets-info')}}" >Tickets</a></li>
-                        <li><a href="{{route('blog')}}" >Blog</a></li>
-
-                        <li><a href="{{route('contact')}}" >Contacts</a></li>
-
-
-
-                    </ul>
-                </div><!-- End main-menu -->
-                <ul id="top_tools">
-                    <li>
-                        <a href="javascript:void(0);" class="search-overlay-menu-btn"><i class="icon_search"></i></a>
-                        &nbsp;&nbsp;&nbsp;
-                    </li>
-
-                </ul>
-            </nav>
-        </div>
-    </div><!-- container -->
+   @include('partials.mobile_home_menu')
 </header><!-- End Header -->
 
 @yield('content')
@@ -259,62 +219,14 @@
     <div class="small-dialog-header">
         <h3>Sign In</h3>
     </div>
-    <form method="POST" action="{{ route('event_organizer_login_form_post') }}">
-        @csrf
-        <div class="sign-in-wrapper">
-            {{--<a href="#0" class="social_bt facebook">Login with Facebook</a>--}}
-            {{--<a href="#0" class="social_bt google">Login with Google</a>--}}
-            {{--<div class="divider"><span>Or</span></div>--}}
-            <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
-                <label class="custom-control-label" for="email">Email</label>
-                <input type="email" class="form-control" name="email" id="email" placeholder="Input email address" value="{{ old('email') }}" required autofocus>
-                <i class="icon_mail_alt"></i>
-                @if ($errors->has('email'))
-                    <span class="help-block">
-                    <strong>{{ $errors->first('email') }}</strong>
-                </span>
-                @endif
-            </div>
-            <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                <label class="control-label" for="password">Password</label>
-                <input class="form-control" type="password" name="password" placeholder="Input password" required>
-                <i class="icon_lock_alt"></i>
-                @if ($errors->has('password'))
-                    <span class="help-block">
-                    <strong>{{ $errors->first('password') }}</strong>
-                </span>
-                @endif
-            </div>
-            <div class="clearfix add_bottom_15">
-                <div class="checkboxes float-left">
-                    <input id="remember" type="checkbox" name="remember">
-                    <label for="remember">Remember Me</label>
-                </div>
-                <div class="float-right"><a id="forgot" href="{{ route('event_organizer_email_form') }}">Forgot Password?</a></div>
-            </div>
-            <div class="text-center"><input type="submit" value="Log In" class="btn_login"></div>
-            <div class="text-center">
-                Don’t have an account? <a href="{{ route('event_organizer_register_form') }}">Sign up</a>
-            </div>
-            {{--<div id="forgot_pw">--}}
-                {{--<div class="form-group">--}}
-                    {{--<label>Please confirm login email below</label>--}}
-                    {{--<input type="email" class="form-control" name="email_forgot" id="email_forgot">--}}
-                    {{--<i class="icon_mail_alt"></i>--}}
-                {{--</div>--}}
-                {{--<p>You will receive an email containing a link allowing you to reset your password to a new preferred one.</p>--}}
-                {{--<div class="text-center"><input type="submit" value="Reset Password" class="btn_1"></div>--}}
-            {{--</div>--}}
-        </div>
-    </form>
-    <!--form -->
+            @include('partials.event_organizer_login_form')
 </div>
 <!-- /Sign In Popup -->
 
 <!-- Common scripts -->
-<script src="{{'js/jquery-2.2.4.min.js'}}"></script> {{--NOTE:: using any other version of js causes the search, login & mobile menu not to work--}}
-<script src="{{'js/home/common_scripts_min.js'}}"></script>
-<script src="{{'js/home/functions.js'}}"></script>
+<script src="{{url('js/jquery-2.2.4.min.js')}}"></script> {{--NOTE:: using any other version of js causes the search, login & mobile menu not to work--}}
+<script src="{{url('js/home/common_scripts_min.js')}}"></script>
+<script src="{{url('js/home/functions.js')}}"></script>
 
 <!-- SLIDER REVOLUTION SCRIPTS  -->
 <script src="{{url('js/rev-slider/jquery.themepunch.tools.min.js')}}"></script>
