@@ -31,7 +31,7 @@ class NewEventVerification extends Mailable
     public function build()
     {
         return $this->view('event_organizer.email.event_verified',$this->data)
-            ->from('info@fikaplaces.com')
+            ->from('info@fikaplaces.com',"FIKA Places")
             ->subject('Event')
             ->with($this->data);
     }
