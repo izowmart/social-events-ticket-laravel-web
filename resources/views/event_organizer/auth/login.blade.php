@@ -8,7 +8,12 @@
                         <div id="login">
                             <div class="text-center"><img src="{{url('images/home/logo_sticky.png')}}" alt="Logo" data-retina="true"></div>
                             <hr>
-                                @include('partials.event_organizer_login_form')
+                            @if (session('status'))
+                                <div class="alert alert-success">
+                                    {{ session('status') }}
+                                </div>
+                            @endif
+                            @include('partials.event_organizer_login_form')
                         </div>
                     </div>
                 </div>

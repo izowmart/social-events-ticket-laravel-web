@@ -13,12 +13,13 @@
                         <div id="login">
                             <div class="text-center"><img src="{{url('images/home/logo_sticky.png')}}" alt="Image" data-retina="true" ></div>
                             <hr>
+                            @if (session('status'))
+                                <div class="alert alert-success">
+                                    {{ session('status') }}
+                                </div>
+                            @endif
                             <form class="register-form" method="POST" action="{{ route('event_organizer_register_form_post') }}">
                                 @csrf
-                                {{--<div class="form-group">--}}
-                                    {{--<label>First Name</label>--}}
-                                    {{--<input type="text" class=" form-control"  placeholder="First Name">--}}
-                                {{--</div>--}}
                                 <div class="form-group{{ $errors->has('first_name') ? ' has-error' : '' }}">
                                     <label class="control-label">First Name</label>
                                     <input class="form-control" type="text" name="first_name" placeholder="Input first name" value="{{ old('first_name') }}" required autofocus>
