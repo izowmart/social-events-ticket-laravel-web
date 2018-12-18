@@ -40,10 +40,17 @@ class AdminsController extends Controller
 
     public function destroy(Request $request){
         $admin = Admin::find($request->id);
-        $admin->delete();
+
+        //ensure deleted admin does not have adverts
+        if ($admin->adverts->count() == 0) {
+            $admin->delete();
+            $message = 'Admin deleted successfully';
+        }else{
+            $message = "Admin Account has some adverts and cannot be deleted.";
+        }
 
         //Give message to admin after successfull operation
-        $request->session()->flash('status', 'Admin deleted successfully');
+        $request->session()->flash('status', $message);
         return redirect($this->redirectPath);
 
     }
