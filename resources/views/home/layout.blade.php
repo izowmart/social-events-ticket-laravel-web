@@ -259,41 +259,52 @@
     <div class="small-dialog-header">
         <h3>Sign In</h3>
     </div>
-    <form>
+    <form method="POST" action="{{ route('event_organizer_login_form_post') }}">
+        @csrf
         <div class="sign-in-wrapper">
             {{--<a href="#0" class="social_bt facebook">Login with Facebook</a>--}}
             {{--<a href="#0" class="social_bt google">Login with Google</a>--}}
             {{--<div class="divider"><span>Or</span></div>--}}
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" class="form-control" name="email" id="email">
+            <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
+                <label class="custom-control-label" for="email">Email</label>
+                <input type="email" class="form-control" name="email" id="email" placeholder="Input email address" value="{{ old('email') }}" required autofocus>
                 <i class="icon_mail_alt"></i>
+                @if ($errors->has('email'))
+                    <span class="help-block">
+                    <strong>{{ $errors->first('email') }}</strong>
+                </span>
+                @endif
             </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" class="form-control" name="password" id="password" value="">
+            <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
+                <label class="control-label" for="password">Password</label>
+                <input class="form-control" type="password" name="password" placeholder="Input password" required>
                 <i class="icon_lock_alt"></i>
+                @if ($errors->has('password'))
+                    <span class="help-block">
+                    <strong>{{ $errors->first('password') }}</strong>
+                </span>
+                @endif
             </div>
             <div class="clearfix add_bottom_15">
                 <div class="checkboxes float-left">
-                    <input id="remember-me" type="checkbox" name="check">
-                    <label for="remember-me">Remember Me</label>
+                    <input id="remember" type="checkbox" name="remember">
+                    <label for="remember">Remember Me</label>
                 </div>
-                <div class="float-right"><a id="forgot" href="javascript:void(0);">Forgot Password?</a></div>
+                <div class="float-right"><a id="forgot" href="{{ route('event_organizer_email_form') }}">Forgot Password?</a></div>
             </div>
             <div class="text-center"><input type="submit" value="Log In" class="btn_login"></div>
             <div class="text-center">
-                Don’t have an account? <a href="javascript:void(0);">Sign up</a>
+                Don’t have an account? <a href="{{ route('event_organizer_register_form') }}">Sign up</a>
             </div>
-            <div id="forgot_pw">
-                <div class="form-group">
-                    <label>Please confirm login email below</label>
-                    <input type="email" class="form-control" name="email_forgot" id="email_forgot">
-                    <i class="icon_mail_alt"></i>
-                </div>
-                <p>You will receive an email containing a link allowing you to reset your password to a new preferred one.</p>
-                <div class="text-center"><input type="submit" value="Reset Password" class="btn_1"></div>
-            </div>
+            {{--<div id="forgot_pw">--}}
+                {{--<div class="form-group">--}}
+                    {{--<label>Please confirm login email below</label>--}}
+                    {{--<input type="email" class="form-control" name="email_forgot" id="email_forgot">--}}
+                    {{--<i class="icon_mail_alt"></i>--}}
+                {{--</div>--}}
+                {{--<p>You will receive an email containing a link allowing you to reset your password to a new preferred one.</p>--}}
+                {{--<div class="text-center"><input type="submit" value="Reset Password" class="btn_1"></div>--}}
+            {{--</div>--}}
         </div>
     </form>
     <!--form -->
