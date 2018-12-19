@@ -29,6 +29,8 @@ class PostsController extends Controller
         $posts = Post::select('posts.media_url','posts.comment','posts.id','posts.status','venues.id as venue_id','venues.name as venue_name','users.id as user_id','users.first_name','users.last_name')
                 ->join('venues', 'venues.id', '=', 'posts.venue_id')
                 ->join('users', 'users.id', '=', 'posts.user_id')
+            ->leftJoin('shares','shares.original_post_id','=','posts.id') //only fetch non shared posts
+            ->whereNull('shares.original_post_id')
                 ->get();
             
          return view('admin.pages.posts')->with('posts',$posts); 
