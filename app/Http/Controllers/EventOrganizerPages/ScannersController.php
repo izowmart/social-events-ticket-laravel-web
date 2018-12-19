@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\EventOrganizerPages;
 
+use App\EventOrganizerScanner;
 use App\Http\Traits\UniversalMethods;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -76,39 +77,55 @@ class ScannersController extends Controller
         $this->validate($request, [
             'first_name'=>'required',
             'last_name'=>'required',
-            'email'=>'required|email|max:255|unique:scanners'
+            'email'=>'required|email|max:255'
         ]); 
 
         $event_id = Crypt::decrypt($request->event_id);
         $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
         $password = UniversalMethods::passwordGenerator();
 
-        $scanner = new Scanner();
-        $scanner->event_organizer_id = $event_organizer_id;
-        $scanner->first_name = $request->first_name;
-        $scanner->last_name = $request->last_name;
-        $scanner->email = $request->email;     
-        $scanner->password = bcrypt($password);
-        $scanner->save();
+        //create new account if not exists
+        $scanner = Scanner::where('email', '=', $request->email)->first();
 
+        if ($scanner == null) {
+            $scanner = new Scanner();
+            $scanner->first_name = $request->first_name;
+            $scanner->last_name = $request->last_name;
+            $scanner->email = $request->email;
+            $scanner->password = bcrypt($password);
+            $scanner->save();
+
+            //send invite email
+            $first_name = $request->first_name;
+            $email = $request->email;
+            $event_name = $request->event_name;
+
+            $data = array('name'=>$request->first_name,'email'=>$request->email,'password'=>$password,'event_name'=>$event_name);
+            $beautymail = app()->make(\Snowfire\Beautymail\Beautymail::class);
+            $beautymail->send('event_organizer.scanner_mail', $data, function($message) use ($email,$first_name)
+            {
+                $message
+                    ->from('info@fikaplaces.com','Fika Places')
+                    ->to($email, $first_name)
+                    ->subject('Registered as Tickets Scanner');
+            });
+        }
+
+        //link the scanner to the event organizer
+        //create if not exists, a new event_organizer scanner relationship
+        $event_organizer_scanner = EventOrganizerScanner::updateOrCreate(
+            [
+                'event_organizer_id' => $event_organizer_id,
+                'scanner_id'         => $scanner->id
+            ]
+        );
+
+        //link the scanner to the event
         $event_scanner = new EventScanner();
         $event_scanner->scanner_id = $scanner->id;
         $event_scanner->event_id = $event_id;
         $event_scanner->save();
                 
-        $first_name = $request->first_name;
-        $email = $request->email;
-        $event_name = $request->event_name;
-
-        $data = array('name'=>$request->first_name,'email'=>$request->email,'password'=>$password,'event_name'=>$event_name);
-        $beautymail = app()->make(\Snowfire\Beautymail\Beautymail::class);
-        $beautymail->send('event_organizer.scanner_mail', $data, function($message) use ($email,$first_name)
-        {
-            $message
-                ->from('noreply@fikaplaces.com','Fika Places')
-                ->to($email, $first_name)
-                ->subject('Registered as scanner');
-        });
 
         //Give message after successfull operation
         $request->session()->flash('status', 'Scanner added successfully');
