@@ -12,7 +12,7 @@ class Scanner extends Authenticatable
     use Notifiable, HasApiTokens;
 
     protected $fillable = [
-        'event_organizer_id','first_name', 'last_name', 'email', 'password',
+        'first_name', 'last_name', 'email', 'password',
     ];
     protected $hidden = [
         'password','remember_token'
