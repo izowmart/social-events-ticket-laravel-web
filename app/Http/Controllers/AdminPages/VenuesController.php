@@ -97,7 +97,7 @@ class VenuesController extends Controller
             ]);
             $name = $request->file('venue_image')->getClientOriginalName();
             $filename = time().'_'. $name;
-            $request->file('venue_image')->move('venue_images', $filename);
+            $request->file('venue_image')->move('uploads/venue_images', $filename);
             $venue->venue_image = $filename;
 
         }
