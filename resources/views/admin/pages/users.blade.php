@@ -57,7 +57,7 @@
                                 {{'female'}}
                             @endif
                         </td>                        
-                        <td>{{$user->name}}</td>
+                        <td>{{$user->country_name}}</td>
                         <td>{{$user->app_version_code}}</td>                        
                         <td>
                             @if ($user->status==1)
