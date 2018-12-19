@@ -4,6 +4,7 @@ namespace App\Http\Controllers\EventOrganizerPages;
 
 use App\EventOrganizerScanner;
 use App\Http\Traits\UniversalMethods;
+use App\TicketScan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use App\Http\Controllers\Controller;
@@ -173,13 +174,45 @@ class ScannersController extends Controller
     public function destroy(Request $request)
     {
         $scanner = Scanner::find($request->id);
-        $event_scanner = EventScanner::where('scanner_id','=',$request->id);
-        $event_scanner->delete();
-        $scanner->delete();
-        $event_status = $request->status;
+        if ($scanner != null) {
+            $ticketScan = TicketScan::where('scanner_id', $scanner->id)->first();
+
+            if ($ticketScan != null) {
+                $message = "The scanner has scanned some tickets, the account cannot be deleted!";
+            } else {
+                $event_organizer_id = Auth::guard('web_event_organizer')->user()->id;
+
+                //if no scans yet,then we can delete
+
+                // the events association
+                EventScanner::join('events', 'events.id', '=', 'event_scanners.event_id')
+                    ->where('scanner_id', '=', $scanner->id)
+                    ->where('events.event_organizer_id', '=', $event_organizer_id)
+                    ->delete();
+
+                //the event organizer association
+                EventOrganizerScanner::where('event_organizer_id', '=', $event_organizer_id)
+                    ->where('scanner_id', '=', $scanner->id)
+                    ->delete();
+
+                //the account, if no other event organizer association exists
+                $event_organizer_scanner = EventOrganizerScanner::where('scanner_id', '=', $scanner->id)
+                    ->first();
+
+                if ($event_organizer_scanner == null){
+                    //delete the account
+                    $scanner->delete();
+                }
+
+
+                $message = 'Scanner deleted successfully';
+            }
+        }else{
+            $message = 'Scanner account not found!';
+        }
         
         //Give message to event organizer after successfull operation
-        $request->session()->flash('status', 'Scanner deleted successfully');
+        $request->session()->flash('status', $message);
         return redirect('event_organizer/events/'.$request->event_slug.'/scanners');
     }
 }
