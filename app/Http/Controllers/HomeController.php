@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Event;
 use App\PaymentResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +22,20 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home.index');
+        //here we fetch verified (non-)featured (non-)paid events
+        $free_events = Event::where('type', '=', 1)->get();
+
+        $featured_events = Event::where('type', '=', 2)
+            ->where('featured_event', '=', 2)
+            ->get();
+
+        $non_featured_events = Event::where('type', '=', 2)
+            ->where('featured_event', '=', 1)
+            ->get();
+
+        return view('home.index')->with(['free_events'=> $free_events,'featured_events'=>$featured_events,
+                                          'non_featured_events' => $non_featured_events,
+        ]);
     }
 
     public function about()
