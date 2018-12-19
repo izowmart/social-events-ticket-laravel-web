@@ -47,7 +47,7 @@
                         <td>{{$venue->contact_person_name}}</td>
                         <td>{{$venue->contact_person_phone}}</td>
                         <td>{{$venue->contact_person_email}}</td>
-                        <td><img height="100px" width="100px" src="{{asset('/venue_images/'.$venue->venue_image)}}"></td>
+                        <td><img height="100px" width="100px" alt="Venue Image" src="{{url('uploads/venue_images/'.$venue->venue_image)}}"></td>
                         <td>
                           @if($venue->featured_status==0)
                           <button onClick="featureBtn('{{$venue->id}}')" class="btn btn-sm btn-outline-primary">Feature</button>
