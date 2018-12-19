@@ -26,7 +26,7 @@ class PostsController extends Controller
      */
     public function index()
     {
-        $posts = Post::select('posts.media_url','posts.comment','posts.id','posts.status','venues.id as venue_id','venues.name as venue_name','users.id as user_id','users.first_name','users.last_name')
+        $posts = Post::select('posts.media_url','posts.comment','posts.id','posts.status','venues.id as venue_id','venues.name as venue_name','users.id as user_id','users.first_name','users.last_name','posts.media_type')
                 ->join('venues', 'venues.id', '=', 'posts.venue_id')
                 ->join('users', 'users.id', '=', 'posts.user_id')
             ->leftJoin('shares','shares.original_post_id','=','posts.id') //only fetch non shared posts
