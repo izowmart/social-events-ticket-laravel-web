@@ -15,8 +15,8 @@ class CreateScannersTable extends Migration
     {
         Schema::create('scanners', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('event_organizer_id')->unsigned();
-            $table->foreign('event_organizer_id')->references('id')->on('event_organizers');
+//            $table->integer('event_organizer_id')->unsigned();
+//            $table->foreign('event_organizer_id')->references('id')->on('event_organizers');
             $table->string('first_name');
             $table->string('last_name');
             $table->string('email')->unique();
