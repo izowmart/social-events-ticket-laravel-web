@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\EventScanner;
 use App\Helpers\ValidUserScannerPassword;
-use App\Http\Resources\ScannerResource;
 use App\Http\Traits\UniversalMethods;
 use App\Scanner;
 use App\Ticket;
@@ -18,6 +17,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ScannerAuthController extends Controller
 {
@@ -61,29 +61,34 @@ class ScannerAuthController extends Controller
             );
         } else {
             //attempt to authenticate user
-            if ($this->guard()->attempt($request->only(['email', 'password']))) {
+            $credentials = $request->only('email', 'password');
+//            $credentials = ['email'=>'muva.johnn@gmail.com','password'=>'N8eyvt'];
+//            dd(auth('scanner')->attempt($credentials), JWTAuth::attempt($credentials));
+            if (!$token = auth('scanner')->attempt($credentials)) {
 
-                $scanner = $this->guard()->user();
-
-                //generate token for the scanner
-                //create token for the user
-                $tokenResult = $scanner->createToken('Scanner Personal Access Token');
-                $token = $tokenResult->token;
-                $token->expires_at = Carbon::now()->addWeeks(1);
-                $token->save();
-
-                return response()->json(
-                    [
-                        'success' => true,
-                        'message' => 'Scanner Successfully Logged In. Welcome!',
-                        'data'    => fractal($scanner,ScannerTransformer::class),
-                        'access_token' => $tokenResult->accessToken,
-                        'expires_at'   => Carbon::parse(
-                            $tokenResult->token->expires_at
-                        )->toDateTimeString()
-                    ], 201
-                );
-            } else {
+//            if ($this->guard()->attempt($request->only(['email', 'password']))) {
+//
+//                $scanner = $this->guard()->user();
+//
+//                //generate token for the scanner
+//                //create token for the user
+//                $tokenResult = $scanner->createToken('Scanner Personal Access Token');
+//                $token = $tokenResult->token;
+//                $token->expires_at = Carbon::now()->addWeeks(1);
+//                $token->save();
+//
+//                return response()->json(
+//                    [
+//                        'success' => true,
+//                        'message' => 'Scanner Successfully Logged In. Welcome!',
+//                        'data'    => fractal($scanner,ScannerTransformer::class),
+//                        'access_token' => $tokenResult->accessToken,
+//                        'expires_at'   => Carbon::parse(
+//                            $tokenResult->token->expires_at
+//                        )->toDateTimeString()
+//                    ], 201
+//                );
+//            } else {
                 return response()->json(
                     [
                         'success' => true,
@@ -91,6 +96,18 @@ class ScannerAuthController extends Controller
                         'data'    => [],
                     ], 401
                 );
+            }else{
+                $scanner = $this->guard()->user();
+                return response()->json(
+                    [
+                        'success' => true,
+                        'message' => 'Scanner Successfully Logged In. Welcome!',
+                        'data'    => fractal($scanner,ScannerTransformer::class),
+                        'access_token' => $token,
+                        'expires_at'   =>''
+                    ], 201
+                );
+
             }
         }
     }
@@ -223,7 +240,7 @@ class ScannerAuthController extends Controller
     }
 
 
-    //Custom guard for admin
+    //Custom guard for scanner
     protected function guard()
     {
         return Auth::guard('scanner');
