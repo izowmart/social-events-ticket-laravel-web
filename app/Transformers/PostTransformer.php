@@ -30,6 +30,7 @@ class PostTransformer extends TransformerAbstract
             'venue_id'          => $post->venue->id,
             'media_type'        => $post->media_type,
             'media_url'         => $post->media_url,
+            'type'              => $post->type, // 1:everyone 2:venue 3:friends
             'liked'             => $this->user->likesPost($post->id),
             'shared'            => $post->shared($this->user_id),
             'my_shared_post'    => $post->my_shared_post($this->user_id),
