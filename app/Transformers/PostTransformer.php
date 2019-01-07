@@ -30,12 +30,13 @@ class PostTransformer extends TransformerAbstract
             'venue_id'          => $post->venue->id,
             'media_type'        => $post->media_type,
             'media_url'         => $post->media_url,
-            'type'              => $post->type, // 1:everyone 2:venue 3:friends
+            'type'              => $post->type, //1:everyone 2:friends 3: venue
             'liked'             => $this->user->likesPost($post->id),
             'shared'            => $post->shared($this->user_id),
             'my_shared_post'    => $post->my_shared_post($this->user_id),
             'friend_post'       => $post->friends_post($this->user_id),
             'original_post'     => $post->original_post(),
+            'my_friends_only_post' => $post->original_post() == true && $post->type == 2,
             'comment'           => $post->comment,
             'status'            => $post->status == null ? 1 : $post->status,
             'created_at'        => Carbon::parse($post->created_at)->toDateTimeString(),
