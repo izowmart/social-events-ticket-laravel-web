@@ -31,6 +31,7 @@ class VenueTransformer extends TransformerAbstract
             'status'                        => $venue->status ,
             'following'                     => $venue->followed($this->user_id) != null ? true : false,
             'distance'                      => $venue->distance == null ? 0.00 : $venue->distance ,
+            'image_url'                     => $venue->venue_image,
             'created_at'                    => Carbon::parse($venue->created_at)->toDateTimeString(),
             'updated_at'                    => Carbon::parse($venue->updated_at)->toDateTimeString(),
         ];
