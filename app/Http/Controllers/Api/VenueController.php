@@ -49,12 +49,9 @@ class VenueController extends Controller
         try {
             $validator = Validator::make($request->all(),
                 [
-                    'user_id'  => 'required|exists:users,id',
                     'venue_id' => 'required|exists:venues,id',
                 ],
                 [
-                    'user_id.required'  => 'Kindly Login',
-                    'user_id.exists'    => 'Kindly Sign Up',
                     'venue_id.required' => 'Kindly Login',
                     'venue_id.exists'   => 'Kindly Sign Up',
                 ]
@@ -65,13 +62,13 @@ class VenueController extends Controller
                     [
                         'success' => false,
                         'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
-                        'data'    => []
+                        'datum'    => null
                     ], 200
                 );
             }
 
             $venue_id = $request->venue_id;
-            $user_id = $request->user_id;
+            $user_id = $request->user()->id;
 
             $venue = Venue::find($venue_id);
 
@@ -89,7 +86,7 @@ class VenueController extends Controller
                     [
                         "success" => true,
                         "message" => "You now follow " . $venue->name,
-                        'data'    => fractal($venue, $venueTransformer)
+                        'datum'    => fractal($venue, $venueTransformer)
                     ]
                 );
 
@@ -100,16 +97,17 @@ class VenueController extends Controller
                     [
                         "success" => true,
                         "message" => "You no longer follow " . $venue->name,
-                        'data'    => fractal($venue, $venueTransformer)
+                        'datum'    => fractal($venue, $venueTransformer)
                     ],200
                 );
             }
         } catch ( \Exception $exception ) {
+            logger("Following venue id: " .$request->venue_id." failed: ".$exception->getMessage());
             return response()->json(
                 [
                     "success" => false,
-                    "message" => "Venue follow failed ".$exception->getMessage(),
-                    'data'    => []
+                    "message" => "Sorry, venue following failed.",
+                    'datum'    => null
                 ]
             );
         }
