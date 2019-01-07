@@ -17,6 +17,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ScannerAuthController extends Controller
@@ -38,77 +40,76 @@ class ScannerAuthController extends Controller
 
     public function login(Request $request)
     {
-        $validator = Validator::make($request->all(),
-            [
-                'email'    => 'required|email|exists:scanners,email',
-                'password' => ['required', new ValidUserScannerPassword()],
-            ],
-            [
-                'email.required'    => 'Please provide an email address',
-                'email.email'       => 'Email address is invalid',
-                'email.exists'      => 'You do not have an account. Kindly sign up!',
-                'password.required' => 'Please provide a password',
-            ]
-        );
-
-        if ($validator->fails()) {
-            return response()->json(
+        try {
+            $validator = Validator::make($request->all(),
                 [
-                    'success' => false,
-                    'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
-                    'data'    => []
-                ], 200
+                    'email'    => 'required|email|exists:scanners,email',
+                    'password' => ['required', new ValidUserScannerPassword()],
+                ],
+                [
+                    'email.required'    => 'Please provide an email address',
+                    'email.email'       => 'Email address is invalid',
+                    'email.exists'      => 'You do not have an account. Kindly sign up!',
+                    'password.required' => 'Please provide a password',
+                ]
             );
-        } else {
-            //attempt to authenticate user
-            $credentials = $request->only('email', 'password');
-//            $credentials = ['email'=>'muva.johnn@gmail.com','password'=>'N8eyvt'];
-//            dd(auth('scanner')->attempt($credentials), JWTAuth::attempt($credentials));
-            if (!$token = auth('scanner')->attempt($credentials)) {
 
-//            if ($this->guard()->attempt($request->only(['email', 'password']))) {
-//
-//                $scanner = $this->guard()->user();
-//
-//                //generate token for the scanner
-//                //create token for the user
-//                $tokenResult = $scanner->createToken('Scanner Personal Access Token');
-//                $token = $tokenResult->token;
-//                $token->expires_at = Carbon::now()->addWeeks(1);
-//                $token->save();
-//
-//                return response()->json(
-//                    [
-//                        'success' => true,
-//                        'message' => 'Scanner Successfully Logged In. Welcome!',
-//                        'data'    => fractal($scanner,ScannerTransformer::class),
-//                        'access_token' => $tokenResult->accessToken,
-//                        'expires_at'   => Carbon::parse(
-//                            $tokenResult->token->expires_at
-//                        )->toDateTimeString()
-//                    ], 201
-//                );
-//            } else {
+            if ($validator->fails()) {
                 return response()->json(
                     [
-                        'success' => true,
-                        'message' => 'Email or Password is Incorrect!',
-                        'data'    => [],
-                    ], 401
+                        'success' => false,
+                        'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
+                        'data'    => null
+                    ], 200
                 );
-            }else{
-                $scanner = $this->guard()->user();
-                return response()->json(
-                    [
-                        'success' => true,
-                        'message' => 'Scanner Successfully Logged In. Welcome!',
-                        'data'    => fractal($scanner,ScannerTransformer::class),
-                        'access_token' => $token,
-                        'expires_at'   =>''
-                    ], 201
-                );
+            } else {
+                //attempt to authenticate user
+                $credentials = $request->only('email', 'password');
+                if (!$token = auth('scanner')->attempt($credentials)) {
+                    return response()->json(
+                        [
+                            'success' => false,
+                            'message' => 'Email or Password is Incorrect!',
+                            'data'    => null,
+                        ], 200
+                    );
+                } else {
+                    $scanner = $this->guard()->user();
 
+                    return response()->json(
+                        [
+                            'success'      => true,
+                            'message'      => 'Scanner Successfully Logged In. Welcome!',
+                            'data'         => fractal($scanner, ScannerTransformer::class),
+                            'access_token' => $token,
+                            'expires_at'   => Carbon::now()->addSeconds(auth('scanner')->factory()->getTTL() * 60)->toDateTimeString()
+                        ], 200
+                    );
+
+                }
             }
+        } catch ( \Exception $exception ) {
+            return response()->json([
+                'success' => false,
+                'message'   => 'Sorry, something unexpected happened! Try again!',
+            ]);
+        }
+    }
+
+    public function refresh()
+    {
+        try {
+            return response()->json([
+            'access_token' => auth('scanner')->refresh(),
+            'success' => true,
+            'message' => 'new token generated',
+            'expires_at' => Carbon::now()->addSeconds(auth('scanner')->factory()->getTTL() * 60)->toDateTimeString()
+        ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Session expired! Logout and login to continue.',
+            ]);
         }
     }
 
