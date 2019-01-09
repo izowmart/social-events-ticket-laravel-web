@@ -157,4 +157,9 @@ class User extends Authenticatable
     {
         return ucwords($this->first_name. ' '.$this->last_name);
     }
+
+    public function user_notifications()
+    {
+        return $this->hasMany("App\Notification",'recipient_id','id');
+    }
 }
