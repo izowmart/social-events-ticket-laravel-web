@@ -35,6 +35,8 @@ trait SendFCMNotification
 
             $response = FCM::sendTo($tokens, $options, null, $data);
 
+            logger("FCM response: ".json_encode($response));
+
             if ($response->numberSuccess() > 0) {
                 return 1;
             } else {
