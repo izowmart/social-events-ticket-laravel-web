@@ -502,7 +502,7 @@ class AuthController extends Controller
     public function user_relations($user_id)
     {
         try {
-            $data = $this->fetch_relations($user_id);
+            $data = $this->fetch_relations($user_id,0);
 
             return response()->json(
                 [
@@ -525,9 +525,11 @@ class AuthController extends Controller
     /**
      * @param $user_id
      *
+     * @param $followed_id
+     *
      * @return array
      */
-    public function fetch_relations($user_id): array
+    public function fetch_relations($user_id,$followed_id): array
     {
         try {
 //            $user = User::findOrFail($user_id);
@@ -538,11 +540,20 @@ class AuthController extends Controller
                 $userTransformer = new UserTransformer();
                 $userTransformer->setUserId($user_id);
 
-                $data =
-                    [
-                        'followers' => fractal($user->followers, $userTransformer),
-                        'following' => fractal($user->following, $userTransformer)
+                if (count($user->followers) == 0 && count($user->following) ==0 && $followed_id != 0){
+                    $followed = User::find($followed_id);
+                    $data = [
+                        'followers' => [fractal($followed, $userTransformer)],
+                        'following' => []
                     ];
+                }else {
+
+                    $data =
+                        [
+                            'followers' => fractal($user->followers, $userTransformer),
+                            'following' => fractal($user->following, $userTransformer)
+                        ];
+                }
             }
             return $data;
         }catch (\Exception $exception){
@@ -561,6 +572,7 @@ class AuthController extends Controller
     public function follow(Request $request)
     {
         try {
+            //validate the request
             $validator = Validator::make($request->all(),
                 [
                     'follower_id'             => 'required|exists:users,id',
@@ -576,12 +588,12 @@ class AuthController extends Controller
                 ]
             );
 
+            //if any, validation errors
             if ($validator->fails()) {
                 return response()->json(
                     [
                         'success' => false,
                         'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
-                        'data'    => []
                     ], 200
                 );
             }
@@ -656,7 +668,8 @@ class AuthController extends Controller
                             'message' => $follower->username . ' requests to follow you.'
                         ];
 
-                        SendFCMNotification::sendNotification([$token], $data);
+                        $result = SendFCMNotification::sendNotification([$token], $data);
+                        logger("result of sending notification: " . $result);
                     } catch ( \Exception $exception ) {
                         logger("FOLLOW FCM NOTIFICATION FAILED. Reason: " . $exception->getMessage());
                     }
@@ -685,6 +698,19 @@ class AuthController extends Controller
 
                         } else {
                             $follower->unfollows($followed_id);
+
+                            //raise a rejected follow request notification for the followed user
+                            Notification::where('initializer_id', $follower_id)
+                                ->where('recipient_id', $followed_id)
+                                ->where('type', 4)
+                                ->update(
+                                    [
+                                        'type'     => 5,
+                                        'model_id' => null,
+                                        'seen'     => false
+                                    ]
+                                );
+
                         }
 
                         //return a response to the followed with the updated notification records
@@ -692,14 +718,16 @@ class AuthController extends Controller
                         $notifications = Notification::where('recipient_id', '=', $followed_id)
                             ->get();
 
-                        $data = $this->fetch_relations($followed_id);
+                        $data = $this->fetch_relations($followed_id,$followed_id);
                         $data['notifications'] = fractal($notifications,
                             new NotificationTransformer())->withResourceName('notifications');
 
                         return response()->json([
                             'success'   => true,
-                            'message'   => 'Successfully updated your network!',
-                            'data'      => $data
+                            'message'   => 'Successfully updated your network2!',
+                            'followers' => $data['followers'],
+                            'following' => $data['following'],
+                            'notifications' => $data['notifications'],
                         ]);
                     }
                 }
@@ -707,7 +735,7 @@ class AuthController extends Controller
 
 
             //return the response for when a relationship didn't exist
-            $data = $this->fetch_relations($follower_id);
+            $data = $this->fetch_relations($follower_id,$followed_id);
             $notifications = Notification::where('recipient_id','=',$follower_id)
                 ->get();
             $data['notifications'] = fractal($notifications, new NotificationTransformer())->withResourceName('notifications');
@@ -715,8 +743,10 @@ class AuthController extends Controller
             return response()->json(
                 [
                     'success' => true,
-                    'message' => 'Successfully fetched your people!',
-                    'data'    => $data,
+                    'message' => 'Successfully fetched your people1!',
+                    'followers' => $data['followers'],
+                    'following' => $data['following'],
+                    'notifications' => $data['notifications'],
                 ]
             );
 
@@ -725,7 +755,7 @@ class AuthController extends Controller
                 [
                     'success' => false,
                     'message' => 'Something went wrong, sorry: \n' . $exception->getMessage() . ' ------ ' . $exception->getTraceAsString(),
-                    'data'    => [],
+
                 ]
             );
         }
@@ -803,14 +833,14 @@ class AuthController extends Controller
             $validator = Validator::make($request->all(),
                 [
                     'user_id' => 'required|integer|exists:users,id',
-                    'status'  => 'required'
+                    'status'  => 'required|integer'
                 ],
                 [
-                    'user_id.required' => 'Kindly Login1',
-                    'user_id.integer'  => 'Kindly Login2',
-                    'user_id.exists'   => 'Kindly Sign Up3',
-                    'status.required'  => 'Kindly Login4',
-                    'status.boolean'   => 'Kindly Login5',
+                    'user_id.required' => 'Kindly Login',
+                    'user_id.integer'  => 'Kindly Login',
+                    'user_id.exists'   => 'Kindly Sign Up',
+                    'status.required'  => 'Kindly Login',
+                    'status.boolean'   => 'Kindly Login',
                 ]);
 
             if ($validator->fails()) {
@@ -818,12 +848,11 @@ class AuthController extends Controller
                     [
                         'success' => false,
                         'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
-                        'data'    => []
-                    ], 500
+                    ], 200
                 );
             }
             $user_id = $request->user_id;
-            $status = (bool)$request->status;
+            $status = (bool) $request->status;
 
             $result = User::where('id', $user_id)->update([
                 'auto_follow_status' => $status
