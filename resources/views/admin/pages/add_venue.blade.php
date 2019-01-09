@@ -114,10 +114,27 @@
                   </div>
                   <div class="row">
                     <div class="col-md-6">
-                      <div class="form-group">
-                        <label>Image of the venue (optional)</label>
-                        <input type="file" class="form-control-file" name="venue_image">
-                      </div>
+                      {{--<div class="form-group">--}}
+                        {{--<label>Image of the venue (optional)</label>--}}
+                        {{--<input type="file" class="form-control-file" name="venue_image">--}}
+                      {{--</div>--}}
+                        <div class="form-group">
+                            <label for="image">Image</label>
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    <input type="file" aria-describedby="ImageHelp" name="venue_image" onchange="readURL(this);" class="custom-file-input" id="image" required>
+                                    <label class="custom-file-label" for="venue_image">Click to choose image</label>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please select an image.
+                                </div>
+                            </div>
+                            <small class="form-text text-muted" id="ImageHelp">Preview of the image will be shown below.</small>
+                            <div id="hidden">
+                                <br>
+                                <img id="blah" src="" width="565"><br><br>
+                            </div>
+                        </div>
                     </div>
                   </div>
                   <div class="row">
@@ -146,7 +163,20 @@
 <script src="https://cdn.jsdelivr.net/npm/places.js@1.10.0"></script>
 <script src="{{ asset('js/plugins/jquery.placepicker.js') }}"></script>
 <script>
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
 
+            reader.onload = function (e) {
+                $("#hidden").slideDown("slow");
+                $('#blah')
+                    .attr('src', e.target.result)
+                    .width(400);
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
   $(document).ready(function() {
 
     // Advanced usage
