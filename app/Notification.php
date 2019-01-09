@@ -10,6 +10,9 @@ class Notification extends Model
     const SHARE_NOTIFICATION = 2;
     const FOLLOW_NOTIFICATION = 3;
     const FOLLOW_REQUEST_NOTIFICATION =4;
+    const FOLLOW_REQUEST_REJECTED = 5;
+
+
 
     protected $fillable=['initializer_id','recipient_id','type','model_id','seen'];
 
