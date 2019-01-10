@@ -38,7 +38,7 @@
                 <div class="tour_container">
                     <div class="ribbon_3 popular"><span>Featured</span></div>
                     <div class="img_container">
-                        <a href="single_event.html">
+                        <a href="{{route('single_event',$featured_event->slug)}}">
                             <img src="{{url('storage/images/events/'.$featured_event->media_url)}}" width="800" height="533" class="img-fluid" alt="image">
                             {{--<div class="short_info">--}}
                                 {{--<span class="price"><sup>KES</sup>1500</span>--}}
@@ -110,7 +110,7 @@
         <!-- End row -->
 
         <p class="text-center add_bottom_30">
-            <a href="#" class="btn_1 medium"><i class="icon-eye-7"></i>View all events</a>
+            <a href="{{route('all_events')}}" class="btn_1 medium"><i class="icon-eye-7"></i>View all events</a>
         </p>
 
         <hr>
@@ -127,7 +127,7 @@
                 <div class="hotel_container">
                     {{--<div class="ribbon_3"><span>Top Rated</span></div>--}}
                     <div class="img_container">
-                        <a href="single_hotel.html">
+                        <a href="{{route('single_event',$non_featured_event->slug)}}">
                             <img src="{{url('storage/images/events/'.$non_featured_event->media_url)}}" width="800" height="533" class="img-fluid" alt="image">
                             <div class="short_info hotel">
                             </div>
@@ -149,7 +149,7 @@
         <!-- End row -->
 
         <p class="text-center nopadding">
-            <a href="all_hotels_list.html" class="btn_1 medium"><i class="icon-eye-7"></i>View all venues</a>
+            <a href="{{route('all_events')}}" class="btn_1 medium"><i class="icon-eye-7"></i>View all venues</a>
         </p>
             @endif
 
@@ -164,7 +164,7 @@
                             <div class="hotel_container">
                                 {{--<div class="ribbon_3"><span>Top Rated</span></div>--}}
                                 <div class="img_container">
-                                    <a href="single_hotel.html">
+                                    <a href="{{route('single_event',$free_event->slug)}}">
                                         <img src="{{url('storage/images/events/'.$free_event->media_url)}}" width="800" height="533" class="img-fluid" alt="image">
                                         <div class="short_info hotel">
                                         </div>
@@ -186,7 +186,7 @@
                 <!-- End row -->
 
                 <p class="text-center nopadding">
-                    <a href="all_hotels_list.html" class="btn_1 medium"><i class="icon-eye-7"></i>View all venues</a>
+                    <a href="{{route('all_events')}}" class="btn_1 medium"><i class="icon-eye-7"></i>View all venues</a>
                 </p>
             @endif
 
