@@ -4,7 +4,7 @@
              data-natural-width="1400" data-natural-height="">
         <div class="parallax-content-1">
             <div class="animated fadeInDown">
-                <h1>Contact us</h1>
+                <h1>Ticket Information</h1>
             </div>
         </div>
     </section>
