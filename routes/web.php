@@ -12,6 +12,8 @@
 */
 
 
+use Spatie\Honeypot\ProtectAgainstSpam;
+
 Route::get('/', 'HomeController@index')->name('home');
 Route::get('about-us', 'HomeController@about')->name('about');
 Route::get('tickets-info', 'HomeController@tickets')->name('tickets-info');
@@ -20,7 +22,7 @@ Route::get('single_event/{slug}','HomeController@single_event')->name('single_ev
 Route::get('all_events','HomeController@all_events')->name('all_events');
 Route::get('blog', 'HomeController@blog')->name('blog');
 Route::get('contact', 'HomeController@contact')->name('contact');
-
+Route::post('contact', 'HomeController@contact_submission')->name('contact_post')->middleware(ProtectAgainstSpam::class);
 Route::group(['prefix' => 'payments'], function () {
     // Route::get('https://beep2.cellulant.com:9212:/checkout/v2/modal')
     Route::post('encryption_url', 'MulaPaymentController@encryptData')->name('encryption_url');

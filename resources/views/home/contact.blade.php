@@ -23,6 +23,11 @@
         <!-- End Position -->
 
         <div class="container margin_60">
+            @if (session('status'))
+                <div class="alert alert-success">
+                    {{ session('status') }}
+                </div>
+            @endif
             <div class="row">
                 <div class="col-md-8">
                     <div class="form_title">
@@ -38,18 +43,30 @@
                     <div class="step">
 
                         <div id="message-contact"></div>
-                        <form method="post" action="assets/contact.php" id="contactform">
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <form method="post" action="{{route('contact_post')}}" id="contactform">
+                            @csrf
+                            @honeypot
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>First Name</label>
-                                        <input type="text" class="form-control" id="name_contact" name="name_contact" placeholder="Enter Name">
+                                        <input type="text" class="form-control" id="name_contact" name="name_contact" placeholder="Enter Name" value="{{old('name_contact')}}">
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Last Name</label>
-                                        <input type="text" class="form-control" id="lastname_contact" name="lastname_contact" placeholder="Enter Last Name">
+                                        <input type="text" class="form-control" id="lastname_contact" name="lastname_contact" placeholder="Enter Last Name" value="{{old('lastname_contact')}}">
                                     </div>
                                 </div>
                             </div>
@@ -58,13 +75,13 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Email</label>
-                                        <input type="email" id="email_contact" name="email_contact" class="form-control" placeholder="Enter Email">
+                                        <input type="email" id="email_contact" name="email_contact" class="form-control" placeholder="Enter Email" value="{{old('email_contact')}}">
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label>Phone</label>
-                                        <input type="text" id="phone_contact" name="phone_contact" class="form-control" placeholder="Enter Phone number">
+                                        <input type="text" id="phone_contact" name="phone_contact" class="form-control" placeholder="Enter Phone number" value="{{old('phone_contact')}}">
                                     </div>
                                 </div>
                             </div>
@@ -72,14 +89,14 @@
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label>Message</label>
-                                        <textarea rows="5" id="message_contact" name="message_contact" class="form-control" placeholder="Write your message" style="height:200px;"></textarea>
+                                        <textarea rows="5" id="message_contact" name="message_contact" class="form-control" placeholder="Write your message" style="height:200px;">{{old('message_contact')}}</textarea>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-sm-6">
                                     <label>Human verification</label>
-                                    <input type="text" id="verify_contact" class=" form-control add_bottom_30" placeholder="Are you human? 3 + 1 =">
+                                    <input type="text" id="verify_contact" name="verify_contact" class="form-control add_bottom_30" placeholder="Are you human? 3 + 1 =">
                                     <input type="submit" value="Submit" class="btn_1" id="submit-contact">
                                 </div>
                             </div>

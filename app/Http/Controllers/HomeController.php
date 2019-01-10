@@ -7,6 +7,7 @@ use App\PaymentResponse;
 use App\TicketCategoryDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Snowfire\Beautymail\Beautymail;
 
 class HomeController extends Controller
 {
@@ -167,6 +168,50 @@ class HomeController extends Controller
         $data = $this->fetch_all_events(true);
 
         return view('home.tickets-info')->with($data);
+    }
+
+    public function contact_submission(Request $request)
+    {
+        $this->validate($request,[
+            'name_contact' => 'required|string',
+            'lastname_contact' => 'required|string',
+            'email_contact' => 'required|email',
+            'message_contact' => 'required|string',
+            'verify_contact'    => 'required|integer|size:4'
+        ],[
+            'name_contact.required' => 'Enter you First Name',
+            'name_contact.string'   => ' Invalid First Name',
+            'lastname_contact.required' => 'Enter you Last Name',
+            'lastname_contact.string'   => ' Invalid Last Name',
+            'email_contact.required' => 'Enter you Email Address',
+            'email_contact.email'   => ' Invalid Email',
+            'message_contact.required' => 'Enter the message',
+            'message_contact.string'   => 'Invalid Message',
+            'verify_contact.required' => 'Answer the human verification question.',
+            'verify_contact.integer'   => 'Incorrect answer to the human verification question.',
+            'verify_contact.size'   => 'Incorrect answer to the human verification question.',
+        ]);
+
+
+        $data = [
+            'name' => $request->name_contact." ".$request->lastname_contact,
+            'email' => $request->email_contact,
+            'the_body' => $request->message_contact
+        ];
+
+//        dd($data);
+
+        $beautymail = app()->make(Beautymail::class);
+        $beautymail->send('home.emails.contact', $data, function($message) use ($data)
+        {
+            $message
+                ->from($data['email'],$data['name'])
+                ->to('info@fikaplaces.com', 'John Smith')
+                ->subject('New Customer Enquiry!');
+        });
+
+        return redirect()->back()->with('status', "Your Request was submitted successfully");
+
     }
 
 
