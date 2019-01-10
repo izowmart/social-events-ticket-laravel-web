@@ -165,20 +165,11 @@
                 <h3>About</h3>
                 <ul>
                     <li><a href="{{route('about')}}">About us</a></li>
-                    {{--<li><a href="#">FAQ</a></li>--}}
                     <li><a href="{{route('event_organizer_login_form')}}">Login</a></li>
                     <li><a href="{{route('event_organizer_register_form')}}">Register</a></li>
                     <li><a href="{{route('terms-and-conditions')}}">Terms and condition</a></li>
                 </ul>
             </div>
-            {{--<div class="col-md-3">--}}
-                {{--<h3>Discover</h3>--}}
-                {{--<ul>--}}
-                    {{--<li><a href="#">Community blog</a></li>--}}
-                    {{--<li><a href="#">Event guide</a></li>--}}
-                    {{--<li><a href="#">Gallery</a></li>--}}
-                {{--</ul>--}}
-            {{--</div>--}}
             <div class="col-md-4">
                 <h3>Download</h3>
                 <ul>
