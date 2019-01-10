@@ -23,20 +23,9 @@ class HomeController extends Controller
      */
     public function index()
     {
-        //here we fetch verified (non-)featured (non-)paid events
-        $free_events = Event::where('type', '=', 1)->get();
+        $data = $this->fetch_all_events();
 
-        $featured_events = Event::where('type', '=', 2)
-            ->where('featured_event', '=', 2)
-            ->get();
-
-        $non_featured_events = Event::where('type', '=', 2)
-            ->where('featured_event', '=', 1)
-            ->get();
-
-        return view('home.index')->with(['free_events'=> $free_events,'featured_events'=>$featured_events,
-                                          'non_featured_events' => $non_featured_events,
-        ]);
+        return view('home.index')->with($data);
     }
 
     public function about()
@@ -106,5 +95,38 @@ class HomeController extends Controller
         );
         return view('home.single_event')->with($data);
     }
+
+    public function all_events()
+    {
+        $data = $this->fetch_all_events();
+
+        return view('home.all_events')->with($data);
+    }
+
+    /**
+     * @return array
+     */
+    public function fetch_all_events(): array
+    {
+//here we fetch verified (non-)featured (non-)paid events
+        $free_events = Event::where('type', '=', 1)->get();
+
+        $featured_events = Event::where('type', '=', 2)
+            ->where('featured_event', '=', 2)
+            ->get();
+
+        $non_featured_events = Event::where('type', '=', 2)
+            ->where('featured_event', '=', 1)
+            ->get();
+
+        $data = [
+            'free_events'         => $free_events,
+            'featured_events'     => $featured_events,
+            'non_featured_events' => $non_featured_events
+        ];
+
+        return $data;
+    }
+
 
 }
