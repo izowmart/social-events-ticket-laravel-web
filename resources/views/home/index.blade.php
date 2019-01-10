@@ -78,9 +78,6 @@
                     </div>
                     <div class="hotel_title">
                         <h3><strong>{{$non_featured_event->name}} </strong></h3>
-                        <div class="rating">
-                            &nbsp;							</div>
-                        <!-- end rating -->
                     </div>
                 </div>
                 <!-- End box -->
@@ -115,9 +112,6 @@
                                 </div>
                                 <div class="hotel_title">
                                     <h3><strong>{{$free_event->name}} </strong></h3>
-                                    <div class="rating">
-                                        &nbsp;							</div>
-                                    <!-- end rating -->
                                 </div>
                             </div>
                             <!-- End box -->

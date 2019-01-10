@@ -15,7 +15,7 @@ class HomeController extends Controller
      *
      * @return void
      */
-   
+
     /**
      * Show the application dashboard.
      *
@@ -23,9 +23,68 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $data = $this->fetch_all_events();
+        $data = $this->fetch_all_events(false);
 
         return view('home.index')->with($data);
+    }
+
+    /**
+     * @param null $all
+     *
+     * @return array
+     */
+    public function fetch_all_events($all = false): array
+    {
+        $events=[];
+        $free_events=[];
+        $featured_events =[];
+        $non_featured_events =[];
+
+
+        if ($all){
+            $events = Event::where('status', 1)
+                ->whereHas('event_dates', function ($query) {
+                    $query->where('event_dates.start', '>=', now());
+                })
+                ->paginate(5);
+        }else {
+
+            //here we fetch verified (non-)featured (non-)paid events
+            $free_events =  Event::where('type', '=', 1)
+                ->whereHas('event_dates', function ($query) {
+                    $query->where('event_dates.start', '>=', now());
+                })
+                ->where('status', 1)
+                ->take(6)
+                ->get();
+
+            $featured_events = Event::where('type', '=', 2)
+                ->where('featured_event', '=', 2)
+                ->whereHas('event_dates', function ($query) {
+                    $query->where('event_dates.start', '>=', now());
+                })
+                ->where('status', 1)
+                ->take(6)
+                ->get();
+
+            $non_featured_events = Event::where('type', '=', 2)
+                ->where('featured_event', '=', 1)
+                ->whereHas('event_dates', function ($query) {
+                    $query->where('event_dates.start', '>=', now());
+                })
+                ->where('status', 1)
+                ->take(6)
+                ->get();
+        }
+
+        $data = [
+            'events'            => $events,
+            'free_events'         => $free_events,
+            'featured_events'     => $featured_events,
+            'non_featured_events' => $non_featured_events
+        ];
+
+        return $data;
     }
 
     public function about()
@@ -35,7 +94,8 @@ class HomeController extends Controller
 
     public function tickets()
     {
-        return view('home.tickets-info');
+        $data = $this->fetch_all_events(true);
+        return view('home.tickets-info')->with($data);
     }
 
     public function blog()
@@ -76,56 +136,37 @@ class HomeController extends Controller
     public function single_event($slug)
     {
         //we fetch the particular event
-        $event = Event::select('events.id','events.name','events.description','events.location','events.latitude','events.longitude','ticket_category_details.price','ticket_category_details.no_of_tickets','events.type','events.status','events.slug','events.created_at','event_dates.start','event_dates.end','events.media_url','events.ticket_sale_end_date')
+        $event = Event::select('events.id', 'events.name', 'events.description', 'events.location', 'events.latitude',
+            'events.longitude', 'ticket_category_details.price', 'ticket_category_details.no_of_tickets', 'events.type',
+            'events.status', 'events.slug', 'events.created_at', 'event_dates.start', 'event_dates.end',
+            'events.media_url', 'events.ticket_sale_end_date')
             ->join('event_dates', 'event_dates.event_id', '=', 'events.id')
             ->leftJoin('ticket_category_details', 'ticket_category_details.event_id', '=', 'events.id')
-            ->where('slug',$slug)
-            ->orderBy('id','desc')
+            ->where('slug', $slug)
+            ->orderBy('id', 'desc')
             ->first();
-        if($event==null){
+        if ($event == null) {
             return abort(404);
         }
-        $ticket_categories = TicketCategoryDetail::select('ticket_category_details.price','ticket_category_details.category_id','ticket_category_details.no_of_tickets','ticket_categories.name','ticket_categories.slug')
-            ->where('ticket_category_details.event_id',$event->id)
+        $ticket_categories = TicketCategoryDetail::select('ticket_category_details.price',
+            'ticket_category_details.category_id', 'ticket_category_details.no_of_tickets', 'ticket_categories.name',
+            'ticket_categories.slug')
+            ->where('ticket_category_details.event_id', $event->id)
             ->join('ticket_categories', 'ticket_categories.id', '=', 'ticket_category_details.category_id')
             ->get();
-        $data = array(
-            'event'=>$event,
-            'ticket_categories'=>$ticket_categories
-        );
+        $data = [
+            'event'             => $event,
+            'ticket_categories' => $ticket_categories
+        ];
+
         return view('home.single_event')->with($data);
     }
 
     public function all_events()
     {
-        $data = $this->fetch_all_events();
+        $data = $this->fetch_all_events(true);
 
-        return view('home.all_events')->with($data);
-    }
-
-    /**
-     * @return array
-     */
-    public function fetch_all_events(): array
-    {
-//here we fetch verified (non-)featured (non-)paid events
-        $free_events = Event::where('type', '=', 1)->get();
-
-        $featured_events = Event::where('type', '=', 2)
-            ->where('featured_event', '=', 2)
-            ->get();
-
-        $non_featured_events = Event::where('type', '=', 2)
-            ->where('featured_event', '=', 1)
-            ->get();
-
-        $data = [
-            'free_events'         => $free_events,
-            'featured_events'     => $featured_events,
-            'non_featured_events' => $non_featured_events
-        ];
-
-        return $data;
+        return view('home.tickets-info')->with($data);
     }
 
 

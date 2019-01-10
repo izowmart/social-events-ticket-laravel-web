@@ -40,8 +40,7 @@ class EventController extends Controller
 
             $events = Event::join('event_dates', 'event_dates.event_id', '=', 'events.id')
                 ->where('events.status', 1)//approved by admin
-                ->whereDate('event_dates.end', '>=',
-                    now())//upcoming events //TODO::what happens when the event dates are two or more??
+                ->whereDate('event_dates.end', '>=', now())//upcoming events //TODO::what happens when the event dates are two or more??
                 ->groupBy('events.id')
                 ->get();
 
