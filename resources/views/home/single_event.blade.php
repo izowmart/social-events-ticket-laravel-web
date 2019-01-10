@@ -92,16 +92,11 @@
     <!-- End section -->
 
     <main>
-        <div id="position">
-            <div class="container">
-                <ul>
-                    <li><a href="#">Home</a>
-                    </li>
-                    <li><a href="#">{{$event->name}}</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+        @component('partials.home.position')
+            @slot('title')
+                {{$event_name}}
+        @endslot
+    @endcomponent
         <!-- End position -->
 
         <div class="collapse" id="collapseMap">

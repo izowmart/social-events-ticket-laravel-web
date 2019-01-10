@@ -93,10 +93,10 @@ class HomeController extends Controller
         return view('home.about');
     }
 
-    public function tickets()
+    public function ticket_info()
     {
-        $data = $this->fetch_all_events(true);
-        return view('home.tickets-info')->with($data);
+//        $data = $this->fetch_all_events(true);
+        return view('home.ticket_information');
     }
 
     public function blog()
