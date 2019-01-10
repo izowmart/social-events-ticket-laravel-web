@@ -49,12 +49,12 @@
           </a>
         </div>
         <div class="col-md-6 col-lg-3 home-widget">
-          <a href="" data-toggle="tooltip" title="{{count($scanners)}} scanners so far">
+          <a href="" data-toggle="tooltip" title="{{$scanners}} scanners so far">
             {{--<span class="pending text-center">4</span>--}}
             <div class="widget-small warning coloured-icon"><i class="icon fa fa-files-o fa-3x"></i>
               <div class="info">
                 <h4>SCANNERS</h4>
-                <p><b>{{count($scanners)}}</b></p>
+                <p><b>{{$scanners}}</b></p>
               </div>
             </div>
           </a>
