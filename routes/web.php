@@ -16,6 +16,8 @@ Route::get('/', 'HomeController@index')->name('home');
 Route::get('about-us', 'HomeController@about')->name('about');
 Route::get('tickets-info', 'HomeController@tickets')->name('tickets-info');
 Route::get('start-selling', 'HomeController@selling')->name('start-selling');
+Route::get('single_event/{slug}','HomeController@single_event')->name('single_event');
+Route::get('all_events','HomeController@all_events')->name('all_events');
 Route::get('blog', 'HomeController@blog')->name('blog');
 Route::get('contact', 'HomeController@contact')->name('contact');
 
