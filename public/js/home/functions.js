@@ -6,7 +6,7 @@ $(window).load(function () { // makes sure the whole site is loaded
 		'overflow': 'visible'
 	});
 	$(window).scroll();
-})
+});
 
 /* Sticky nav */
 $(window).scroll(function () {
@@ -161,19 +161,26 @@ $(function () {
 	$(".button_inc").on("click", function () {
 
 		var $button = $(this);
-		var oldValue = $button.parent().find("input").val();
+		var number_btn = $button.parent().find("input");
+		var oldValue = parseFloat(number_btn.val());
+        var max = parseFloat(number_btn.attr('max'));
 
 		if ($button.text() == "+") {
-			var newVal = parseFloat(oldValue) + 1;
+		    //don't allow increment above max value
+		    if (oldValue >= max){
+                var newVal = oldValue;
+            } else {
+                var newVal = oldValue + 1;
+            }
 		} else {
 			// Don't allow decrementing below zero
 			if (oldValue > 1) {
-				var newVal = parseFloat(oldValue) - 1;
+				var newVal = oldValue - 1;
 			} else {
 				newVal = 0;
 			}
 		}
-		$button.parent().find("input").val(newVal);
+		number_btn.val(newVal);
 	});
 });
 
@@ -240,6 +247,18 @@ $('.booking_time').timeDropper({
 
 /* Modal Sign In */
 $('#access_link').magnificPopup({
+	type: 'inline',
+	fixedContentPos: false,
+	fixedBgPos: true,
+	overflowY: 'auto',
+	closeBtnInside: true,
+	preloader: false,
+	midClick: true,
+	removalDelay: 300,
+	mainClass: 'my-mfp-zoom-in'
+});
+
+$('#purchase-btn').magnificPopup({
 	type: 'inline',
 	fixedContentPos: false,
 	fixedBgPos: true,
