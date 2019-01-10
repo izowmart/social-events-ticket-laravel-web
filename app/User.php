@@ -65,7 +65,7 @@ class User extends Authenticatable
     public function following() //those I follow
     {
         return $this->belongsToMany(User::class, 'followers', 'follower_id', 'followed_id')
-            ->where('followers.status', '=', 1)
+            ->where('followers.status', '!=', 3) //get approved and pending relationships
             ->withPivot(['status'])
             ->withTimestamps();
     }
@@ -156,5 +156,10 @@ class User extends Authenticatable
     public function getNameAttribute()
     {
         return ucwords($this->first_name. ' '.$this->last_name);
+    }
+
+    public function user_notifications()
+    {
+        return $this->hasMany("App\Notification",'recipient_id','id');
     }
 }

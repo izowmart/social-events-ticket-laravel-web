@@ -6,10 +6,11 @@ use App\Notifications\ScannerResetPasswordNotification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Scanner extends Authenticatable
+class Scanner extends Authenticatable implements JWTSubject
 {
-    use Notifiable, HasApiTokens;
+    use Notifiable;
 
     protected $fillable = [
         'first_name', 'last_name', 'email', 'password',
@@ -17,6 +18,16 @@ class Scanner extends Authenticatable
     protected $hidden = [
         'password','remember_token'
     ];
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 
     public function events()
     {

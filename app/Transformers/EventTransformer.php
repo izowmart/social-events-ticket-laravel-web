@@ -3,6 +3,7 @@
 namespace App\Transformers;
 
 use App\Event;
+use App\Http\Traits\UniversalMethods;
 use League\Fractal\TransformerAbstract;
 
 class EventTransformer extends TransformerAbstract
@@ -28,6 +29,7 @@ class EventTransformer extends TransformerAbstract
                 'location'              =>$event->location,
                 'type'                  => $event->type,
                 'image_url'             => $event->media_url,
+                'start_date'            => UniversalMethods::getEventDateTimeStr($event->event_dates),
                 'dates'                 => fractal($event->event_dates,EventDateTransformer::class)->withResourceName('dates'),
                 'ticket_categories'     => fractal($event->ticket_category_details, $ticket_category_transformer)->withResourceName('ticket_categories'),
                 'tickets'               => fractal($tickets,TicketTransformer::class)->withResourceName('tickets'),

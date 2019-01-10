@@ -59,7 +59,7 @@ return [
 
         //our scanners custom driver
         'scanner' =>[
-            'driver' => 'session',
+            'driver' => 'jwt',
             'provider' => 'scanners',
         ],
     ],

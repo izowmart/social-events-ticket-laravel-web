@@ -77,9 +77,13 @@ Route::group(['prefix' => 'user', 'middleware' => 'auth:api'], function () use (
     Route::post('event_category_details', 'Api\EventController@event_ticket_category_details');
 });
 
-Route::group(['prefix' => 'scanner', 'middleware' => 'api'], function () use ($base_url) {
+Route::group(['prefix' => 'scanner', 'middleware' => 'auth.jwt'], function () use ($base_url) {
     Route::get('events/{scanner_id}', $base_url . 'Api\EventController@scanner_events');
 
+});
+
+Route::group(['prefix' => 'scanner'],function (){
+    Route::get('token/refresh', 'Api\ScannerAuthController@refresh');
 });
 
 

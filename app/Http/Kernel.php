@@ -66,5 +66,7 @@ class Kernel extends HttpKernel
 //         'admin_guest' => \App\Http\Middleware\RedirectIfAdminAuthenticated::class,
          'event_organizer_auth' => \App\Http\Middleware\AuthenticateEventOrganizer::class,
 //         'event_organizer_guest' => \App\Http\Middleware\RedirectIfEventOrganizerAuthenticated::class,
+        'auth.jwt' => \Tymon\JWTAuth\Http\Middleware\Authenticate::class,
+        'jwt.refresh' => \Tymon\JWTAuth\Middleware\RefreshToken::class,
     ];
 }

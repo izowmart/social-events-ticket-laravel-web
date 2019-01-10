@@ -50,13 +50,10 @@ class NotificationController extends Controller
         try {
             $validator = Validator::make($request->all(),
                 [
-                    'user_id'          => 'required|exists:users,id',
-                    'notification_ids' => 'required'
+                    'notification_ids' => 'required|array'
                 ],
                 [
-                    'user_id.required'         => 'Kindly Log In!',
-                    'user_id.exists'           => 'Kindly Sign Up!',
-                    'notification_ids.required' => 'Kindly Sign Up!'
+                    'notification_ids.required' => 'Invalid request!'
                 ]
             );
             if ($validator->fails()) {
@@ -69,23 +66,17 @@ class NotificationController extends Controller
                 );
             }
 
+            $user = $request->user();
+
             Notification::whereIn('id', $request->notification_ids)
                 ->update([
                     'seen' => true
                 ]);
 
-
-            $notifications = Notification::whereIn('id', $request->notification_ids)
-                ->select('notifications.*')
-                ->get();
-
-
-//            $notifications = NotificationResource::make($notifications);
-
             return response()->json([
                 'success' => true,
                 'message' => 'Marked the notification(s) as Read',
-                'data'      => fractal($notifications, NotificationTransformer::class)
+                'data'      => fractal($user->user_notifications, NotificationTransformer::class)
             ]);
 
         } catch ( \Exception $exception ) {

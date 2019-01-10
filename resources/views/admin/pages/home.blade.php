@@ -53,7 +53,7 @@
         <div class="col-md-6 col-lg-3 home-widget">
           <a @if ($pending_events->count()>0)
               href="{{ route('admin_unverified_events') }}"
-              data-toggle="tooltip" title="{{$pending_events->count()}} pending even organizer(s)"
+              data-toggle="tooltip" title="{{$pending_events->count()}} pending event(s)"
           @else
               href="{{ route('admin_verified_paid_events') }}"
           @endif>
