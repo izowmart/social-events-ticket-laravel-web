@@ -132,7 +132,7 @@ class ScannerAuthController extends Controller
                 [
                     'success' => false,
                     'message' => '' . UniversalMethods::getValidationErrorsAsString($validator->errors()->toArray()),
-                    'data'    => []
+                    'data'    => null
                 ], 200
             );
         } else {
@@ -166,7 +166,7 @@ class ScannerAuthController extends Controller
                 [
                     'success' => true,
                     'message' => 'Password Reset Link Email sent successfully. Kindly check your inbox!',
-                    'data'    => []
+                    'data'    => null
                 ], 200
             );
         }else{
@@ -174,7 +174,7 @@ class ScannerAuthController extends Controller
                 [
                     'success' => true,
                     'message' => 'Sending the Reset Link Email Failed!',
-                    'data'    => []
+                    'data'    => null
                 ], 200
             );
 
