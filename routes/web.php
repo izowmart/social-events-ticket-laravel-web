@@ -96,7 +96,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('user/home', 'HomeController@home_user');
 });
 
-Route::group(['middleware' => 'scanner', 'prefix'=>'scanner'], function () {
+Route::group(['prefix'=>'scanner'], function () {
     Route::get('home', 'HomeController@home_scanner');
 });
 
