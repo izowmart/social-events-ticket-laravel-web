@@ -9,6 +9,6 @@
         Great! Your payment was successful.
     </p>
     <p class="lead">
-        <a href="{{route('tickets_home')}}" class="btn btn-lg btn-secondary">Home</a>
+        <a href="{{route('home')}}" class="btn btn-lg btn-secondary">Home</a>
     </p>
 @endsection()
