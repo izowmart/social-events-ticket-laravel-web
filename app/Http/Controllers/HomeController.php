@@ -43,7 +43,7 @@ class HomeController extends Controller
 
 
         if ($all){
-            $events = Event::where('status', 1)
+            $events = Event::where('status', Event::VERIFIED_EVENT)
                 ->whereHas('event_dates', function ($query) {
                     $query->where('event_dates.start', '>=', now());
                 })
@@ -51,29 +51,29 @@ class HomeController extends Controller
         }else {
 
             //here we fetch verified (non-)featured (non-)paid events
-            $free_events =  Event::where('type', '=', 1)
+            $free_events =  Event::where('type', '=', Event::FREE_EVENT)
                 ->whereHas('event_dates', function ($query) {
                     $query->where('event_dates.start', '>=', now());
                 })
-                ->where('status', 1)
+                ->where('status', Event::VERIFIED_EVENT)
                 ->take(6)
                 ->get();
 
-            $featured_events = Event::where('type', '=', 2)
-                ->where('featured_event', '=', 2)
+            $featured_events = Event::where('type', '=', Event::PAID_EVENT)
+                ->where('featured_event', '=', Event::FEATURED_EVENT)
                 ->whereHas('event_dates', function ($query) {
                     $query->where('event_dates.start', '>=', now());
                 })
-                ->where('status', 1)
+                ->where('status', Event::VERIFIED_EVENT)
                 ->take(6)
                 ->get();
 
-            $non_featured_events = Event::where('type', '=', 2)
-                ->where('featured_event', '=', 1)
+            $non_featured_events = Event::where('type', '=', Event::PAID_EVENT)
+                ->where('featured_event', '=', Event::NON_FEATURED_EVENT)
                 ->whereHas('event_dates', function ($query) {
                     $query->where('event_dates.start', '>=', now());
                 })
-                ->where('status', 1)
+                ->where('status', Event::VERIFIED_EVENT)
                 ->take(6)
                 ->get();
         }

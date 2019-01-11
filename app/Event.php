@@ -7,6 +7,12 @@ use Cviebrock\EloquentSluggable\Sluggable;
 
 class Event extends Model
 {
+    const FEATURED_EVENT = 1;
+    const NON_FEATURED_EVENT = 2;
+    const FREE_EVENT = 1;
+    const PAID_EVENT = 2;
+    const VERIFIED_EVENT = 1;
+
      use Sluggable;
 
     /**
