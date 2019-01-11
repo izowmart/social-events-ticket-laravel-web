@@ -54,7 +54,7 @@
         <!-- End row -->
 
         <p class="text-center add_bottom_30">
-            <a href="{{route('all_events')}}" class="btn_1 medium"><i class="icon-eye-7"></i>View all events</a>
+            <a href="{{route('all_events')}}" class="btn_1 medium"><i class="icon-eye-7"></i>View All Events</a>
         </p>
 
         <hr>
@@ -89,7 +89,7 @@
         <!-- End row -->
 
         <p class="text-center nopadding">
-            <a href="{{route('all_events')}}" class="btn_1 medium"><i class="icon-eye-7"></i>View all venues</a>
+            <a href="{{route('all_events')}}" class="btn_1 medium"><i class="icon-eye-7"></i>View All Events</a>
         </p>
             @endif
 
@@ -123,7 +123,7 @@
                 <!-- End row -->
 
                 <p class="text-center nopadding">
-                    <a href="{{route('all_events')}}" class="btn_1 medium"><i class="icon-eye-7"></i>View all venues</a>
+                    <a href="{{route('all_events')}}" class="btn_1 medium"><i class="icon-eye-7"></i>View All Events</a>
                 </p>
             @endif
 
