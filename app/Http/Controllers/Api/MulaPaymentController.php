@@ -26,11 +26,14 @@ class MulaPaymentController
 
             $validator = Validator::make($request->all(),
                 [
+                    'phone_number'                          => ['required','regex:/^(7|07|\+2547|2547)(\d){8}/'],
                     'tickets'                               => 'required|array',
                     'tickets.*.ticket_category_detail_id'   => 'required|integer|exists:ticket_category_details,id',
                     'tickets.*.no_of_tickets'               => 'required|integer',
                 ],
                 [
+                    'phone_number.required'                         => 'Kindly enter your phone number',
+                    'phone_number.regex'                            => 'Invalid phone number format',
                     'tickets.required'                              => 'invalid request',
                     'tickets.array'                                 => 'invalid value',
                     'tickets.*.ticket_category_detail_id.required'  => 'invalid value',
@@ -47,6 +50,12 @@ class MulaPaymentController
             }
 
             $user = $request->user();
+
+            //update the user's phone number
+            if ($user->phone_number == null){
+                $user->phone_number = $request->phone_number;
+                $user->save();
+            }
 
             //register the user as a ticket customer
             $ticket_customer = TicketCustomer::updateOrCreate(
