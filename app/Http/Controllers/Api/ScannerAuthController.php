@@ -89,6 +89,7 @@ class ScannerAuthController extends Controller
                 }
             }
         } catch ( \Exception $exception ) {
+            logger("error logging in a scanner: ".$exception->getMessage()."\n".$exception->getTraceAsString());
             return response()->json([
                 'success' => false,
                 'message'   => 'Sorry, something unexpected happened! Try again!',
