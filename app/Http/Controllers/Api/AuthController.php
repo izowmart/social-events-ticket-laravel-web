@@ -944,7 +944,7 @@ class AuthController extends Controller
     public function testNotification()
     {
         $data=['message'=> 'This is a test notification'];
-        $fcm_token = User::find(25)->fcm_token;
+        $fcm_token = \request()->user()->fcm_token;
 
         $result = SendFCMNotification::sendNotification([$fcm_token], $data);
 
