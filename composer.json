@@ -20,6 +20,7 @@
         "simplesoftwareio/simple-qrcode": "~2",
         "snowfire/beautymail": "dev-master",
         "spatie/laravel-fractal": "^5.4",
+        "spatie/laravel-honeypot": "^1.1",
         "tymon/jwt-auth": "1.0.*"
     },
     "require-dev": {

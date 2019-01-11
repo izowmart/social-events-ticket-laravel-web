@@ -27,7 +27,9 @@
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="{{url('ms-icon-144x144.png')}}">
     <meta name="theme-color" content="#ffffff">
-    
+
+    <script src="{{url('js/jquery-2.2.4.min.js')}}"></script> {{--NOTE:: using any other version of js causes the search, login & mobile menu not to work--}}
+
     <!-- COMMON CSS -->
     <link href="{{url('css/bootstrap.min.css')}}" rel="stylesheet">
     <link href="{{url('css/home/style.css')}}" rel="stylesheet">
@@ -117,6 +119,7 @@
             cursor: pointer
         }
     </style>
+    @yield('styles')
 
 </head>
 
@@ -149,7 +152,6 @@
 </header><!-- End Header -->
 
 @yield('content')
-<!-- End main -->
 
 <footer class="revealed">
     <div class="container">
@@ -159,29 +161,19 @@
                 <a href="tel://+254722123456" id="phone">+254 722 123 456</a>
                 <a href="mailto:help@fikaplaces.com" id="email_footer">help@fikaplaces.com</a>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <h3>About</h3>
                 <ul>
                     <li><a href="{{route('about')}}">About us</a></li>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">Login</a></li>
-                    <li><a href="#">Register</a></li>
-                    <li><a href="#">Terms and condition</a></li>
+                    <li><a href="{{route('event_organizer_login_form')}}">Login</a></li>
+                    <li><a href="{{route('event_organizer_register_form')}}">Register</a></li>
+                    <li><a href="{{route('terms-and-conditions')}}">Terms and condition</a></li>
                 </ul>
             </div>
-            <div class="col-md-3">
-                <h3>Discover</h3>
-                <ul>
-                    <li><a href="#">Community blog</a></li>
-                    <li><a href="#">Event guide</a></li>
-                    <li><a href="#">Gallery</a></li>
-                </ul>
-            </div>
-            <div class="col-md-2">
+            <div class="col-md-4">
                 <h3>Download</h3>
                 <ul>
-                    <li><a href="#">Andriod App</a></li>
-                    <li><a href="#">iOS App</a></li>
+                    <li><a href="http://play.google.com/store/apps/details?id=com.fika.places">FIKA App</a></li>
                 </ul>
 
             </div>
@@ -190,10 +182,9 @@
             <div class="col-md-12">
                 <div id="social_footer">
                     <ul>
-                        <li><a href="#"><i class="icon-facebook"></i></a></li>
-                        <li><a href="#"><i class="icon-twitter"></i></a></li>
-                        <li><a href="#"><i class="icon-instagram"></i></a></li>
-                        <li><a href="#"><i class="icon-youtube-play"></i></a></li>
+                        <li><a href="https://www.facebook.com/fika.live/"><i class="icon-facebook"></i></a></li>
+                        <li><a href="https://twitter.com/fika_live/"><i class="icon-twitter"></i></a></li>
+                        <li><a href="https://instagram.com/fikaplaces"><i class="icon-instagram"></i></a></li>
                     </ul>
                     <p>© FikaPlaces 2018</p>
                 </div>
@@ -223,8 +214,15 @@
 </div>
 <!-- /Sign In Popup -->
 
+<div id="purchase-dialog" class="zoom-anim-dialog mfp-hide">
+    <div class="small-dialog-header">
+        <h3>Purchase</h3>
+    </div>
+    @include('partials.event_organizer_login_form')
+</div>
+
 <!-- Common scripts -->
-<script src="{{url('js/jquery-2.2.4.min.js')}}"></script> {{--NOTE:: using any other version of js causes the search, login & mobile menu not to work--}}
+
 <script src="{{url('js/home/common_scripts_min.js')}}"></script>
 <script src="{{url('js/home/functions.js')}}"></script>
 
@@ -325,6 +323,7 @@
         }
     }); /*ready*/
 </script>
+@yield('scripts')
 
 
 

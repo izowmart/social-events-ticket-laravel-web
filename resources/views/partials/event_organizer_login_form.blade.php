@@ -1,10 +1,9 @@
 <form method="POST" action="{{ route('event_organizer_login_form_post') }}">
     @csrf
     <div class="sign-in-wrapper">
-        <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
+        <div class="form-group{{ $errors->has('email') ? ' has-error ' : '' }}">
             <label class="custom-control-label" for="email">Email</label>
             <input type="email" class="form-control" name="email" id="email" placeholder="Input email address" value="{{ old('email') }}" required autofocus>
-            {{--<i class="icon_mail_alt"></i>--}}
             @if ($errors->has('email'))
                 <span class="help-block">
                     <strong>{{ $errors->first('email') }}</strong>

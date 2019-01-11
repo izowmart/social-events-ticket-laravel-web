@@ -10,16 +10,11 @@
 <!-- End section -->
 
 <main>
-    <div id="position">
-        <div class="container">
-            <ul>
-                <li><a href="#">Home</a>
-                </li>
-                <li><a href="#">Community Blog</a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    @component('partials.home.position')
+        @slot('title')
+            Community Blog
+    @endslot
+@endcomponent
     <!-- End position -->
 
     <div class="container margin_60">

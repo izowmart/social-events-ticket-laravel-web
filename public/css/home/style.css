@@ -5550,9 +5550,8 @@ div.datedropper.primary .pick-btn {
 /*-------- 7.5 Sing In Modal --------*/
 #sign-in-dialog {
   background: #fff;
-  padding: 30px;
-  padding-top: 0;
-  text-align: left;
+	padding: 0 30px 30px;
+	text-align: left;
   max-width: 400px;
   margin: 40px auto;
   position: relative;
@@ -5560,6 +5559,19 @@ div.datedropper.primary .pick-btn {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
+}
+
+#purchase-dialog {
+	background: #fff;
+	padding: 0 30px 30px;
+	text-align: left;
+	max-width: 600px;
+	margin: 40px auto;
+	position: relative;
+	box-sizing: border-box;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
 }
 
 /* Popup close button*/
@@ -5586,6 +5598,32 @@ div.datedropper.primary .pick-btn {
   font-size: 24px;
   font-family: 'ElegantIcons';
   content: "\4d";
+}
+
+/* Popup close button*/
+#purchase-dialog .mfp-close,
+#small-dialog .mfp-close {
+	color: #666;
+	background-color: #e4e4e4;
+	-webkit-border-radius: 50%;
+	-moz-border-radius: 50%;
+	border-radius: 50%;
+	top: 12px;
+	right: 20px;
+	width: 32px;
+	height: 32px;
+	line-height: 32px;
+}
+#purchase-dialog .mfp-close:hover,
+#small-dialog .mfp-close:hover {
+	color: #fff;
+	background-color: #66676b;
+}
+
+#purchase-dialog .mfp-close:before {
+	font-size: 24px;
+	font-family: 'ElegantIcons';
+	content: "\4d";
 }
 
 .small-dialog-header {
@@ -5615,6 +5653,12 @@ div.datedropper.primary .pick-btn {
   background-color: #66676b;
 }
 
+#purchase-dialog .mfp-close:hover,
+#small-dialog .mfp-close:hover {
+	color: #fff;
+	background-color: #66676b;
+}
+
 #sign-in-dialog .form-group {
   position: relative;
 }
@@ -5635,6 +5679,28 @@ div.datedropper.primary .pick-btn {
 }
 #sign-in-dialog .form-group i.icon_lock_alt {
   top: 37px;
+}
+
+#purchase-dialog .form-group {
+	position: relative;
+}
+#purchase-dialog .form-group input.form-control {
+	padding-left: 40px;
+}
+#purchase-dialog .form-group i {
+	font-size: 21px;
+	font-size: 1.3125rem;
+	position: absolute;
+	left: 12px;
+	top: 35px;
+	color: #ccc;
+	width: 25px;
+	height: 25px;
+	display: block;
+	font-weight: 400 !important;
+}
+#purchase-dialog .form-group i.icon_lock_alt {
+	top: 37px;
 }
 
 .checkboxes {
