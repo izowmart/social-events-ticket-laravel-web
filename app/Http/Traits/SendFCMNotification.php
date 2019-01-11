@@ -35,7 +35,15 @@ trait SendFCMNotification
 
             $response = FCM::sendTo($tokens, $options, null, $data);
 
-            logger("FCM response: ".json_encode($response));
+            logger("FCM response: \nsuccessful: ".$response->numberSuccess()
+                ."\nfailed: ".$response->numberFailure()
+                ."\nmodify: ".$response->numberModification()
+                ."\n to delete: ".json_encode($response->tokensToDelete())
+                ."\n to modify: ".json_encode($response->tokensToModify())
+                ."\n to retry: ".json_encode($response->tokensToRetry())
+                ."\n tokens with error: ".json_encode($response->tokensWithError())."\n"
+
+            );
 
             if ($response->numberSuccess() > 0) {
                 return 1;
