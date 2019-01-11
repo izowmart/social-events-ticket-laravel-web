@@ -94,7 +94,7 @@
     <main>
         @component('partials.home.position')
             @slot('title')
-                {{$event_name}}
+                {{$event->name}}
         @endslot
     @endcomponent
         <!-- End position -->
@@ -452,7 +452,7 @@
                                 }
 
                                 // this closes the modal with its overlay
-                                $('#exampleModal').modal('toggle');
+                                $('#purchase-dialog').magnificPopup('close');
 
                                 encrypt().then(response => {
                                     console.log("response: " + JSON.stringify(response));
