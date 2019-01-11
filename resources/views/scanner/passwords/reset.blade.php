@@ -1,4 +1,4 @@
-@extends('admin.layouts')
+@extends('common_pages.layouts')
 
 @section('title')
     <title>Reset Password - Fika</title>
@@ -24,7 +24,7 @@
             <input type="hidden" name="token" value="{{ $token }}">
           <h3 class="login-head">
               <i class="fa fa-lg fa-fw fa-user"></i><br>
-              User
+              Scanner
           </h3>
           <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
             <label class="control-label">Email</label>
