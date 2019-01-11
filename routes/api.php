@@ -34,7 +34,7 @@ Route::group(['prefix' => 'auth'], function () use ($base_url) {
 
     Route::group(['prefix' => 'scanner'], function () use ($base_url) {
         ///unauthenticated routes
-        Route::post('register', $base_url . 'Api\ScannerAuthController@register');
+//        Route::post('register', $base_url . 'Api\ScannerAuthController@register');
         Route::post('login', $base_url . 'Api\ScannerAuthController@login');
         Route::post('reset_password_email', $base_url . 'Api\ScannerAuthController@reset_password');
         Route::post('events_tickets', $base_url . 'Api\ScannerAuthController@events_tickets');
