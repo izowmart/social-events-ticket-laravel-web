@@ -67,6 +67,7 @@ return [
 
     'timezone' => 'Africa/Nairobi',
 
+
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration
