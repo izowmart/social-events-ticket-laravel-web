@@ -12,10 +12,10 @@
                     <!-- LAYERS -->
 
                     <!-- LAYER NR. 1 -->
-                    <div class="tp-caption NotGeneric-Title   tp-resizeme" id="slide-140-layer-1" data-x="['center','center','center','center']" data-hoffset="['0','0','0','0']" data-y="['middle','middle','middle','middle']" data-voffset="['0','0','0','0']" data-fontsize="['50','46','36','28']" data-lineheight="['46','46','36','28']" data-width="none" data-height="none" data-whitespace="nowrap" data-type="text" data-responsive_offset="on" data-frames='[{"delay":1000,"split":"chars","split_direction":"forward","splitdelay":0.05,"speed":2000,"frame":"0","from":"x:[105%];z:0;rX:45deg;rY:0deg;rZ:90deg;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;s:inherit;e:inherit;","to":"o:1;","ease":"Power4.easeInOut"},{"delay":"wait","speed":1000,"frame":"999","to":"y:[100%];","mask":"x:inherit;y:inherit;s:inherit;e:inherit;","ease":"Power2.easeInOut"}]' data-textAlign="['left','left','left','left']" data-paddingtop="[10,10,10,10]" data-paddingright="[0,0,0,0]" data-paddingbottom="[10,10,10,10]" data-paddingleft="[0,0,0,0]" style="z-index: 5; white-space: nowrap; font-size: 50px; line-height: 46px; font-weight: 700;font-family:Montserrat;">WELCOME TO FIKAPLACES </div>
+                    <div class="tp-caption NotGeneric-Title   tp-resizeme" id="slide-140-layer-1" data-x="['center','center','center','center']" data-hoffset="['0','0','0','0']" data-y="['middle','middle','middle','middle']" data-voffset="['0','0','0','0']" data-fontsize="['50','46','36','28']" data-lineheight="['46','46','36','28']" data-width="none" data-height="none" data-whitespace="nowrap" data-type="text" data-responsive_offset="on" data-frames='[{"delay":1000,"split":"chars","split_direction":"forward","splitdelay":0.05,"speed":2000,"frame":"0","from":"x:[105%];z:0;rX:45deg;rY:0deg;rZ:90deg;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;s:inherit;e:inherit;","to":"o:1;","ease":"Power4.easeInOut"},{"delay":"wait","speed":1000,"frame":"999","to":"y:[100%];","mask":"x:inherit;y:inherit;s:inherit;e:inherit;","ease":"Power2.easeInOut"}]' data-textAlign="['left','left','left','left']" data-paddingtop="[10,10,10,10]" data-paddingright="[0,0,0,0]" data-paddingbottom="[10,10,10,10]" data-paddingleft="[0,0,0,0]" style="z-index: 5; white-space: nowrap; font-size: 50px; line-height: 46px; font-weight: 700;font-family:Montserrat;">WELCOME TO FIKA PLACES </div>
 
                     <!-- LAYER NR. 2 -->
-                    <div class="tp-caption NotGeneric-SubTitle   tp-resizeme" id="slide-140-layer-4" data-x="['center','center','center','center']" data-hoffset="['0','0','0','0']" data-y="['middle','middle','middle','middle']" data-voffset="['52','52','52','51']" data-fontweight="['400','500','500','500']" data-width="none" data-height="none" data-whitespace="nowrap" data-type="text" data-responsive_offset="on" data-frames='[{"delay":1500,"speed":2000,"frame":"0","from":"y:[100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;opacity:0;","mask":"x:0px;y:[100%];s:inherit;e:inherit;","to":"o:1;","ease":"Power4.easeInOut"},{"delay":"wait","speed":1000,"frame":"999","to":"y:[100%];","mask":"x:inherit;y:inherit;s:inherit;e:inherit;","ease":"Power2.easeInOut"}]' data-textAlign="['left','left','left','left']" data-paddingtop="[0,0,0,0]" data-paddingright="[0,0,0,0]" data-paddingbottom="[0,0,0,0]" data-paddingleft="[0,0,0,0]" style="z-index: 6; white-space: nowrap; font-weight: 400;font-family:Montserrat;">KENYA'S #1 TICKET PLATFORM</div>
+                    <div class="tp-caption NotGeneric-SubTitle   tp-resizeme" id="slide-140-layer-4" data-x="['center','center','center','center']" data-hoffset="['0','0','0','0']" data-y="['middle','middle','middle','middle']" data-voffset="['52','52','52','51']" data-fontweight="['400','500','500','500']" data-width="none" data-height="none" data-whitespace="nowrap" data-type="text" data-responsive_offset="on" data-frames='[{"delay":1500,"speed":2000,"frame":"0","from":"y:[100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;opacity:0;","mask":"x:0px;y:[100%];s:inherit;e:inherit;","to":"o:1;","ease":"Power4.easeInOut"},{"delay":"wait","speed":1000,"frame":"999","to":"y:[100%];","mask":"x:inherit;y:inherit;s:inherit;e:inherit;","ease":"Power2.easeInOut"}]' data-textAlign="['left','left','left','left']" data-paddingtop="[0,0,0,0]" data-paddingright="[0,0,0,0]" data-paddingbottom="[0,0,0,0]" data-paddingleft="[0,0,0,0]" style="z-index: 6; white-space: nowrap; font-weight: 400;font-family:Montserrat;">KENYA'S #1 App for Nights Out and Ticket Platform</div>
                 </li>
 
             </ul>
@@ -141,31 +141,31 @@
             <div class="row">
 
                 <div class="col-lg-4 wow zoomIn" data-wow-delay="0.2s">
-                    <div class="feature_home">
+                    <div class="feature_home" style="height: 380px;">
                         <i class="icon_set_1_icon-41"></i>
-                        <h3><span>200+</span> Tickets</h3>
+                        <h3><span>FIKA</span> Ticket Scanner</h3>
                         <p>
-                            Lorem ipsum dolor sit amet, vix erat audiam ei. Cum doctus civibus efficiantur in. Nec id tempor imperdiet deterruisset.
+                            Our Fika Ticket scanner allows users to scan tickets and instantaneously collect event data. Event organisers who use our Fika Ticket Scanner also benefit by having their event advertised on both our website and on our Fika PLACES App. Tickets for you event can also be bought from these two platforms.
                         </p>
                     </div>
                 </div>
 
                 <div class="col-lg-4 wow zoomIn" data-wow-delay="0.4s">
-                    <div class="feature_home">
+                    <div class="feature_home" style="height: 380px;">
                         <i class="icon_set_1_icon-30"></i>
-                        <h3><span>1000+</span> Customers</h3>
+                        <h3><span>Customers</span> </h3>
                         <p>
-                            Lorem ipsum dolor sit amet, vix erat audiam ei. Cum doctus civibus efficiantur in. Nec id tempor imperdiet deterruisset.
+                            Currently our customers are mainly from Kenya but we aim to expand across various countries allowing our expanding community to enjoy the vast experiences that the world has to offer.
                         </p>
                     </div>
                 </div>
 
                 <div class="col-lg-4 wow zoomIn" data-wow-delay="0.6s">
-                    <div class="feature_home">
+                    <div class="feature_home" style="height: 380px;">
                         <i class="icon_set_1_icon-57"></i>
-                        <h3><span>24h </span> Support</h3>
+                        <h3><span>Support </span> </h3>
                         <p>
-                            Lorem ipsum dolor sit amet, vix erat audiam ei. Cum doctus civibus efficiantur in. Nec id tempor imperdiet deterruisset.
+                            For any enquiries you can contact us via <a href="mailto:info@fikaplaces.com">info@fikaplaces.com</a>. Kindly ensure that the subject is relevant to the enquiry.
                         </p>
                     </div>
                 </div>
@@ -186,14 +186,12 @@
                 </div>
                 <div class="col-md-6">
                     <h3><span>Get started</span> with Fika Places App</h3>
-                    <p>
-                        Lorem ipsum dolor sit amet, vix erat audiam ei. Cum doctus civibus efficiantur in. Nec id tempor imperdiet deterruisset.
-                    </p>
                     <ul class="list_order">
-                        <li><span>1</span>Lorem ipsum dolor sit amet, vix erat audiam ei.</li>
-                        <li><span>2</span>Lorem ipsum dolor sit amet, vix erat audiam ei.</li>
-                        <li><span>3</span>Lorem ipsum dolor sit amet, vix erat audiam ei.</li>
-                        <li><span>4</span>Lorem ipsum dolor sit amet, vix erat audiam ei.</li>
+                        <li><span>1</span>Download Fika Places from Google Play store for FREE.</li>
+                        <li><span>2</span>Create a user profile and sign in.</li>
+                        <li><span>3</span>Verify your email address.</li>
+                        <li><span>4</span>Start looking for Venues and Events to Enjoy!!</li>
+                        <li><span>5</span>Recommend Fika Places to your friends</li>
 
                     </ul>
                     <a href="https://play.google.com/store/apps/details?id=com.fika.places" target="_blank"><img src="{{url('images/home/playstore.png')}}" alt="play store"></a>

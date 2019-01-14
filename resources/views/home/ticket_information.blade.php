@@ -23,24 +23,40 @@
             </div>
 
             <div class="row justify-content-between">
-                <p>We provide a ticket scanning App for free that is available on android phones only. This comes with
-                    instructions on how to use it and is directly linked to your event organiser account. To create an
-                    Event Organiser account click here. To download our Fika Ticket Scanner App click here. Several
-                    people can download the app and temporarily access your event in order to help you scan tickets.</p>
+                <p>
+                    Once you create a profile as an Event Organiser, you will be able to use our
+                    Free Ticket Scanner. The scanner can be downloaded via play store, or by
+                    following the links sent to your email address.
+
+                    Fika Ticket Scanner is a Free Ticket scanning App that is available for android
+                    only.
+                    The App comes with instructions on how to use it and is directly linked to your
+                    Event Organiser Account. To create an Event Organiser account <a
+                            href="{{route('event_organizer_register_form')}}">click here</a>.
+
+                    To download our Fika Ticket Scanner click <a
+                            href="https://play.google.com/store/apps/details?id=com.fika.tickets">here</a>.
+                </p>
             </div>
 
-            <div class="row">
-                <div class="col-md-8 offset-2">
-                    <ul class="list_ok">
-                        <li>You must first create an Event in your event organiser profile</li>
-                        <li>Add their email to your team list for the specific event</li>
-                        <li>They will receive an email with the app and log in credentials, which will allow them to
-                            scan tickets for your event
-                        </li>
-                        <li>They can also just download the app from Google play store</li>
-                    </ul>
-                </div>
+
+            <div class="row justify-content-between">
+                <p>
+                    Our App has a feature that allows you to add staff members who can
+                    temporarily access your account for a specific event, in order to help you scan
+                    Tickets (very useful for big events). To do this you must follow the steps
+                    below:
+                </p>
+                <ul class="list_ok">
+                    <li>You must first create an Event in your event organiser profile</li>
+                    <li>Add staff member email to your team list for the specific event</li>
+                    <li>They will receive an email with the app and log in credentials, which will allow them to scan
+                        tickets for your event
+                    </li>
+                    <li>They can also just download the app from Google play store</li>
+                </ul>
             </div>
+
 
             <div class="row justify-content-between">
                 <ul class="list_orders">

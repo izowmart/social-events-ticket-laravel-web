@@ -167,7 +167,7 @@ class HomeController extends Controller
     {
         $data = $this->fetch_all_events(true);
 
-        return view('home.tickets-info')->with($data);
+        return view('home.all_events')->with($data);
     }
 
     public function contact_submission(Request $request)

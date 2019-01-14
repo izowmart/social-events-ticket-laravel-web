@@ -15,13 +15,9 @@
                 <ul>
                     <li><a href="{{route('home')}}" >Home</a></li>
                     <li><a href="{{route('about')}}" >About Us</a></li>
-                    <li><a href="{{route('tickets-info')}}" >Tickets</a></li>
+                    <li><a href="{{route('all_events')}}" >Tickets</a></li>
                     <li><a href="{{route('blog')}}" >Blog</a></li>
-
                     <li><a href="{{route('contact')}}" >Contacts</a></li>
-
-
-
                 </ul>
             </div><!-- End main-menu -->
             {{--<ul id="top_tools">--}}
