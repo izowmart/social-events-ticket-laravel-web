@@ -9,6 +9,7 @@
 namespace App\Http\Traits;
 
 
+use App\User;
 use Exception;
 use LaravelFCM\Facades\FCM;
 use LaravelFCM\Message\OptionsBuilder;
@@ -44,6 +45,31 @@ trait SendFCMNotification
                 ."\n tokens with error: ".json_encode($response->tokensWithError())."\n"
 
             );
+
+            try {
+                //these ones are to be deleted
+                foreach ($response->tokensToDelete() as $token) {
+                    User::where('fcm_token', $token)->update(['fcm_token'=> null]);
+                }
+
+
+                //these ones are to be deleted
+                foreach ($response->tokensWithError() as $token) {
+                    User::where('fcm_token', $token)->update(['fcm_token'=> null]);
+                }
+
+                //TODO:: how to handle these ones we retry sending the message??
+
+
+                //these one's are to be updated
+                foreach ($response->tokensToModify() as $token){
+                    User::where('fcm_token', $token['oldToken'])->update(['fcm_token'=> $token['newToken']]);
+                }
+
+
+            } catch ( Exception $exception ) {
+                logger("error resolving the tokens: " . $exception->getMessage());
+            }
 
             if ($response->numberSuccess() > 0) {
                 return 1;
