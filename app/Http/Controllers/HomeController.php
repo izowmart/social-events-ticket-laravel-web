@@ -213,6 +213,4 @@ class HomeController extends Controller
         return redirect()->back()->with('status', "Your Request was submitted successfully");
 
     }
-
-
 }
