@@ -139,9 +139,9 @@
 
                 <div class="col-6">
                     <ul id="top_links">
-                        <li><a href="{{route('start-selling')}}">Sell Tickets</a></li>
+                        {{--<li><a href="{{route('start-selling')}}">Sell Tickets</a></li>--}}
 
-                        <li><a href="#sign-in-dialog" id="access_link">Sign in</a></li>
+                        <li><a href="#sign-in-dialog" id="access_link">Sell Tickets</a></li>
                     </ul>
                 </div>
             </div><!-- End row -->
@@ -208,7 +208,7 @@
 <!-- Sign In Popup -->
 <div id="sign-in-dialog" class="zoom-anim-dialog mfp-hide">
     <div class="small-dialog-header">
-        <h3>Sign In</h3>
+        <h3>Event organizer Sign In</h3>
     </div>
             @include('partials.event_organizer_login_form')
 </div>
