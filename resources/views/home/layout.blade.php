@@ -148,7 +148,7 @@
         </div><!-- End container-->
     </div><!-- End top line-->
 
-   @include('partials.mobile_home_menu')
+   @include('partials.home_menu')
 </header><!-- End Header -->
 
 @yield('content')
@@ -208,7 +208,7 @@
 <!-- Sign In Popup -->
 <div id="sign-in-dialog" class="zoom-anim-dialog mfp-hide">
     <div class="small-dialog-header">
-        <h3>Event organizer Sign In</h3>
+        <h3>Event Organizer Sign In</h3>
     </div>
             @include('partials.event_organizer_login_form')
 </div>
