@@ -18,158 +18,29 @@
 
     <div class="container margin_60">
 
-        <div class="main_title">
-            <h2>Join <span>our</span> community</h2>
+        <div class="post">
+            <p> Fika Places is a Kenyan based company that provides people with information regarding the
+            entertainment sector in Kenya. More specifically we identify and highlight the best places to eat and the
+            best places to party  </p>
+            <p> You can download our App <a href="http://play.google.com/store/apps/details?id=com.fika.places">here</a> and begin to discover new establishments for your entertainment.
+            Our app allows you to take and share pictures/videos in different venues. The content will be seen by
+            others and used almost as a review, allowing them to understand what that particular venue looks/feels
+            like before they visit.</p>
+            <p>Fika Places also displays venue contact details and GPS location, allowing users to contact the venue to
+            make bookings or use its location for directions.</p>
+            <p>All content on the Fika Places mobile application is user generated and therefore images and videos that
+            you see are accurate representations of the venues you visit.</p>
+            <p>Sharing the app with friends will enable you to see a variety of venues, allowing you to experience more.</p>
+
+            <p>In addition to all those functions, Fika Places also has tickets for various events, which users can buy.
+            Tickets can be bought directly from the app, or from our website. However, App ticket holders will have
+            more benefits in some events.</p>
+
+            <p>See Share and Love you City</p>
+            <p>Download Fika Places now.</p>
         </div>
-
-        <div class="row">
-
-            <div class="col-lg-4 wow zoomIn" data-wow-delay="0.2s">
-                <div class="feature_home">
-                    <i class="icon_set_1_icon-41"></i>
-                    <h3><span>200+</span> Tickets</h3>
-                    <p>
-                        Lorem ipsum dolor sit amet, vix erat audiam ei. Cum doctus civibus efficiantur in. Nec id tempor imperdiet deterruisset.
-                    </p>
-                </div>
-            </div>
-
-            <div class="col-lg-4 wow zoomIn" data-wow-delay="0.4s">
-                <div class="feature_home">
-                    <i class="icon_set_1_icon-30"></i>
-                    <h3><span>1000+</span> Customers</h3>
-                    <p>
-                        Lorem ipsum dolor sit amet, vix erat audiam ei. Cum doctus civibus efficiantur in. Nec id tempor imperdiet deterruisset.
-                    </p>
-                </div>
-            </div>
-
-            <div class="col-lg-4 wow zoomIn" data-wow-delay="0.6s">
-                <div class="feature_home">
-                    <i class="icon_set_1_icon-57"></i>
-                    <h3><span>24h </span> Support</h3>
-                    <p>
-                        Lorem ipsum dolor sit amet, vix erat audiam ei. Cum doctus civibus efficiantur in. Nec id tempor imperdiet deterruisset.
-                    </p>
-                </div>
-            </div>
-
-        </div>
-        <!--End row -->
     </div>
     <!-- End container -->
-
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-lg-6 nopadding features-intro-img">
-                <div class="features-bg">
-                    <div class="features-img"></div>
-                </div>
-            </div>
-            <div class="col-lg-6 nopadding">
-                <div class="features-content">
-                    <h3>"Briefly About Us"</h3>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed a lorem quis neque interdum consequat ut sed sem. Duis quis tempor nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed a lorem quis neque interdum consequat ut sed sem. Duis quis tempor nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus.</p>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- End container-fluid  -->
-
-    <div class="container margin_60">
-
-        <div class="main_title">
-            <h2>What <span>customers </span>says</h2>
-        </div>
-
-        <div class="row">
-            <div class="col-lg-6">
-                <div class="review_strip">
-                    <img src="{{url('images/home/avatar2.jpg')}}" alt="Image" class="rounded-circle">
-                    <h4>Jack Doe</h4>
-                    <p>
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed a lorem quis neque interdum consequat ut sed sem. Duis quis tempor nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus."
-                    </p>
-                    <div class="rating">
-                        &nbsp;						</div>
-                </div>
-                <!-- End review strip -->
-            </div>
-
-            <div class="col-lg-6">
-                <div class="review_strip">
-                    <img src="{{url('images/home/avatar2.jpg')}}" alt="Image" class="rounded-circle">
-                    <h4>Frank Rosso</h4>
-                    <p>
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed a lorem quis neque interdum consequat ut sed sem. Duis quis tempor nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus."
-                    </p>
-                    <div class="rating">
-                        &nbsp;
-                    </div>
-                </div>
-                <!-- End review strip -->
-            </div>
-        </div>
-        <!-- End row -->
-        <div class="row">
-            <div class="col-lg-6">
-                <div class="review_strip">
-                    <img src="{{url('images/home/avatar3.jpg')}}" alt="Image" class="rounded-circle">
-                    <h4>Marc twain</h4>
-                    <p>
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed a lorem quis neque interdum consequat ut sed sem. Duis quis tempor nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus."
-                    </p>
-                    <div class="rating">
-                        &nbsp;
-                    </div>
-                </div>
-                <!-- End review strip -->
-            </div>
-
-            <div class="col-lg-6">
-                <div class="review_strip">
-                    <img src="{{url('images/home/avatar2.jpg')}}" alt="Image" class="rounded-circle">
-                    <h4>Peter Gabriel</h4>
-                    <p>
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed a lorem quis neque interdum consequat ut sed sem. Duis quis tempor nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus."
-                    </p>
-                    <div class="rating">
-                        &nbsp;
-                    </div>
-                </div>
-                <!-- End review strip -->
-            </div>
-        </div>
-        <!-- End row -->
-
-        <hr>
-
-        <div class="row">
-            <div class="col-md-6">
-                <img src="{{url('images/home/app.png')}}" alt="Laptop" class="img-fluid laptop">
-            </div>
-            <div class="col-md-6">
-                <h3><span>Get started</span> with Fika Places App</h3>
-                <p>
-                    Lorem ipsum dolor sit amet, vix erat audiam ei. Cum doctus civibus efficiantur in. Nec id tempor imperdiet deterruisset.
-                </p>
-                <ul class="list_order">
-                    <li><span>1</span>Lorem ipsum dolor sit amet, vix erat audiam ei.</li>
-                    <li><span>2</span>Lorem ipsum dolor sit amet, vix erat audiam ei.</li>
-                    <li><span>3</span>Lorem ipsum dolor sit amet, vix erat audiam ei.</li>
-                    <li><span>4</span>Lorem ipsum dolor sit amet, vix erat audiam ei.</li>
-
-                </ul>
-                <img src="{{url('images/home/playstore.png')}}">
-                <br><br><br>
-                {{--<img src="img/apple.png">--}}
-            </div>
-        </div>
-        <!-- End row -->
-
-    </div>
-    <!-- End Container -->
 </main>
 <!-- End main -->
 @endsection
