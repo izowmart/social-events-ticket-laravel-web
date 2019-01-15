@@ -1,6 +1,6 @@
 @extends('home.layout')
 @section('content')
-    <section class="parallax-window" data-parallax="scroll" data-image-src="{{url('images/home/contact.jpg')}}"
+    <section class="parallax-window" data-parallax="scroll" data-image-src="{{url('images/home/about.jpg')}}"
              data-natural-width="1400" data-natural-height="">
         <div class="parallax-content-1">
             <div class="animated fadeInDown">
