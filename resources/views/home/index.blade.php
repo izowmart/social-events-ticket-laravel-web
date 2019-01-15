@@ -145,7 +145,7 @@
                         <i class="icon_set_1_icon-41"></i>
                         <h3><span>FIKA</span> Ticket Scanner</h3>
                         <p>
-                            Our Fika Ticket scanner allows users to scan tickets and instantaneously collect event data. Event organisers who use our Fika Ticket Scanner also benefit by having their event advertised on both our website and on our Fika PLACES App. Tickets for you event can also be bought from these two platforms.
+                            Our Fika Ticket scanner allows users to scan tickets and instantaneously collect event data. Event organisers who use our Fika Ticket Scanner also benefit by having their event advertised on both our website and on our Fika PLACES App. Tickets for your event can also be bought from both our website and App.
                         </p>
                     </div>
                 </div>
