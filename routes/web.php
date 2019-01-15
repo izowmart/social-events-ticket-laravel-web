@@ -257,7 +257,7 @@ Route::get('display-tickets', 'TicketsController@displayTickets')->name('display
 
 //display ticket information
 Route::get('ticket-information',function (){
-    return view('ticket_information');
+    return view('home.ticket_information');
 })->name('ticket-info');
 
 //Terms and conditions pages
