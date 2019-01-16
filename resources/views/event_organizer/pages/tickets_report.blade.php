@@ -32,26 +32,26 @@
               </div>
             </a>
           </div> 
-          <div class="col-md-6 col-lg-3 home-widget">
-            <a href="{{ route('tickets_source', ['source_name'=>'website']) }}">
-              <div class="widget-small warning coloured-icon"><i class="icon fa fa-calendar-check-o fa-3x"></i>
-                <div class="info">
-                  <h4>Bought from website</h4>
-                  <p><b>{{$tickets_from_web->count()}}</b></p>
-                </div>
-              </div>
-            </a>
-          </div>  
-          <div class="col-md-6 col-lg-3 home-widget">
-            <a href="{{ route('tickets_source', ['source_name'=>'mobile']) }}">
-              <div class="widget-small warning coloured-icon"><i class="icon fa fa-calendar-check-o fa-3x"></i>
-                <div class="info">
-                  <h4>Bought from mobile</h4>
-                  <p><b>{{$tickets_from_mobile->count()}}</b></p>
-                </div>
-              </div>
-            </a>
-          </div> 
+          {{--<div class="col-md-6 col-lg-3 home-widget">--}}
+            {{--<a href="{{ route('tickets_source', ['source_name'=>'website']) }}">--}}
+              {{--<div class="widget-small warning coloured-icon"><i class="icon fa fa-calendar-check-o fa-3x"></i>--}}
+                {{--<div class="info">--}}
+                  {{--<h4>Bought from website</h4>--}}
+                  {{--<p><b>{{$tickets_from_web->count()}}</b></p>--}}
+                {{--</div>--}}
+              {{--</div>--}}
+            {{--</a>--}}
+          {{--</div>  --}}
+          {{--<div class="col-md-6 col-lg-3 home-widget">--}}
+            {{--<a href="{{ route('tickets_source', ['source_name'=>'mobile']) }}">--}}
+              {{--<div class="widget-small warning coloured-icon"><i class="icon fa fa-calendar-check-o fa-3x"></i>--}}
+                {{--<div class="info">--}}
+                  {{--<h4>Bought from mobile</h4>--}}
+                  {{--<p><b>{{$tickets_from_mobile->count()}}</b></p>--}}
+                {{--</div>--}}
+              {{--</div>--}}
+            {{--</a>--}}
+          {{--</div> --}}
           </div>
           <div class="tile">  
             <div class="tile-body">
@@ -60,15 +60,15 @@
                 <thead>
                   <tr>
                     <th>Event name</th>
-                    <th>Customer Name</th>
-                    <th>Email</th>
-                    <th>Phone number</th>
-                    <th>Bought from</th>
-                    <th>Bought on</th>
+                    {{--<th>Customer Name</th>--}}
+                    {{--<th>Email</th>--}}
+                    {{--<th>Phone number</th>--}}
+                    {{--<th>Bought from</th>--}}
+                    {{--<th>Bought on</th>--}}
                   </tr>
                 </thead>
                 <tbody>
-                    @foreach ($tickets as $ticket)
+                    @foreach ($events as $ticket)
                     <tr class="item">
                         <td><a href="{{ route('event_organizer_single_event', ['slug'=>$ticket->event->slug]) }}">{{$ticket->event->name}}</a></td>
                         <td>{{$ticket->ticket_customer->first_name}} {{$ticket->ticket_customer->last_name}}</td>

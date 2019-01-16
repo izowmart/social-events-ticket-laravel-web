@@ -238,6 +238,7 @@ Route::group(['middleware' => 'event_organizer_auth','prefix'=>'event_organizer'
     });
 
     Route::group(['prefix'=>'reports'], function () {
+        Route::get('events','CommonPages\EventsController@EOeventsReport')->name('event_organizer_events_report');
         Route::group(['prefix'=>'tickets'], function () {
             Route::get('/', 'CommonPages\EventsController@ticketsReport')->name('tickets_report'); 
             Route::get('source/{source_name}', 'CommonPages\EventsController@ticketsSource')->name('tickets_source');

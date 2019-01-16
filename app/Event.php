@@ -11,7 +11,10 @@ class Event extends Model
     const NON_FEATURED_EVENT = 2;
     const FREE_EVENT = 1;
     const PAID_EVENT = 2;
+    const UNVERIFIED_EVENT = 0;
     const VERIFIED_EVENT = 1;
+    const DEACTIVATED_EVENT = 2;
+    const DRAFT_EVENT = 3;
 
      use Sluggable;
 

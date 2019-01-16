@@ -38,4 +38,26 @@ class EventOrganizer extends Authenticatable
     {
         return $this->hasMany('App\Scanner','event_organizer_id');
     }
+
+    public function paid_events()
+    {
+        return $this->hasMany('App\Event')
+            ->where('type',Event::PAID_EVENT)
+            ->where('status',Event::VERIFIED_EVENT);
+    }
+
+    public function free_events()
+    {
+        return $this->hasMany('App\Event')
+            ->where('type',Event::FREE_EVENT)
+            ->where('status',Event::VERIFIED_EVENT)
+            ;
+    }
+
+    public function all_events()
+    {
+        return $this->hasMany('App\Event')
+            ->where('type',Event::PAID_EVENT)
+            ->where('status',Event::VERIFIED_EVENT);
+    }
 }

@@ -678,42 +678,72 @@ class EventsController extends Controller
         return;
     }
 
+    public function EOeventsReport()
+    {
+        $user = Auth::guard('web_event_organizer')->user();
+
+        $events = $user->paid_events()
+            ->join('tickets','tickets.event_id','=','events.id')
+            ->join('ticket_category_details','tickets.ticket_category_detail_id','=','ticket_category_details.id')
+            ->selectRaw('events.name, events.slug,count(tickets.id) as tickets_bought, sum(ticket_category_details.price) as total_revenue')
+            ->groupBy('events.id')
+            ->get();
+
+
+    }
+
     public function ticketsReport(){
-        $tickets = Ticket::all(); 
+        //only show for the events created by logged in EO
+        $user = Auth::guard('web_event_organizer')->user();
+
+        $events = $user->paid_events()
+            ->join('tickets','tickets.event_id','=','events.id')
+            ->join('ticket_category_details','tickets.ticket_category_detail_id','=','ticket_category_details.id')
+            ->selectRaw('events.name, events.slug,count(tickets.id) as tickets_bought, sum(ticket_category_details.price) as total_revenue')
+            ->groupBy('events.id')
+            ->get();
+
+        $total_tickets_sold = $events->sum('tickets_bought');
+        $total_revenue_earned = $events->sum('total_revenue');
+
+//        dd($total_tickets_sold, $total_revenue_earned);
 
         $data = [
             'filter'=>'all',
-            'tickets'=>$tickets,
-            'tickets_from_web'=>$this->getTicketsFromSource(1),
-            'tickets_from_mobile'=>$this->getTicketsFromSource(2)
+            'events'=>$events,
+            'total_tickets_sold'    => $total_tickets_sold,
+            'total_revenue_earned'  =>$total_revenue_earned
+//            'tickets_from_web'=>$this->getTicketsFromSource(1,$event_ids),
+//            'tickets_from_mobile'=>$this->getTicketsFromSource(2,$event_ids)
         ];
-        return view('event_organizer.pages.tickets_report')->with($data);
+        return view('event_organizer.pages.events_reports')->with($data);
     }
 
-    public function ticketsSource($source_name){
-        if($source_name=='website'){
-            $source = 1;
-        }else{
-            $source = 2;
-        }
+//    public function ticketsSource($source_name){
+//        if($source_name=='website'){
+//            $source = 1;
+//        }else{
+//            $source = 2;
+//        }
+//
+//        $tickets_source = $this->getTicketsFromSource($source);
+//        $data = [
+//            'filter'=>$source_name,
+//            'tickets'=>$tickets_source,
+//            'tickets_from_web'=>$this->getTicketsFromSource(1),
+//            'tickets_from_mobile'=>$this->getTicketsFromSource(2)
+//        ];
+//        return view('event_organizer.pages.tickets_report')->with($data);
+//    }
 
-        $tickets_source = $this->getTicketsFromSource($source);
-        $data = [
-            'filter'=>$source_name,
-            'tickets'=>$tickets_source,
-            'tickets_from_web'=>$this->getTicketsFromSource(1),
-            'tickets_from_mobile'=>$this->getTicketsFromSource(2)
-        ];
-        return view('event_organizer.pages.tickets_report')->with($data);
-    }
-
-    public function getTicketsFromSource($source){
+    public function getTicketsFromSource($source,$event_ids){
         $callback = function($query) use($source){
             $query->where('ticket_customers.source',$source);
         };
 
         $tickets = Ticket::whereHas('ticket_customer',$callback)
         ->with(['ticket_customer'=>$callback])
+            ->whereIn('tickets.event_id',$event_ids)
         ->get();
 
         return $tickets;
